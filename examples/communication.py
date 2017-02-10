@@ -41,3 +41,6 @@ def start():
     else:
         print("\nERROR: The DemoKit has not been found")
         
+if __name__ == "__main__": start()
+
+        

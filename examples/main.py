@@ -5,6 +5,7 @@
 import sys
 sys.path.insert(0, '../examples')
 import communication
+import trackingViewer
 
 __author__      =   "Francesco Pessolano"
 __copyright__   =   "Copyright 2017, Xetal nv"
@@ -16,11 +17,12 @@ __status__      =   "release"
 
 availableDemos = {
                   # shows an example of communication and tracking, not graphical
-                  "communication": communication.start
+                  "communication": communication.start,
+                  "trackingViewer": trackingViewer.start
                   }
 
 def main():
-    availableDemos["communication"]()
+    availableDemos["trackingViewer"]()
     
         
 if __name__ == "__main__": main()
