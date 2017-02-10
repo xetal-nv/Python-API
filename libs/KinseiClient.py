@@ -38,7 +38,7 @@ class KinseiSocket(object):
     pauseMS: interval forced between commands to the device in ms
     port: device port, 2005 is the default port if not manually changed in the device itself
     """
-    def __init__(self,host = '192.168.42.1', timeout = 15.0, pauseMS = 150, port = 2005):
+    def __init__(self,host = '192.168.42.1', timeout = 15.0, pauseMS = 300, port = 2005):
         self.latencyMS = pauseMS
         try:
             self.server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
