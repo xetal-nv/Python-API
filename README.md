@@ -1,2 +1,8 @@
-# Python-Kinsei-Client
-The Kinsei libraries for python with usage examples
+# Python Kinsei Client
+
+This module provides the libraries for the standard use of a Kinsei system.
+
+Libraries can be found in the ./libs folder including inline documentation.
+Examples of usage of the libraries can be found in the ./examples including inline documentation.
+
+In case of further help please contact us at contact@xetal.eu
