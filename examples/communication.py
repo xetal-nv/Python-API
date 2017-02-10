@@ -17,6 +17,7 @@ __status__      =   "release"
     
 def start():
     # create a socket coinnection to the device
+    #demoKit2 = KinseiClient.KinseiSocket('192.168.1.42'); # change the IP with the one used by the kit
     demoKit2 = KinseiClient.KinseiSocket('81.82.231.115'); # change the IP with the one used by the kit
     # check if the system is online before asking data
     if demoKit2.checkIfOnline():
