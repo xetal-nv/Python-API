@@ -29,7 +29,7 @@ class KinseiSocket(object):
                  "error":                   b'\x65'
                  }
     
-    """ 
+    """ __init__:
     The costructor create the socket for a device at the provided IP and port.
     
     Arguments are as follows:
@@ -48,12 +48,14 @@ class KinseiSocket(object):
         except socket.error as err:
             self.serverConnected = False
             
+    """ __del__:
+    Destructor
+    """
     def __del__(self):
         if (self.serverConnected):
             self.server.close()
         
-    # set the forced waiting after a socket comunication 
-    """
+    """ setTimeIntervalMS:
     Set the time interval between to messages forced when the methods below are executes with the flag wait
     set to True
     It is adviced to keep this value not below 150 ms.
@@ -61,7 +63,7 @@ class KinseiSocket(object):
     def setTimeIntervalMS(self,pauseMS):
         self.latencyMS = pauseMS
         
-    """
+    """ checkIfOnline:
     Returns True is the device at the provided IP has been found and connection was possible.
     False otherwise
     """
@@ -73,7 +75,7 @@ class KinseiSocket(object):
             return True
         return False
     
-    """
+    """ getRoomSize:
     Returns the dimension of the bounding box of the room in mm.
     False in case of comunication error
     """
@@ -85,7 +87,7 @@ class KinseiSocket(object):
         y = [data[3], data[4]]
         return [self.bytes_to_int(x), self.bytes_to_int(y)]
     
-    """ 
+    """ getPersonsPositions:
     Returns an array of dimensions equal to the number of maximum persons being tracked plus one.
     Each element in the array provide the X and Y coordinates of the position or [0,0] in case in invalid values
     
@@ -110,7 +112,7 @@ class KinseiSocket(object):
             allPositions.append(currentPosition)
         return allPositions
     
-    """
+    """ getNumberPersonsFixed:
     Return the number of detected people as a fixed number.
     
     False is returned in case or connection error
@@ -121,7 +123,7 @@ class KinseiSocket(object):
             return False
         return data[1]
     
-    """
+    """ getNumberPersonsFloat:
     Retunes the detecte number of people as a decimal number
     
     This method is to be preferred to getNumberPersonsFixed as it allows to set thresholds for proper 
@@ -135,7 +137,7 @@ class KinseiSocket(object):
             return False
         return data[1] / 10  
     
-    """
+    """ getBatteryLevels:
     Returns an array with the battery voltage levels of the connected sensors.
     If the sensors are connected to a fix supply, the array will report 0 for each sensor
     
@@ -152,7 +154,7 @@ class KinseiSocket(object):
             batteryLevels.append(self.bytes_to_int(singleBattery) / 100)
         return batteryLevels
 
-    """
+    """ checkIfSensorsOnline:
     Returns an array indicating which sensor is online and which not
     
     False is returned in case or connection error
@@ -167,7 +169,7 @@ class KinseiSocket(object):
             sensorsStatus.append(data[2+5*x])
         return sensorsStatus
     
-    """
+    """ getFusionValues:
     Returns an array where each element is an array providing the X and Y coordinates of a possible person detection 
     and a value indicating the confidence level that thay is a real person or not.
     
@@ -190,7 +192,7 @@ class KinseiSocket(object):
             sensedLocationsData.append(locationStatus)
         return sensedLocationsData 
     
-    """
+    """ getZones:
     Returns an array with all defines zones of interest.
     Each array will provide a label indicating if the zone is "circular" or "polygonal".
     In case of circular, the X and Y coordinates and the radius will be provides
@@ -228,7 +230,7 @@ class KinseiSocket(object):
             zonesSpecs.append(currentZone)
         return zonesSpecs   
     
-    """
+    """ executeCommand:
     Executes any comand and return the message from the devoce at it was received
     
     False is returned in case or connection error
