@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 
-"""main.py: basic example of connecting to a Kinsei DemoKit v2 for people tracking"""
+"""communication.py: basic example of connecting to a Kinsei DemoKit v2 for people tracking"""
 
 import sys
 
