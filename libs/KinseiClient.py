@@ -8,10 +8,10 @@ import time
 __author__      =   "Francesco Pessolano"
 __copyright__   =   "Copyright 2017, Xetal nv"
 __license__     =   "MIT"
-__version__     =   "0.9"
+__version__     =   "1.0"
 __maintainer__  =   "Francesco Pessolano"
 __email__       =   "francesco@xetal.eu"
-__status__      =   "pre-release"
+__status__      =   "release"
 
 # the class implmeneting the kinser client
 class KinseiSocket(object):
@@ -86,6 +86,25 @@ class KinseiSocket(object):
         x = [data[1], data[2]]
         y = [data[3], data[4]]
         return [self.bytes_to_int(x), self.bytes_to_int(y)]
+        
+    """ getRoomCorners:
+    Returns the position of the corners of the room in mm.
+    False in case of comunication error
+    """
+    def getRoomCorners(self, wait = True):
+        data = self.executeCommand(self.kinseiCommand["roomSize"], wait)
+        if (data == self.kinseiCommand["error"]):
+            return False
+        cornersNumber = data[5]
+        roomCorners = []
+        for i in range(0,cornersNumber):
+            currentCorner = []
+            x = [data[6+4*i], data[7+4*i]]
+            y = [data[8+4*i], data[9+4*i]]
+            currentCorner.append(self.bytes_to_int(x))
+            currentCorner.append(self.bytes_to_int(y))
+            roomCorners.append(currentCorner)
+        return roomCorners
     
     """ getPersonsPositions:
     Returns an array of dimensions equal to the number of maximum persons being tracked plus one.
