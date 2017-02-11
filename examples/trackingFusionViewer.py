@@ -48,7 +48,7 @@ def colorscale(hexstr, scalefactor):
     return "#%02x%02x%02x" % (r, g, b)
         
 # this class shows how to visualise tracking with tkinter
-class ViewerTrackingFusion:
+class TrackingFusionViewer:
     def __init__(self, ip):
         try:
             self.demoKit = KinseiClient.KinseiSocket(ip)
@@ -157,7 +157,7 @@ class StartGUI:
             return
         
         self.ipEntry.configure(fg="black")
-        self.device = ViewerTrackingFusion(self.ipEntry.get())
+        self.device = TrackingFusionViewer(self.ipEntry.get())
         
         if self.device.isConnected():
             self.master.destroy()
