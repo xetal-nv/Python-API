@@ -7,6 +7,7 @@ sys.path.insert(0, '../examples')
 import communication
 import trackingViewer
 import trackingFusionViewer
+import presencehttp
 
 __author__      =   "Francesco Pessolano"
 __copyright__   =   "Copyright 2017, Xetal nv"
@@ -20,7 +21,8 @@ availableDemos = {
                   # shows an example of communication and tracking, not graphical
                   "communication": communication.start,
                   "trackingViewer": trackingViewer.start,
-                  "trackingFusionViewer": trackingFusionViewer.start
+                  "trackingFusionViewer": trackingFusionViewer.start,
+                  "presencehttp": presencehttp.start
                   }
 
 def main():
