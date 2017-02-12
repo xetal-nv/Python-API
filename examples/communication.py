@@ -14,11 +14,12 @@ __version__     =   "1.0"
 __maintainer__  =   "Francesco Pessolano"
 __email__       =   "francesco@xetal.eu"
 __status__      =   "release"
+
+IP_DEVICE = '192.168.1.42' # in AP mode it is '192.168.1.42' otherwise check your network
     
 def start():
     # create a socket coinnection to the device
-    #demoKit2 = KinseiClient.KinseiSocket('192.168.1.42') # change the IP with the one used by the kit
-    demoKit2 = KinseiClient.KinseiSocket('81.82.231.115') # change the IP with the one used by the kit
+    demoKit2 = KinseiClient.KinseiSocket(IP_DEVICE) 
     # check if the system is online before asking data
     if demoKit2.checkIfOnline():
         # get room boundig box dimensions
