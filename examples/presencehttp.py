@@ -18,7 +18,7 @@ __email__       =   "francesco@xetal.eu"
 __status__      =   "pre release"
     
 PORT_NUMBER = 8080
-IP_DEVICE = '192.168.1.42' # in AP mode it is '192.168.1.42' otherwise check your network
+IP_DEVICE = '81.82.231.115' # in AP mode it is '192.168.1.42' otherwise check your network
 
 class myHandler(BaseHTTPRequestHandler):
     
