@@ -12,7 +12,7 @@ from http.server import BaseHTTPRequestHandler, HTTPServer
 __author__      =   "Francesco Pessolano"
 __copyright__   =   "Copyright 2017, Xetal nv"
 __license__     =   "MIT"
-__version__     =   "0.5"
+__version__     =   "0.5.0"
 __maintainer__  =   "Francesco Pessolano"
 __email__       =   "francesco@xetal.eu"
 __status__      =   "pre release"

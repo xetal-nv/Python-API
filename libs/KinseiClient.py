@@ -8,7 +8,7 @@ import time
 __author__      =   "Francesco Pessolano"
 __copyright__   =   "Copyright 2017, Xetal nv"
 __license__     =   "MIT"
-__version__     =   "1.0"
+__version__     =   "1.1.0"
 __maintainer__  =   "Francesco Pessolano"
 __email__       =   "francesco@xetal.eu"
 __status__      =   "release"
@@ -33,10 +33,10 @@ class KinseiSocket(object):
     The costructor create the socket for a device at the provided IP and port.
     
     Arguments are as follows:
-    host: device IP with default value valid for a device in Access Point mode
-    timeout: timeout of the connection in ms
-    pauseMS: interval forced between commands to the device in ms
-    port: device port, 2005 is the default port if not manually changed in the device itself
+    host:             device IP with default value valid for a device in Access Point mode
+    timeout:          timeout of the connection in ms
+    pauseMS:          interval forced between commands to the device in ms
+    port:             device port, 2005 is the default port if not manually changed in the device itself
     """
     def __init__(self,host = '192.168.42.1', timeout = 15.0, pauseMS = 300, port = 2005):
         self.latencyMS = pauseMS
@@ -62,6 +62,13 @@ class KinseiSocket(object):
     """
     def setTimeIntervalMS(self,pauseMS):
         self.latencyMS = pauseMS
+        
+    """ getTimeIntervalMS:
+    Returns the time interval between to messages forced when the methods below are executes with the flag wait
+    set to True
+    """
+    def getTimeIntervalMS(self):
+        return self.latencyMS
         
     """ checkIfOnline:
     Returns True is the device at the provided IP has been found and connection was possible.
