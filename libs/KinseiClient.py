@@ -4,6 +4,8 @@
 
 import socket
 import time
+import math
+
 
 __author__      =   "Francesco Pessolano"
 __copyright__   =   "Copyright 2017, Xetal nv"
@@ -273,6 +275,28 @@ class KinseiSocket(object):
                 return self.kinseiCommand["error"]
         else:
             return self.kinseiCommand["error"] 
+        
+    """ getStablePosition:    
+    Returns a position, if possible, that is stable for a given ammount of time
+    Arguments are as follows:
+    draw:                attempt to draw (depends on if the canvas was set up already)
+    whichPerson:         which person to be checked
+    timeMS:              time interval for stability 
+    howManyTries:        maximum number of tries
+    """
+    def getStablePosition(self, whichPerson = 0, timeMS = 2000, howManyTries = 5):
+        iterations = math.floor(timeMS / self.latencyMS)
+        for i in range(0,howManyTries):
+            newPosition = self.getPersonsPositions()[whichPerson]
+            stable = True
+            for ii in range(0,iterations):
+                currentPosition = self.getPersonsPositions()[whichPerson]
+                if (currentPosition != newPosition):
+                    stable = False
+                    break
+            if stable:
+                return newPosition
+        return False
 
     """
     Internal methods
