@@ -10,7 +10,7 @@ import math
 __author__      =   "Francesco Pessolano"
 __copyright__   =   "Copyright 2017, Xetal nv"
 __license__     =   "MIT"
-__version__     =   "1.1.0"
+__version__     =   "1.1.1"
 __maintainer__  =   "Francesco Pessolano"
 __email__       =   "francesco@xetal.eu"
 __status__      =   "release"
@@ -284,8 +284,8 @@ class KinseiSocket(object):
     timeMS:              time interval for stability 
     howManyTries:        maximum number of tries
     """
-    def getStablePosition(self, whichPerson = 0, timeMS = 2000, howManyTries = 5):
-        iterations = math.floor(timeMS / self.latencyMS)
+    def getStablePosition(self, whichPerson = 0, timeMS = 500, howManyTries = 5):
+        iterations = math.floor(timeMS / self.latencyMS) + 1
         for i in range(0,howManyTries):
             newPosition = self.getPersonsPositions()[whichPerson]
             stable = True

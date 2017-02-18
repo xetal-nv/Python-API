@@ -77,7 +77,7 @@ class ViewerStableTracking:
             
     # executes the tracking
     def trackPersons(self):
-        positionData = self.demoKit.getStablePosition(self.index,1000,2);
+        positionData = self.demoKit.getStablePosition(self.index,500,2);
         if (positionData != False):  
             self.sofaCorners.append([self.canvas.create_oval(0, 0, 20, 20, fill="green"),positionData])
             currentPositionData = self.adjustedCoordinates(positionData);
