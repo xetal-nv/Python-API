@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 
-"""trackingFusionViewer.py: graphical viewer for persons tracking and fusion"""
+"""trackingFusionViewer.py: graphical viewer for persons tracking and fusion (raw data indicating
+    a possibe detected person where probability of being a real person is proportional to the color brightness)"""
 
 import sys
 import ipaddress
@@ -13,19 +14,21 @@ import KinseiClient
 __author__      =   "Francesco Pessolano"
 __copyright__   =   "Copyright 2017, Xetal nv"
 __license__     =   "MIT"
-__version__     =   "1.0.0"
+__version__     =   "1.0.1"
 __maintainer__  =   "Francesco Pessolano"
 __email__       =   "francesco@xetal.eu"
 __status__      =   "release"
 
 # the color array is used to simplify color assignment to the tracking balls
-colors = ["green", "blue", "red", "magenta", "white", "cyan", "black", "yellow"]
+colors = ["green", "blue", "magenta", "white", "cyan", "black", "yellow", "red"]
         
 # set the tracking canvas dimensions
 screenX = 600
 screenY = 600
 
-# the following methids are used o properly shade a given color
+# the following methods are used to properly shade a given color
+# as from KinseiClient the larger the value the more likely is the decetion
+# and the bigther the color
 def clamp(val, minimum=0, maximum=255):
     if val < minimum:
         return minimum

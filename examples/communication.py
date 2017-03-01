@@ -15,7 +15,7 @@ __maintainer__  =   "Francesco Pessolano"
 __email__       =   "francesco@xetal.eu"
 __status__      =   "release"
 
-IP_DEVICE = '192.168.1.61' # in AP mode it is '192.168.1.42' otherwise check your network
+IP_DEVICE = '192.168.1.42' # in AP mode it is '192.168.1.42' otherwise check your network
     
 def start():
     # create a socket coinnection to the device

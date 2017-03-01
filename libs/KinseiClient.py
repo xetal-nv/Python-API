@@ -10,12 +10,12 @@ import math
 __author__      =   "Francesco Pessolano"
 __copyright__   =   "Copyright 2017, Xetal nv"
 __license__     =   "MIT"
-__version__     =   "1.1.1"
+__version__     =   "1.1.2"
 __maintainer__  =   "Francesco Pessolano"
 __email__       =   "francesco@xetal.eu"
 __status__      =   "release"
 
-# the class implmeneting the kinser client
+# the class implmeneting the kinsei client
 class KinseiSocket(object):
     
     kinseiCommand = { 

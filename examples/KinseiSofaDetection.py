@@ -18,7 +18,7 @@ __email__       =   "francesco@xetal.eu"
 __status__      =   "in progress"
 
 # the color array is used to simplify color assignment to the tracking balls
-colors = ["green", "blue", "red", "magenta", "white", "cyan", "black", "yellow"]
+colors = ["green", "blue", "magenta", "white", "cyan", "black", "yellow", "red"]
         
 # set the tracking canvas dimensions
 screenX = 600
