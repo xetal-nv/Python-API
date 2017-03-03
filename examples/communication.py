@@ -10,12 +10,13 @@ import KinseiClient
 __author__      =   "Francesco Pessolano"
 __copyright__   =   "Copyright 2017, Xetal nv"
 __license__     =   "MIT"
-__version__     =   "1.0.0"
+__version__     =   "1.0.1"
 __maintainer__  =   "Francesco Pessolano"
 __email__       =   "francesco@xetal.eu"
 __status__      =   "release"
 
-IP_DEVICE = '192.168.1.42' # in AP mode it is '192.168.1.42' otherwise check your network
+IP_DEVICE = '192.168.1.42'  # in AP mode it is '192.168.1.42' otherwise check your network
+                            # it accespt also DNS addresses
     
 def start():
     # create a socket coinnection to the device

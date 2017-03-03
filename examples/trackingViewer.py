@@ -12,7 +12,7 @@ import KinseiClient
 __author__      =   "Francesco Pessolano"
 __copyright__   =   "Copyright 2017, Xetal nv"
 __license__     =   "MIT"
-__version__     =   "1.0.1"
+__version__     =   "1.0.2"
 __maintainer__  =   "Francesco Pessolano"
 __email__       =   "francesco@xetal.eu"
 __status__      =   "release"
@@ -95,17 +95,30 @@ class StartGUI:
         # bind escape to terminate
         master.bind('<Escape>', quit)
         
-        Button(master, text='Connect', command=self.connectDevice).pack(side=LEFT,padx=10, pady=5)
+        Button(master, text='Connect IP', command=self.connectDeviceIP).pack(side=LEFT,padx=10, pady=5)
+        Button(master, text='Connect DNS', command=self.connectDeviceDNS).pack(side=LEFT,padx=10, pady=5)
         Button(master, text='Quit', command=master.quit).pack(side=RIGHT, padx=10, pady=5)
 
 
-    def connectDevice(self):
+    def connectDeviceIP(self):
         # the module ipaddress is used to verify the validity of the entered IP address
         try:
             ipaddress.ip_address(self.ipEntry.get())
         except:
             self.ipEntry.configure(fg="red")
             return
+        
+        self.ipEntry.configure(fg="black")
+        self.device = ViewerTrackingOnly(self.ipEntry.get())
+        
+        if self.device.isConnected():
+            self.master.destroy()
+            self.device.start()
+        else:
+            self.ipEntry.configure(fg="red")
+            
+    def connectDeviceDNS(self):
+        # the module ipaddress is used to verify the validity of the entered IP address
         
         self.ipEntry.configure(fg="black")
         self.device = ViewerTrackingOnly(self.ipEntry.get())

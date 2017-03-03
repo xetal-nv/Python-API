@@ -29,7 +29,7 @@ availableDemos = {
                   }
 
 def main():
-    availableDemos["communication"]()
+    availableDemos["trackingFusionViewer"]()
     
         
 if __name__ == "__main__": main()
