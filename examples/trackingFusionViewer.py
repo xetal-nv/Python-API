@@ -14,7 +14,7 @@ import KinseiClient
 __author__      =   "Francesco Pessolano"
 __copyright__   =   "Copyright 2017, Xetal nv"
 __license__     =   "MIT"
-__version__     =   "1.0.2"
+__version__     =   "1.0.3"
 __maintainer__  =   "Francesco Pessolano"
 __email__       =   "francesco@xetal.eu"
 __status__      =   "release"
@@ -56,6 +56,7 @@ class TrackingFusionViewer:
         try:
             self.demoKit = KinseiClient.KinseiSocket(ip)
             self.connected = self.demoKit.checkIfOnline()
+            #self.demoKit.setTimeIntervalMS(50) # maximum speed
             self.fusionMap = []
         except:
             self.connected = False
@@ -130,7 +131,7 @@ class TrackingFusionViewer:
             y0 = currentPositionData[1]
             x1 = currentPositionData[0] + screenX + 30
             y1 = currentPositionData[1] + 20
-            self.fusionMap.append(self.canvas.create_oval(x0,y0,x1,y1, fill=colorscale("#adff2f",fusionData[i][2]/26)))
+            self.fusionMap.append(self.canvas.create_oval(x0,y0,x1,y1, fill=colorscale("#ff0000",fusionData[i][2]/26)))
             
     
 # this class is used to get the IP of the device from the user
@@ -142,7 +143,7 @@ class StartGUI:
         
         self.ipEntry = Entry(master, width=20)
         self.ipEntry.pack(side=TOP,padx=10,pady=10)
-        self.ipEntry.insert(0,"192.168.1.42")
+        self.ipEntry.insert(0,"192.168.42.1")
         
         # bind escape to terminate
         master.bind('<Escape>', quit)

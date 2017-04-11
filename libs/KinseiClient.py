@@ -10,7 +10,7 @@ import math
 __author__      =   "Francesco Pessolano"
 __copyright__   =   "Copyright 2017, Xetal nv"
 __license__     =   "MIT"
-__version__     =   "1.1.2"
+__version__     =   "1.1.3"
 __maintainer__  =   "Francesco Pessolano"
 __email__       =   "francesco@xetal.eu"
 __status__      =   "release"
@@ -60,7 +60,7 @@ class KinseiSocket(object):
     """ setTimeIntervalMS:
     Set the time interval between to messages forced when the methods below are executes with the flag wait
     set to True
-    It is adviced to keep this value not below 150 ms.
+    It is adviced to keep this value not below 50 ms.
     """
     def setTimeIntervalMS(self,pauseMS):
         self.latencyMS = pauseMS
@@ -152,7 +152,7 @@ class KinseiSocket(object):
         return data[1]
     
     """ getNumberPersonsFloat:
-    Retunes the detecte number of people as a decimal number
+    Retunes the detected number of people as a decimal number
     
     This method is to be preferred to getNumberPersonsFixed as it allows to set thresholds for proper 
     tuning in determining the actualy number of detected persons.

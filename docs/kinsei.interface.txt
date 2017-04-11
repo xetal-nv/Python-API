@@ -27,20 +27,20 @@ Number Of Persons (float number)
     Client -> MOCA
     0x6E
     MOCA -> Client
-    0x6E npersons(1) (this value is an unsigned int devide by 10 to get the float number) 
+    0x6E npersons(1) (this value is an unsigned int divide by 10 to get the float number) 
  
 Number Of Persons (Fixed number used by the system)
     Client -> MOCA
     0x6D
     MOCA -> Client
-    0x6D #persons(1)
+    0x6D #persons(1) 
 	!! ERROR !! The current firmware has a bug and returns 0x6E #persons(1) 
     
-Persons Position (it is indipendent from the number of persons but if different (fixed one) it will fallback after a while)
+Persons Position (it is independent from the number of persons but if different (fixed one) it will fallback after a while)
     Client -> MOCA
     0x64 
     MOCA -> Client
-    0x64 #positions(1) {index(2) X(2) Y(2)}*#positions (all 0x00 if not valid position) 
+    0x64 #positions(1) {index(2) X(2) Y(2)}*#positions (when a position is not valid the index will be 0xffff) 
   
 Online Check
     Client -> MOCA

@@ -90,7 +90,7 @@ class StartGUI:
         
         self.ipEntry = Entry(master, width=20)
         self.ipEntry.pack(side=TOP,padx=10,pady=10)
-        self.ipEntry.insert(0,"192.168.1.42")
+        self.ipEntry.insert(0,"192.168.42.1")
         
         # bind escape to terminate
         master.bind('<Escape>', quit)
