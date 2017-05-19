@@ -50,22 +50,24 @@ class ThermalMap:
     
     def colorEquivalent(self,temp10):
         # these values could be changed or made parameters for generalisation
-        minval, maxval = 1, 3
+        minval, maxval = 0, 4
         colors = [(0, 0, 255), (0, 255, 0), (255, 0, 0)]  # [BLUE, GREEN, RED]
-        minTemp = 100
-        maxTemp = 800
-        if (temp10 < minTemp):
-            temp10 = minTemp
+        minTemp = 150
+        transparentTemp = 150
+        maxTemp = 600
+        if (temp10 < transparentTemp):
+            return ''
         elif (temp10 > maxTemp):
             temp10 = maxTemp
-        val = 2*((temp10 - minTemp)/maxTemp)+1
+        val = 3*((temp10 - minTemp)/maxTemp)+1
         
         max_index = len(colors)-1
         v = float(val-minval) / float(maxval-minval) * max_index
         i1, i2 = int(v), min(int(v)+1, max_index)
         (r1, g1, b1), (r2, g2, b2) = colors[i1], colors[i2]
         f = v - i1
-        return int(r1 + f*(r2-r1)), int(g1 + f*(g2-g1)), int(b1 + f*(b2-b1))
+        
+        return '#%02x%02x%02x' % (int(r1 + f*(r2-r1)), int(g1 + f*(g2-g1)), int(b1 + f*(b2-b1)))
     
     def defineCanvas(self):
         boundingBoxRatio = self.roomSize[0] / self.roomSize[1]
@@ -125,10 +127,7 @@ class ThermalMap:
             self.thermalMapSettings = self.demoKit.getThermalMapResolution()
             self.grid = self.canvas.grid(row=0,column=0)
             self.drawBackground()
-            
-            #test
-            print(list(map(self.colorEquivalent,self.demoKit.getThermalMapPixels())))
-            
+                        
             self.drawMap()
             self.master.mainloop()
             
@@ -144,13 +143,16 @@ class ThermalMap:
         self.canvas.delete("all")
         w=self.screenX
         h=self.screenY
+        colors = list(map(self.colorEquivalent,self.demoKit.getThermalMapPixels()))
+                
         # draws the map
         cellwidth = w/self.thermalMapSettings[0]
         cellheight=h/self.thermalMapSettings[1]
         for row in range(self.thermalMapSettings[1]):
             for col in range(self.thermalMapSettings[0]):
                 self.canvas.create_rectangle(col*cellwidth + offset,row*cellheight + offset,
-                                             (col+1)*cellwidth + offset,(row+1)*cellheight + offset, fill="#"+("%06x"%random.randint(0,16777215)), outline="")
+                                             (col+1)*cellwidth + offset,(row+1)*cellheight + offset, 
+                                             fill= colors[row*self.thermalMapSettings[0] + col],outline="")
                     
         self.drawBackground()
         self.canvas.after(10, self.drawMap) # delay must be larger than 0
