@@ -6,6 +6,7 @@ import sys
 import ipaddress
 from tkinter import *
 from math import *
+import random
 
 sys.path.insert(0, '../libs')
 import KinseiClient
@@ -46,6 +47,25 @@ class ThermalMap:
         coordX = int((coordinates[0] / 10) * ((self.screenX * 10) / self.roomSize[0])) +  offset
         coordY = int((coordinates[1] / 10) * ((self.screenY * 10) / self.roomSize[1])) +  offset
         return [coordX, coordY]
+    
+    def colorEquivalent(self,temp10):
+        # these values could be changed or made parameters for generalisation
+        minval, maxval = 1, 3
+        colors = [(0, 0, 255), (0, 255, 0), (255, 0, 0)]  # [BLUE, GREEN, RED]
+        minTemp = 100
+        maxTemp = 800
+        if (temp10 < minTemp):
+            temp10 = minTemp
+        elif (temp10 > maxTemp):
+            temp10 = maxTemp
+        val = 2*((temp10 - minTemp)/maxTemp)+1
+        
+        max_index = len(colors)-1
+        v = float(val-minval) / float(maxval-minval) * max_index
+        i1, i2 = int(v), min(int(v)+1, max_index)
+        (r1, g1, b1), (r2, g2, b2) = colors[i1], colors[i2]
+        f = v - i1
+        return int(r1 + f*(r2-r1)), int(g1 + f*(g2-g1)), int(b1 + f*(b2-b1))
     
     def defineCanvas(self):
         boundingBoxRatio = self.roomSize[0] / self.roomSize[1]
@@ -98,34 +118,41 @@ class ThermalMap:
             # bind escape to terminate
             self.master.bind('<Escape>', quit)
             
+            # set the common variable background values
             self.canvas = Canvas(self.master, width=(self.screenX + 2*offset), height=(self.screenY + 2*offset))
             self.canvas.pack()
-            self.canvas.create_rectangle(10, 10, self.screenX + offset, self.screenY + offset, dash=(5,5), outline="red")
-            realVertex = list(map(self.adjustedCoordinates, self.demoKit.getRoomCorners()))
-            self.canvas.create_polygon(*realVertex,fill='', outline = 'blue')
-            print (realVertex)
-            positionData = self.demoKit.getPersonsPositions(False);
+            self.realVertex = list(map(self.adjustedCoordinates, self.demoKit.getRoomCorners()))
+            self.thermalMapSettings = self.demoKit.getThermalMapResolution()
+            self.grid = self.canvas.grid(row=0,column=0)
+            self.drawBackground()
             
-#             self.persons =[]
-#             for i in range(0, len(positionData)):
-#                 person = self.canvas.create_oval(0, 0, 20, 20, fill=colors[i % len(colors)])
-#                 self.persons.append([person,[0,0]])
-                
-            # the following method starts the fusion map
+            #test
+            print(list(map(self.colorEquivalent,self.demoKit.getThermalMapPixels())))
+            
             self.drawMap()
             self.master.mainloop()
             
-    # executes the tracking
-    def drawMap(self):
-#         positionData = self.demoKit.getPersonsPositions();
-#         
-#         for i in range(0, len(positionData)):
-#             currentPositionData = self.adjustedCoordinates(positionData[i]);
-#             deltax = currentPositionData[0] - self.persons[i][1][0]
-#             deltay = currentPositionData[1] - self.persons[i][1][1]
-#             self.canvas.move(self.persons[i][0], deltax, deltay)
-#             self.persons[i][1] = currentPositionData
             
+    # draw background
+    def drawBackground(self):
+            self.canvas.create_rectangle(10, 10, self.screenX + offset, self.screenY + offset, dash=(5,5), outline="red", width='3')
+            self.canvas.create_polygon(*self.realVertex,fill='', outline = 'blue', width='3')
+        
+    # executes the thermal map
+    # currently random colors
+    def drawMap(self):
+        self.canvas.delete("all")
+        w=self.screenX
+        h=self.screenY
+        # draws the map
+        cellwidth = w/self.thermalMapSettings[0]
+        cellheight=h/self.thermalMapSettings[1]
+        for row in range(self.thermalMapSettings[1]):
+            for col in range(self.thermalMapSettings[0]):
+                self.canvas.create_rectangle(col*cellwidth + offset,row*cellheight + offset,
+                                             (col+1)*cellwidth + offset,(row+1)*cellheight + offset, fill="#"+("%06x"%random.randint(0,16777215)), outline="")
+                    
+        self.drawBackground()
         self.canvas.after(10, self.drawMap) # delay must be larger than 0
     
 # this class is used to get the IP of the device from the user

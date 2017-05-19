@@ -10,7 +10,7 @@ import math
 __author__      =   "Francesco Pessolano"
 __copyright__   =   "Copyright 2017, Xetal nv"
 __license__     =   "MIT"
-__version__     =   "1.2.0"
+__version__     =   "2.0.0"
 __maintainer__  =   "Francesco Pessolano"
 __email__       =   "francesco@xetal.eu"
 __status__      =   "release"
@@ -28,7 +28,10 @@ class KinseiSocket(object):
                  "checkSensorsOnline":      b'\x7A',
                  "batteryLevels":           b'\x76',
                  "fusionValues":            b'\x66',
+                 "thermres":                b'\x1A',
+                 "thermmap":                b'\x1B',
                  "error":                   b'\x65'
+
                  }
     
     """ __init__:
@@ -104,7 +107,6 @@ class KinseiSocket(object):
         data = self.executeCommand(self.kinseiCommand["roomSize"], wait)
         if (data == self.kinseiCommand["error"]):
             return False
-        print (data)
         cornersNumber = data[5]
         roomCorners = []
         for i in range(0,cornersNumber):
@@ -277,6 +279,27 @@ class KinseiSocket(object):
         else:
             return self.kinseiCommand["error"] 
         
+    """ executeVariableCommand:
+    Executes any comand and return the message from the devoce at it was received assiming data size is int he second/third byte
+    with data size given by size
+    
+    False is returned in case or connection error
+    """
+    def executeVariableCommand(self, command, size = 2, wait = True):
+        if (self.serverConnected):
+            try:
+                self.server.sendall(command)
+                dataSizeByte = self.server.recv(3)
+                dataSize = self.bytes_to_int([dataSizeByte[1],dataSizeByte[2]])
+                data = self.server.recv(size*dataSize)
+                if (wait): 
+                    time.sleep(self.latencyMS / 1000)
+                return data
+            except socket.error as err:
+                return self.kinseiCommand["error"]
+        else:
+            return self.kinseiCommand["error"] 
+        
     """ getStablePosition:    
     Returns a position, if possible, that is stable for a given ammount of time
     Arguments are as follows:
@@ -298,6 +321,30 @@ class KinseiSocket(object):
             if stable:
                 return newPosition
         return False
+    
+    """ getThermalMapResolution:
+    Returns the number of pixel per x and y axis and the pixel size in mm.
+    False in case of comunication error
+    """
+    def getThermalMapResolution(self, wait = True):
+        data = self.executeCommand(self.kinseiCommand["thermres"], wait)
+        if (data == self.kinseiCommand["error"]):
+            return False
+        return [data[1],data[2],data[3]]
+    
+    
+    """ getThermalMapPixels:
+    Returns the pisel temperatures in row order
+    False
+    """
+    def getThermalMapPixels(self, wait = True):
+        data = self.executeVariableCommand(self.kinseiCommand["thermmap"], 2, wait)
+        numberPixels = math.trunc(len(data)/2)
+        pixelTemps = []
+        # transform data into an array of temperatures factored by 10x in integers
+        for i in range(numberPixels):
+            pixelTemps.append(self.bytes_to_int([data[2*i],data[2*i+1]]))
+        return pixelTemps
 
     """
     Internal methods

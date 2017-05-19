@@ -72,11 +72,11 @@ Pixel Resolution and pixel size for the thermal map
     MOCA -> Client
     0x1A PixelNumber_X PixelNumber_Y PixelSizeInCm
     
-Thermal map, pixel temperature
+Thermal map, pixel temperature (multiplied by 10 and trunced)
     Client -> MOCA
     0x1B
     MOCA -> Client
-    0x1B #PixelNumber(2) {pixelvalue(2)}*#PixelNumber
+    0x1B #PixelNumber(2) {pixeltemp(2)}*#PixelNumber
                                     
 Error generic
     MOCA -> Client     
