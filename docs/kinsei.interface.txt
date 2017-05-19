@@ -65,6 +65,18 @@ Fusion Values
     0x66
     MOCA -> Client
     0x66 #cells(1) {index(2) center_x(2) center_y(2) value(1)}*#cells //the value must be divided by 10
+
+Pixel Resolution and pixel size for the thermal map
+    Client -> MOCA
+    0x1A
+    MOCA -> Client
+    0x1A PixelNumber_X PixelNumber_Y PixelSizeInCm
+    
+Thermal map, pixel temperature
+    Client -> MOCA
+    0x1B
+    MOCA -> Client
+    0x1B #PixelNumber(2) {pixelvalue(2)}*#PixelNumber
                                     
 Error generic
     MOCA -> Client     
