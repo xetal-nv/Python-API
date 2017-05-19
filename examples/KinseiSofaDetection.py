@@ -15,7 +15,7 @@ __license__     =   "MIT"
 __version__     =   "0.1.0"
 __maintainer__  =   "Francesco Pessolano"
 __email__       =   "francesco@xetal.eu"
-__status__      =   "in progress"
+__status__      =   "in progress - not working"
 
 # the color array is used to simplify color assignment to the tracking balls
 colors = ["green", "blue", "magenta", "white", "cyan", "black", "yellow", "red"]
@@ -116,12 +116,11 @@ class StartGUI:
     def connectDevice(self):
         # the module ipaddress is used to verify the validity of the entered IP address
         if (self.device == None):
-            try:
-                ipaddress.ip_address(self.ipEntry.get())
-            except:
-                self.ipEntry.configure(fg="red")
-                return
-            
+        #    try:
+        #        ipaddress.ip_address(self.ipEntry.get())
+        #    except:
+        #        self.ipEntry.configure(fg="red")
+        #        return   
             self.ipEntry.configure(fg="black")
             self.device = ViewerStableTracking(self.ipEntry.get())
         

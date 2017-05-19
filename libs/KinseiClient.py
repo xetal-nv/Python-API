@@ -10,7 +10,7 @@ import math
 __author__      =   "Francesco Pessolano"
 __copyright__   =   "Copyright 2017, Xetal nv"
 __license__     =   "MIT"
-__version__     =   "1.1.3"
+__version__     =   "1.2.0"
 __maintainer__  =   "Francesco Pessolano"
 __email__       =   "francesco@xetal.eu"
 __status__      =   "release"
@@ -104,6 +104,7 @@ class KinseiSocket(object):
         data = self.executeCommand(self.kinseiCommand["roomSize"], wait)
         if (data == self.kinseiCommand["error"]):
             return False
+        print (data)
         cornersNumber = data[5]
         roomCorners = []
         for i in range(0,cornersNumber):
