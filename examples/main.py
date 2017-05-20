@@ -8,6 +8,7 @@ import communication
 import trackingViewer
 import trackingFusionViewer
 import presencehttp
+import thermalmap
 
 __author__      =   "Francesco Pessolano"
 __copyright__   =   "Copyright 2017, Xetal nv"
@@ -25,11 +26,13 @@ availableDemos = {
                   # shows an example of graphical viewer for tracking and raw data (fusion)
                   "trackingFusionViewer": trackingFusionViewer.start,
                   # shows an example of http server reporting number of people
-                  "presencehttp": presencehttp.start
+                  "presencehttp": presencehttp.start,
+                  # shows a thermal map based on the settings in the source files
+                  "thermalmap": thermalmap.start
                   }
 
 def main():
-    availableDemos["trackingFusionViewer"]()
+    availableDemos["thermalmap"]()
     
         
 if __name__ == "__main__": main()
