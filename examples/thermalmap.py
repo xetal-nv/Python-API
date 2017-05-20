@@ -7,8 +7,10 @@ import ipaddress
 from tkinter import *
 from math import *
 
+import colormaps
 sys.path.insert(0, '../libs')
 import KinseiClient
+
 
 __author__      =   "Francesco Pessolano"
 __copyright__   =   "Copyright 2017, Xetal nv"
@@ -24,18 +26,15 @@ maxScreenX = 1000 # maximum X size of screen window in pixels
 maxScreenY = 800 # maximum Y size of screen window in pixels
 offset = 10 # padding offset in pixels
 
-# types of thermal maos
-thermalType = ["linear", "personTracking"]
-
-# Temperature range in Celsius (if supported by the thermal map mode)
-minimimTemp = 15
-maximumTemp = 80
+# set the type of colormap (see colormaps.py)
+whichcoloring = colormaps.humanSpot
         
 # this class shows how to visualise tracking with tkinter
 class ThermalMap:
 
-    def __init__(self, ip):
+    def __init__(self, ip, whichMap = whichcoloring):
         try:
+            self.coloring = whichMap
             self.demoKit = KinseiClient.KinseiSocket(ip)
             self.connected = self.demoKit.checkIfOnline()
         except:
@@ -50,31 +49,6 @@ class ThermalMap:
         coordX = int((coordinates[0] / 10) * ((self.screenX * 10) / self.roomSize[0])) +  offset
         coordY = int((coordinates[1] / 10) * ((self.screenY * 10) / self.roomSize[1])) +  offset
         return [coordX, coordY]
-    
-    def colorEquivalent(self,temp10):
-        # these values could be changed or made parameters for generalisation
-        minval, maxval = 0, 4
-        colors = [(0, 0, 255), (0, 255, 0), (255, 0, 0)]  # [BLUE, GREEN, RED]
-        minTemp = minimimTemp * 10
-        maxTemp = maximumTemp * 10
-        if (temp10 < minTemp):
-            return ''
-        elif (temp10 > maxTemp):
-            temp10 = maxTemp
-        val = 3*((temp10 - minTemp)/maxTemp)+1
-         
-        max_index = len(colors)-1
-        v = float(val-minval) / float(maxval-minval) * max_index
-        i1, i2 = int(v), min(int(v)+1, max_index)
-        (r1, g1, b1), (r2, g2, b2) = colors[i1], colors[i2]
-        f = v - i1
-         
-        return '#%02x%02x%02x' % (int(r1 + f*(r2-r1)), int(g1 + f*(g2-g1)), int(b1 + f*(b2-b1)))
-
-#         if (temp10 > 250):
-#             return "#FF0000"
-#         else:
-#             return ""
     
     def defineCanvas(self):
         boundingBoxRatio = self.roomSize[0] / self.roomSize[1]
@@ -141,16 +115,15 @@ class ThermalMap:
             
     # draw background
     def drawBackground(self):
-            self.canvas.create_rectangle(10, 10, self.screenX + offset, self.screenY + offset, dash=(5,5), outline="red", width='3')
-            self.canvas.create_polygon(*self.realVertex,fill='', outline = 'blue', width='3')
+            self.canvas.create_rectangle(10, 10, self.screenX + offset, self.screenY + offset, dash=(5,5), outline="red", width='2')
+            self.canvas.create_polygon(*self.realVertex,fill='', outline = 'blue', width='2')
         
     # executes the thermal map
-    # currently random colors
     def drawMap(self):
         self.canvas.delete("all")
         w=self.screenX
         h=self.screenY
-        colors = list(map(self.colorEquivalent,self.demoKit.getThermalMapPixels()))
+        colors = list(map(self.coloring,self.demoKit.getThermalMapPixels()))
                 
         # draws the map
         cellwidth = w/self.thermalMapSettings[0]
