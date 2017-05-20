@@ -3,6 +3,8 @@
 """colormaps.py: methods for temperature colormapping"""
 
 from math import *
+#from matplotlib import *
+#import matplotlib.pyplot as plt
 
 __author__      =   "Francesco Pessolano"
 __copyright__   =   "Copyright 2017, Xetal nv"
@@ -10,11 +12,11 @@ __license__     =   "MIT"
 __version__     =   "1.0.0"
 __maintainer__  =   "Francesco Pessolano"
 __email__       =   "francesco@xetal.eu"
-__status__      =   "in development"
+__status__      =   "release"
 
 # Temperature range in Celsius (if supported by the thermal map mode)
 minimimTemp = 15
-maximumTemp = 80
+maximumTemp = 40
 
 # select linear in order to have a linear map from blue to red in the given range
 def linear(temp10):
@@ -42,3 +44,19 @@ def humanSpot(temp10):
         return "#FF0000"
     else:
         return ""
+    
+# uses standard matplotlib colorscales to make the color mapping
+# change the valoe of modifier to compress (<1) or inflate (<1) mid range
+def matplotlibScale(temp10, modifier = 1, colorScale = "ocean"):
+    minTemp = minimimTemp * 10
+    maxTemp = maximumTemp * 10
+    if (temp10 < minTemp):
+        return ''
+    elif (temp10 > maxTemp):
+        temp10 = maxTemp
+    val = ((temp10 - minTemp)/maxTemp) ** modifier
+    import matplotlib.pyplot as plt
+    Scale = plt.get_cmap(colorScale)
+    colors = (list(map(lambda x: trunc(x * 255), Scale(val))))
+    return ('#%02x%02x%02x' % (colors[0],colors[1],colors[2]))
+

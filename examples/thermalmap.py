@@ -27,7 +27,7 @@ maxScreenY = 800 # maximum Y size of screen window in pixels
 offset = 10 # padding offset in pixels
 
 # set the type of colormap (see colormaps.py)
-whichcoloring = colormaps.humanSpot
+whichcoloring = colormaps.matplotlibScale
         
 # this class shows how to visualise tracking with tkinter
 class ThermalMap:
