@@ -6,7 +6,6 @@ import sys
 import ipaddress
 from tkinter import *
 from math import *
-import random
 
 sys.path.insert(0, '../libs')
 import KinseiClient
@@ -14,19 +13,23 @@ import KinseiClient
 __author__      =   "Francesco Pessolano"
 __copyright__   =   "Copyright 2017, Xetal nv"
 __license__     =   "MIT"
-__version__     =   "0.5.0"
+__version__     =   "1.0.0"
 __maintainer__  =   "Francesco Pessolano"
 __email__       =   "francesco@xetal.eu"
-__status__      =   "in development"
+__status__      =   "release"
 
-# the color array is used to simplify color assignment to the tracking balls
-colors = ["green", "blue", "magenta", "white", "cyan", "black", "yellow", "red"]
         
-# set the screen maximum dimensions
-maxScreenX = 1000
-maxScreenY = 800
-offset = 10
+# set the viewing window
+maxScreenX = 1000 # maximum X size of screen window in pixels
+maxScreenY = 800 # maximum Y size of screen window in pixels
+offset = 10 # padding offset in pixels
 
+# types of thermal maos
+thermalType = ["linear", "personTracking"]
+
+# Temperature range in Celsius (if supported by the thermal map mode)
+minimimTemp = 15
+maximumTemp = 80
         
 # this class shows how to visualise tracking with tkinter
 class ThermalMap:
@@ -52,22 +55,26 @@ class ThermalMap:
         # these values could be changed or made parameters for generalisation
         minval, maxval = 0, 4
         colors = [(0, 0, 255), (0, 255, 0), (255, 0, 0)]  # [BLUE, GREEN, RED]
-        minTemp = 150
-        transparentTemp = 150
-        maxTemp = 600
-        if (temp10 < transparentTemp):
+        minTemp = minimimTemp * 10
+        maxTemp = maximumTemp * 10
+        if (temp10 < minTemp):
             return ''
         elif (temp10 > maxTemp):
             temp10 = maxTemp
         val = 3*((temp10 - minTemp)/maxTemp)+1
-        
+         
         max_index = len(colors)-1
         v = float(val-minval) / float(maxval-minval) * max_index
         i1, i2 = int(v), min(int(v)+1, max_index)
         (r1, g1, b1), (r2, g2, b2) = colors[i1], colors[i2]
         f = v - i1
-        
+         
         return '#%02x%02x%02x' % (int(r1 + f*(r2-r1)), int(g1 + f*(g2-g1)), int(b1 + f*(b2-b1)))
+
+#         if (temp10 > 250):
+#             return "#FF0000"
+#         else:
+#             return ""
     
     def defineCanvas(self):
         boundingBoxRatio = self.roomSize[0] / self.roomSize[1]
