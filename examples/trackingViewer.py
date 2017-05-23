@@ -5,6 +5,7 @@
 import sys
 import ipaddress
 from tkinter import *
+from math import *
 
 sys.path.insert(0, '../libs')
 import KinseiClient
@@ -12,17 +13,18 @@ import KinseiClient
 __author__      =   "Francesco Pessolano"
 __copyright__   =   "Copyright 2017, Xetal nv"
 __license__     =   "MIT"
-__version__     =   "1.0.2"
+__version__     =   "1.2.0"
 __maintainer__  =   "Francesco Pessolano"
 __email__       =   "francesco@xetal.eu"
-__status__      =   "release"
+__status__      =   "in development"
 
 # the color array is used to simplify color assignment to the tracking balls
 colors = ["green", "blue", "magenta", "white", "cyan", "black", "yellow", "red"]
-        
-# set the tracking canvas dimensions
-screenX = 600
-screenY = 600
+
+# set the viewing window
+maxScreenX = 1000 # maximum X size of screen window in pixels
+maxScreenY = 800 # maximum Y size of screen window in pixels
+offset = 10 # padding offset in pixels
         
 # this class shows how to visualise tracking with tkinter
 class ViewerTrackingOnly:
@@ -37,26 +39,67 @@ class ViewerTrackingOnly:
         return self.connected
     
     # the KinseiClient class provides coordinates in mm and absolute
-    # here we scalte to cm and made them relative to our 800x800 canvas
+    # here we scalte to cm and made them relative to our 800x800 canvas    
     def adjustedCoordinates(self, coordinates):
-        coordX = int((coordinates[0] / 10) * ((screenX * 10) / self.roomSize[0]))
-        coordY = int((coordinates[1] / 10) * ((screenY * 10) / self.roomSize[1]))
+        coordX = int((coordinates[0] / 10) * ((self.screenX * 10) / self.roomSize[0])) +  offset
+        coordY = int((coordinates[1] / 10) * ((self.screenY * 10) / self.roomSize[1])) +  offset
         return [coordX, coordY]
+    
+    def defineCanvas(self):
+        boundingBoxRatio = self.roomSize[0] / self.roomSize[1]
+        screenRatio = maxScreenX / maxScreenY
+        if (screenRatio < 1):
+            # portrait screen
+            if ((boundingBoxRatio < 1) and (screenRatio > boundingBoxRatio)):
+                #We need to scale from the height
+                yMax = maxScreenY
+                yMin = 0
+                theOtherDimension = trunc((yMax - yMin) * boundingBoxRatio)
+                xMin = trunc((maxScreenX - theOtherDimension) /2)
+                xMax = xMin + theOtherDimension
+            else:
+                #We need to scale from the width
+                xMin = 0
+                xMax = maxScreenX
+                theOtherDimension = trunc((xMax - xMin) / boundingBoxRatio)
+                yMin = 0
+                yMax = yMin + theOtherDimension
+        else:
+            # landscape screen
+            if ((boundingBoxRatio > 1) and (screenRatio < boundingBoxRatio)):
+                # We need to scale from the width
+                xMin = 0
+                xMax = maxScreenX
+                theOtherDimension = trunc((xMax - xMin) / boundingBoxRatio);
+                yMin = 0;
+                yMax = yMin + theOtherDimension;
+
+            else:
+                # We need to scale from the height
+                yMax = maxScreenY
+                yMin = 0
+                theOtherDimension = trunc((yMax - yMin) * boundingBoxRatio)
+                xMin = trunc((maxScreenX - theOtherDimension) /2)
+                xMax = xMin + theOtherDimension
+        self.screenX = xMax - xMin
+        self.screenY = yMax - yMin
     
     # this function set-up the canvas and let the tracking start
     def start(self):
         if self.connected:
             # the canvas is created and all elements initialisated
             self.roomSize = self.demoKit.getRoomSize()
+            self.defineCanvas()
             self.master = Tk()
             self.master.title("Kinsei Viewer Demo")
             
             # bind escape to terminate
             self.master.bind('<Escape>', quit)
             
-            self.canvas = Canvas(self.master, width=(screenX + 10), height=(screenY + 10))
+            self.canvas = Canvas(self.master, width=(self.screenX + 2*offset), height=(self.screenY + 2*offset))
             self.canvas.pack()
-            self.canvas.create_rectangle(10, 10, screenX, screenY, dash=(5,5), outline="blue")
+            self.realVertex = list(map(self.adjustedCoordinates, self.demoKit.getRoomCorners()))
+            self.drawBackground()
             positionData = self.demoKit.getPersonsPositions(False);
             
             self.persons =[]
@@ -68,12 +111,21 @@ class ViewerTrackingOnly:
             self.trackPersons()
             self.master.mainloop()
             
+    # draw background
+    def drawBackground(self):
+            self.canvas.create_rectangle(10, 10, self.screenX + offset, self.screenY + offset, dash=(5,5), outline="red", width='2')
+            self.canvas.create_polygon(*self.realVertex,fill='', outline = 'blue', width='2')            
+
     # executes the tracking
     def trackPersons(self):
         positionData = self.demoKit.getPersonsPositions();
         
         for i in range(0, len(positionData)):
             currentPositionData = self.adjustedCoordinates(positionData[i]);
+            #TODO: to be tested if it truly works well
+            if (currentPositionData == [10,10]):
+                currentPositionData = [-50,-50]
+            #TODO
             deltax = currentPositionData[0] - self.persons[i][1][0]
             deltay = currentPositionData[1] - self.persons[i][1][1]
             self.canvas.move(self.persons[i][0], deltax, deltay)
@@ -90,7 +142,8 @@ class StartGUI:
         
         self.ipEntry = Entry(master, width=20)
         self.ipEntry.pack(side=TOP,padx=10,pady=10)
-        self.ipEntry.insert(0,"192.168.42.1")
+        # self.ipEntry.insert(0,"192.168.42.1")
+        self.ipEntry.insert(0,"81.82.231.115") # temporary
         
         # bind escape to terminate
         master.bind('<Escape>', quit)

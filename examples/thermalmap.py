@@ -26,7 +26,7 @@ maxScreenX = 1000 # maximum X size of screen window in pixels
 maxScreenY = 800 # maximum Y size of screen window in pixels
 offset = 10 # padding offset in pixels
 
-# set the type of colormap (see colormaps.py)
+# set the type of colormap (see colormaps.py for types of maps available)
 whichcoloring = colormaps.matplotlibScale
         
 # this class shows how to visualise tracking with tkinter
@@ -146,7 +146,8 @@ class StartGUI:
         
         self.ipEntry = Entry(master, width=20)
         self.ipEntry.pack(side=TOP,padx=10,pady=10)
-        self.ipEntry.insert(0,"192.168.42.1")
+        # self.ipEntry.insert(0,"192.168.42.1")
+        self.ipEntry.insert(0,"81.82.231.115") # temporary
         
         # bind escape to terminate
         master.bind('<Escape>', quit)

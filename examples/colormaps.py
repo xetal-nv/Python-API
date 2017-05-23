@@ -47,7 +47,7 @@ def humanSpot(temp10):
     
 # uses standard matplotlib colorscales to make the color mapping
 # change the valoe of modifier to compress (<1) or inflate (<1) mid range
-def matplotlibScale(temp10, modifier = 1, colorScale = "ocean"):
+def matplotlibScale(temp10, modifier = 1, colorScale = "hot"):
     minTemp = minimimTemp * 10
     maxTemp = maximumTemp * 10
     if (temp10 < minTemp):
