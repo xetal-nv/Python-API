@@ -114,7 +114,10 @@ class ViewerTrackingOnly:
     # draw background
     def drawBackground(self):
             self.canvas.create_rectangle(10, 10, self.screenX + offset, self.screenY + offset, dash=(5,5), outline="red", width='2')
-            self.canvas.create_polygon(*self.realVertex,fill='', outline = 'blue', width='2')            
+            self.canvas.create_polygon(*self.realVertex,fill='', outline = 'blue', width='2') 
+            roomSizeLabel = self.canvas.create_text(offset + 5, offset + 5, anchor="nw", font=('Helvetica', 14))
+            label = "Room envelop is " + str(int(self.roomSize[0]/10)) + "cm x " + str(int(self.roomSize[1]/10)) + "cm"
+            self.canvas.itemconfig(roomSizeLabel, text=label)           
 
     # executes the tracking
     def trackPersons(self):
