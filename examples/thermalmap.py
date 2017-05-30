@@ -32,6 +32,9 @@ whichcoloring = colormaps.matplotlibScaleAdapted
 # set if average temperature needs to be shown
 showAverageTemp = True
 
+# show colormapping or temperatures
+showColorMapping = False
+
 if (showAverageTemp):
     from statistics import mean
         
@@ -116,7 +119,10 @@ class ThermalMap:
             self.grid = self.canvas.grid(row=0,column=0)
             self.drawBackground()
                         
-            self.drawMap()
+            if (showColorMapping):
+                self.drawMapColor()
+            else:
+                self.drawMapTemps()
             self.master.mainloop()
             
             
@@ -132,8 +138,8 @@ class ThermalMap:
                 labelTemp = "Average Temperature is " + "{0:.2f}".format(self.averageTemp) + "C"
                 self.canvas.itemconfig(avgTempLabel, text=labelTemp)
         
-    # executes the thermal map
-    def drawMap(self):
+    # executes the thermal map with colors
+    def drawMapColor(self):
         self.canvas.delete("all")
         w=self.screenX
         h=self.screenY
@@ -157,7 +163,36 @@ class ThermalMap:
                                              fill= colors[row*self.thermalMapSettings[0] + col],outline="")
                     
         self.drawBackground()
-        self.canvas.after(10, self.drawMap) # delay must be larger than 0
+        self.canvas.after(10, self.drawMapColor) # delay must be larger than 0
+        
+    # executes the thermal map with temperatures
+    def drawMapTemps(self):
+        self.canvas.delete("all")
+        w=self.screenX
+        h=self.screenY
+        pixelTemperatures10 = self.demoKit.getThermalMapPixels()
+        if (showAverageTemp):
+            self.averageTemp = mean(filter(lambda a: a != 0, pixelTemperatures10)) / 10
+                
+        # draws the map
+        cellwidth = w/self.thermalMapSettings[0]
+        cellheight=h/self.thermalMapSettings[1]
+        for row in range(self.thermalMapSettings[1]):
+            for col in range(self.thermalMapSettings[0]):
+                if (pixelTemperatures10[row*self.thermalMapSettings[0] + col] == 0):
+                    outlineColor = ""
+                else:
+                    outlineColor = "gray"
+                    tempLabelPosition = self.canvas.create_text((col+0.5)*cellwidth + offset,(row+0.5)*cellheight + offset, anchor="center", \
+                                                                font=('Helvetica', 10))
+                    tempLabel = str(pixelTemperatures10[row*self.thermalMapSettings[0] + col]/10)
+                    self.canvas.itemconfig(tempLabelPosition, text=tempLabel)
+                self.canvas.create_rectangle(col*cellwidth + offset,row*cellheight + offset,
+                                             (col+1)*cellwidth + offset,(row+1)*cellheight + offset, 
+                                             fill= "",outline=outlineColor)
+                    
+        self.drawBackground()
+        self.canvas.after(10, self.drawMapTemps) # delay must be larger than 0
     
 # this class is used to get the IP of the device from the user
 class StartGUI:
