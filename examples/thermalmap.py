@@ -27,7 +27,13 @@ maxScreenY = 800 # maximum Y size of screen window in pixels
 offset = 10 # padding offset in pixels
 
 # set the type of colormap (see colormaps.py for types of maps available)
-whichcoloring = colormaps.matplotlibScale
+whichcoloring = colormaps.matplotlibScaleAdapted
+
+# set if average temperature needs to be shown
+showAverageTemp = True
+
+if (showAverageTemp):
+    from statistics import mean
         
 # this class shows how to visualise tracking with tkinter
 class ThermalMap:
@@ -37,6 +43,7 @@ class ThermalMap:
             self.coloring = whichMap
             self.demoKit = KinseiClient.KinseiSocket(ip)
             self.connected = self.demoKit.checkIfOnline()
+            self.averageTemp = 0
         except:
             self.connected = False
             
@@ -120,13 +127,25 @@ class ThermalMap:
             roomSizeLabel = self.canvas.create_text(offset + 5, offset + 5, anchor="nw", font=('Helvetica', 14))
             label = "Room envelop is " + str(int(self.roomSize[0]/10)) + "cm x " + str(int(self.roomSize[1]/10)) + "cm"
             self.canvas.itemconfig(roomSizeLabel, text=label)
+            if (showAverageTemp):
+                avgTempLabel = self.canvas.create_text(self.screenX, offset + 5, anchor="ne", font=('Helvetica', 14))
+                labelTemp = "Average Temperature is " + "{0:.2f}".format(self.averageTemp) + "C"
+                self.canvas.itemconfig(avgTempLabel, text=labelTemp)
         
     # executes the thermal map
     def drawMap(self):
         self.canvas.delete("all")
         w=self.screenX
         h=self.screenY
-        colors = list(map(self.coloring,self.demoKit.getThermalMapPixels()))
+        pixelTemperatures10 = self.demoKit.getThermalMapPixels()
+        if (showAverageTemp):
+            self.averageTemp = mean(filter(lambda a: a != 0, pixelTemperatures10)) / 10
+        if (self.coloring == colormaps.matplotlibScaleAdapted):
+            frameMax = max(pixelTemperatures10)
+            frameMin = min(filter(lambda a: a != 0, pixelTemperatures10))
+            colors = [self.coloring(x, frameMin, frameMax) for x in pixelTemperatures10]
+        else: 
+            colors = list(map(self.coloring,pixelTemperatures10))
                 
         # draws the map
         cellwidth = w/self.thermalMapSettings[0]
