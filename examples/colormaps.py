@@ -39,7 +39,7 @@ def linear(temp10):
     return '#%02x%02x%02x' % (int(r1 + f*(r2-r1)), int(g1 + f*(g2-g1)), int(b1 + f*(b2-b1)))
 
 # shows in red anything whose temoerature is above 25C
-def humanSpot(temp10):
+def thresholdMap(temp10):
     if (temp10 > 250):
         return "#FF0000"
     else:
@@ -69,4 +69,14 @@ def matplotlibScaleAdapted(temp10, minTemp, maxTemp, modifier = 1, colorScale = 
     Scale = plt.get_cmap(colorScale)
     colors = (list(map(lambda x: trunc(x * 255), Scale(val))))
     return ('#%02x%02x%02x' % (colors[0],colors[1],colors[2]))
+
+# uses three colors for the temperature text only with respect to a referebce value
+def threeWayColor(temp10, avgTemp, variation = 0):
+    if (abs(temp10 - avgTemp) <= variation) :
+        return "black"
+    elif (temp10 > (avgTemp+variation)):
+        return "red"
+    else:
+        return "blue"
+    
 

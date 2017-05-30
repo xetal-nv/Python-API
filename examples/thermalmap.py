@@ -35,6 +35,9 @@ showAverageTemp = True
 # show colormapping or temperatures
 showColorMapping = False
 
+# Error on average for textColorMapping
+minVariation = 0.1
+
 if (showAverageTemp):
     from statistics import mean
         
@@ -183,8 +186,13 @@ class ThermalMap:
                     outlineColor = ""
                 else:
                     outlineColor = "gray"
+                    if (showAverageTemp):
+                        colorText = colormaps.threeWayColor(pixelTemperatures10[row*self.thermalMapSettings[0] + col]/10,self.averageTemp,\
+                                                            minVariation)
+                    else:
+                        colorText = "black"
                     tempLabelPosition = self.canvas.create_text((col+0.5)*cellwidth + offset,(row+0.5)*cellheight + offset, anchor="center", \
-                                                                font=('Helvetica', 10))
+                                                                font=('Helvetica', 10), fill=colorText)
                     tempLabel = str(pixelTemperatures10[row*self.thermalMapSettings[0] + col]/10)
                     self.canvas.itemconfig(tempLabelPosition, text=tempLabel)
                 self.canvas.create_rectangle(col*cellwidth + offset,row*cellheight + offset,
