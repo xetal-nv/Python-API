@@ -15,10 +15,11 @@ __maintainer__  =   "Francesco Pessolano"
 __email__       =   "francesco@xetal.eu"
 __status__      =   "release"
 
-# in AP mode it is '192.168.42.1' otherwise check your network
 # it accespt also DNS addresses
-#IP_DEVICE = '192.168.42.1' 
-IP_DEVICE = '192.168.2.182' 
+
+# IP_DEVICE = "192.168.42.1" # remove comment to set as default the standard AP address
+# IP_DEVICE = "192.168.76.1" # remove comment to set as default the standard AP address
+IP_DEVICE = "81.82.231.115" # occasionally remotely available Xetal kit
     
 def start():
     # create a socket coinnection to the device

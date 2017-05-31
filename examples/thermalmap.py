@@ -211,8 +211,9 @@ class StartGUI:
         
         self.ipEntry = Entry(master, width=20)
         self.ipEntry.pack(side=TOP,padx=10,pady=10)
-        # self.ipEntry.insert(0,"192.168.42.1")
-        self.ipEntry.insert(0,"81.82.231.115") # temporary
+        # self.ipEntry.insert(0,"192.168.42.1") # remove comment to set as default the standard AP address
+        # self.ipEntry.insert(0,"192.168.76.1") # remove comment to set as default the standard AP address
+        self.ipEntry.insert(0,"81.82.231.115") # occasionally remotely available Xetal kit
         
         # bind escape to terminate
         master.bind('<Escape>', quit)
