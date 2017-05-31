@@ -27,13 +27,13 @@ maxScreenY = 800 # maximum Y size of screen window in pixels
 offset = 10 # padding offset in pixels
 
 # set the type of colormap (see colormaps.py for types of maps available)
-whichcoloring = colormaps.matplotlibScaleAdapted
+whichcoloring = colormaps.matplotlibScale
 
 # set if average temperature needs to be shown
 showAverageTemp = True
 
 # show colormapping or temperatures
-showColorMapping = False
+showColorMapping = True
 
 # Error on average for textColorMapping
 minVariation = 0.1
