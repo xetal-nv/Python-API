@@ -1,3 +1,8 @@
 *.pyc
 *.log
 *.hide
+*.DS*
+*.project
+include/
+bin/
+lib/

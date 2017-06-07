@@ -187,10 +187,10 @@ class TrackingFusionViewer:
         self.fusionMap = []
         for i in range(0, len(fusionData)):
             currentPositionData = self.adjustedCoordinates([fusionData[i][0],fusionData[i][1]]);
-            x0 = currentPositionData[0] + screenX + 10
+            x0 = currentPositionData[0] + self.screenX + offset
             y0 = currentPositionData[1]
-            x1 = currentPositionData[0] + screenX + 30
-            y1 = currentPositionData[1] + 20
+            x1 = currentPositionData[0] + self.screenX + 3*offset
+            y1 = currentPositionData[1] + 2*offset
             self.fusionMap.append(self.canvas.create_oval(x0,y0,x1,y1, fill=colorscale("#ff0000",fusionData[i][2]/26)))
             
     
