@@ -51,7 +51,10 @@ def start():
                 for x in positionData:
                     if (x != [0,0]):
                         heatmapMatrix[x[1]][x[0]] += 1
-                yield heatmapMatrix/heatmapMatrix.max()
+                if (heatmapMatrix.max() > 0):
+                	yield heatmapMatrix/heatmapMatrix.max()
+                else:
+                	yield np.zeros((dimensions[0],dimensions[1]))
             
             def update(heatmapMatrix):
                 im.set_data(heatmapMatrix)
