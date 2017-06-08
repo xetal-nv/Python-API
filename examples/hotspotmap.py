@@ -63,7 +63,7 @@ def start():
             print("\nThe DemoKit is online. \nRoom size is " + str(dimensions[0]) + "cm by " + str(dimensions[1]) + "cm.\n")
             print("Starting persons tracking")
 
-            ani = animation.FuncAnimation(fig, update, data_gen, interval=500)
+            ani = animation.FuncAnimation(fig, update, data_gen, interval=350)
 
             plt.show()
 
