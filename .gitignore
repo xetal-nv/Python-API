@@ -9,3 +9,6 @@ lib/
 .project
 .pydevproject
 .Python
+.Python/
+.python
+.Python
