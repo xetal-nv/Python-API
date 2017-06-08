@@ -16,7 +16,7 @@ __license__     =   "MIT"
 __version__     =   "1.2.0"
 __maintainer__  =   "Francesco Pessolano"
 __email__       =   "francesco@xetal.eu"
-__status__      =   "in development"
+__status__      =   "release"
 
 # the color array is used to simplify color assignment to the tracking balls
 colors = ["green", "blue", "magenta", "white", "cyan", "black", "yellow", "red"]

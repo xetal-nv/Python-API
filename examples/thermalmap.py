@@ -33,7 +33,7 @@ whichcoloring = colormaps.matplotlibScale
 showAverageTemp = True
 
 # show colormapping or temperatures
-showColorMapping = True
+showColorMapping = False
 
 # Error on average for textColorMapping
 minVariation = 0.1

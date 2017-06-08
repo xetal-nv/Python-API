@@ -9,6 +9,7 @@ import trackingViewer
 import trackingFusionViewer
 import presencehttp
 import thermalmap
+import hotspotmap
 
 __author__      =   "Francesco Pessolano"
 __copyright__   =   "Copyright 2017, Xetal nv"
@@ -28,11 +29,13 @@ availableDemos = {
                   # shows an example of http server reporting number of people
                   "presencehttp": presencehttp.start,
                   # shows a thermal map based on the settings in the source files
-                  "thermalmap": thermalmap.start
+                  "thermalmap": thermalmap.start,
+                  # shows a an hot spot map based on people position
+                  "hotspotmap": hotspotmap.start
                   }
 
 def main():
-    availableDemos["trackingFusionViewer"]()
+    availableDemos["hotspotmap"]()
     
         
 if __name__ == "__main__": main()
