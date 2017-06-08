@@ -8,4 +8,4 @@ bin/
 lib/
 .project
 .pydevproject
-.Python/
+.Python
