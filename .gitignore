@@ -8,7 +8,6 @@ bin/
 lib/
 .project
 .pydevproject
-.Python
-.Python/
-.python
-.Python
+/.Python
+/usr/*
+.idea/

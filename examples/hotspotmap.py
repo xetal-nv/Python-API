@@ -11,56 +11,58 @@ import matplotlib.animation as animation
 sys.path.insert(0, '../libs')
 import KinseiClient
 
-__author__      =   "Francesco Pessolano"
-__copyright__   =   "Copyright 2017, Xetal nv"
-__license__     =   "MIT"
-__version__     =   "0.5.0"
-__maintainer__  =   "Francesco Pessolano"
-__email__       =   "francesco@xetal.eu"
-__status__      =   "in development"
+__author__ = "Francesco Pessolano"
+__copyright__ = "Copyright 2017, Xetal nv"
+__license__ = "MIT"
+__version__ = "0.5.0"
+__maintainer__ = "Francesco Pessolano"
+__email__ = "francesco@xetal.eu"
+__status__ = "in development"
 
-IP_DEVICE = "81.82.231.115" # occasionally remotely available Xetal kit
+IP_DEVICE = "81.82.231.115"  # occasionally remotely available Xetal kit
 SCALE = 100
-    
+
+
 def start():
-    # create a socket coinnection to the device
-    demoKit2 = KinseiClient.KinseiSocket(IP_DEVICE) 
+    # create a socket connection to the device
+    demoKit2 = KinseiClient.KinseiSocket(IP_DEVICE)
     # check if the system is online before asking data
     if demoKit2.checkIfOnline():
-        # get room boundig box dimensions
+        # get room bounding box dimensions
         dimensions = demoKit2.getRoomSize()
         if dimensions:
-            dimensions = list(map(lambda x: int(x/SCALE), dimensions))
-            heatmapMatrix = np.random.rand(dimensions[0],dimensions[1])
-            
+            dimensions = list(map(lambda x: int(x / SCALE), dimensions))
+            heatmapMatrix = np.random.rand(dimensions[0], dimensions[1])
+
             fig, ax = plt.subplots()
             im = plt.imshow(heatmapMatrix, cmap='inferno', interpolation='nearest')
             plt.colorbar()
-            heatmapMatrix = np.zeros((dimensions[0],dimensions[1]))
+            heatmapMatrix = np.zeros((dimensions[0], dimensions[1]))
             labelX = ['']
-            labelX.extend(list(map(lambda x: str(x),range(0,dimensions[0]*SCALE,5*SCALE))))
+            labelX.extend(list(map(lambda x: str(x), range(0, dimensions[0] * SCALE, 5 * SCALE))))
             labelY = ['']
-            labelY.extend(list(map(lambda x: str(x),range(0,dimensions[1]*SCALE,5*SCALE))))
+            labelY.extend(list(map(lambda x: str(x), range(0, dimensions[1] * SCALE, 5 * SCALE))))
             ax.set_xticklabels(labelX)
             ax.set_yticklabels(labelY)
-            
+
             def data_gen():
                 positionData = demoKit2.getPersonsPositions(False);
                 if positionData:
-                    positionData = list(map(lambda x: [int(x[0]/SCALE),int(x[1]/SCALE)], positionData))
+                    positionData = list(map(lambda x: [int(x[0] / SCALE), int(x[1] / SCALE)], positionData))
                 for x in positionData:
-                    if (x != [0,0]):
+                    if x != [0, 0]:
                         heatmapMatrix[x[1]][x[0]] += 1
-                if (heatmapMatrix.max() > 0):
-                	yield heatmapMatrix/heatmapMatrix.max()
+                if heatmapMatrix.max() > 0:
+                    yield heatmapMatrix / heatmapMatrix.max()
                 else:
-                	yield np.zeros((dimensions[0],dimensions[1]))
-            
+                    yield np.zeros((dimensions[0], dimensions[1]))
+
             def update(heatmapMatrix):
                 im.set_data(heatmapMatrix)
                 return im
-            
-            print("\nThe DemoKit is online. \nRoom size is " + str(dimensions[0]) + "cm by " + str(dimensions[1]) + "cm.\n")
+
+            print("\nThe DemoKit is online. \nRoom size is " + str(dimensions[0]) + "cm by " + str(
+                dimensions[1]) + "cm.\n")
             print("Starting persons tracking")
 
             ani = animation.FuncAnimation(fig, update, data_gen, interval=350)
@@ -71,5 +73,6 @@ def start():
             print("There has been an error in comunicating with the DemoKit")
     else:
         print("\nERROR: The DemoKit has not been found")
-        
+
+
 if __name__ == "__main__": start()
