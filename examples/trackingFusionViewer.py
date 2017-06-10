@@ -22,10 +22,6 @@ __status__      =   "release"
 
 # the color array is used to simplify color assignment to the tracking balls
 colors = ["green", "blue", "magenta", "white", "cyan", "black", "yellow", "red"]
-        
-# set the tracking canvas dimensions
-screenX = 600
-screenY = 600
 
 # set the viewing window
 maxScreenX = 1000 # maximum X size of screen window in pixels
