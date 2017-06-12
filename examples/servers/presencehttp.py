@@ -5,7 +5,7 @@
 import sys
 import datetime
 
-sys.path.insert(0, '../libs')
+sys.path.insert(0, '../../libs')
 import KinseiClient
 from http.server import BaseHTTPRequestHandler, HTTPServer
 
@@ -16,6 +16,8 @@ __version__     =   "0.5.0"
 __maintainer__  =   "Francesco Pessolano"
 __email__       =   "francesco@xetal.eu"
 __status__      =   "pre release"
+__requiredfirmware__ = "february2017 or later"
+
     
 PORT_NUMBER = 8080
 # it accespt also DNS addresses

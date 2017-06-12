@@ -3,13 +3,9 @@
 """main.py: main for all examples, please enable only one by selecting the proper item of the availableDemos dictionary"""
 
 import sys
-sys.path.insert(0, '../examples')
-import communication
-import trackingViewer
-import trackingFusionViewer
-import presencehttp
-import thermalmap
-import hotspotmap
+sys.path.insert(0, '../viewers')
+from viewers import trackingFusionViewer, thermalmap, communication, trackingViewer, hotspotmap
+from servers import presencehttp
 
 __author__      =   "Francesco Pessolano"
 __copyright__   =   "Copyright 2017, Xetal nv"

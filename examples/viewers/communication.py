@@ -4,7 +4,7 @@
 
 import sys
 
-sys.path.insert(0, '../libs')
+sys.path.insert(0, '../../libs')
 import KinseiClient
 
 __author__      =   "Francesco Pessolano"
@@ -14,6 +14,8 @@ __version__     =   "1.0.1"
 __maintainer__  =   "Francesco Pessolano"
 __email__       =   "francesco@xetal.eu"
 __status__      =   "release"
+__requiredfirmware__ = "february2017 or later"
+
 
 # it accespt also DNS addresses
 
@@ -35,7 +37,7 @@ def start():
                 # get position data
                 positionData = demoKit2.getPersonsPositions(False);
                 if positionData:
-                    print ("Coordinates af present persons ")
+                    print ("Coordinates of present persons ")
                     print ("\t\t", positionData)
                 # get the number of people in float mode
                 positionData = demoKit2.getNumberPersonsFloat()
