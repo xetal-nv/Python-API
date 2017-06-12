@@ -12,9 +12,14 @@ __status__ = "in development"
 
 import socket
 import threading
+import select
 
-# Set verbose for debug
-VERBOSE = False
+# Set verbose for DEBUG ONLY
+VERBOSE = True
+
+# Use timeout
+TIMEOUT = False
+TIMEOUTMS = 60
 
 
 class ThreadedServer(object):
@@ -24,13 +29,23 @@ class ThreadedServer(object):
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self.sock.bind((self.host, self.port))
+        self.lock = threading.Lock()
 
     def listen(self):
         self.sock.listen(5)
         while True:
-            client, address = self.sock.accept()
-            client.settimeout(60)
-            threading.Thread(target=self.listenToClient, args=(client, address)).start()
+            try:
+                result = select.select([self.sock], [], [], 0.0)
+                if self.sock in result[0]:
+                    with self.lock:
+                        client, address = self.sock.accept()
+                        if TIMEOUT:
+                            client.settimeout(TIMEOUTMS)
+                        t = threading.Thread(target=self.listenToClient, args=(client, address))
+                        t.daemon = True
+                        t.start()
+            except KeyboardInterrupt:
+                break
 
     def listenToClient(self, client, address):
         size = 1024
@@ -41,7 +56,6 @@ class ThreadedServer(object):
             try:
                 data = client.recv(size)
                 if data:
-                    # Set the response to echo back the received data
                     self.onMessage(data, client)
                 else:
                     if VERBOSE:
@@ -59,7 +73,8 @@ class ThreadedServer(object):
 
     # needs to be properly overridden
     def onMessage(self, message, client):
-        client.send(message)
+        if VERBOSE:
+            print ("Client ", client, " sent ", message)
 
     # needs to be properly overridden
     def onConnect(self, client, address):
@@ -69,18 +84,3 @@ class ThreadedServer(object):
     def onDisconnect(self, client, address):
         pass
 
-
-def test():
-    while True:
-        port_num = input("Port? ")
-        try:
-            port_num = int(port_num)
-            break
-        except ValueError:
-            pass
-
-    ThreadedServer('', port_num).listen()
-
-
-if __name__ == "__main__":
-    test()
