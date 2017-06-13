@@ -17,7 +17,7 @@ from colormaps import *
 __author__ = "Francesco Pessolano"
 __copyright__ = "Copyright 2017, Xetal nv"
 __license__ = "MIT"
-__version__ = "1.3.0"
+__version__ = "1.4.0"
 __maintainer__ = "Francesco Pessolano"
 __email__ = "francesco@xetal.eu"
 __status__ = "release"
@@ -45,6 +45,7 @@ class TrackingFusionViewer:
         self.screenX = 0
         self.screenY = 0
         self.fusionMap = None
+        self.numberPersons = [0.0, 0]
 
     def connect(self, ip):
         try:
@@ -150,6 +151,13 @@ class TrackingFusionViewer:
         roomSizeLabel = self.canvas.create_text(offset + 5, offset + 5, anchor="nw", font=('Helvetica', 14))
         label = "Room envelop is " + str(int(self.roomSize[0] / 10)) + "cm x " + str(int(self.roomSize[1] / 10)) + "cm"
         self.canvas.itemconfig(roomSizeLabel, text=label)
+        personFloat = self.demoKit.getNumberPersonsFloat(False)
+        personFix = self.demoKit.getNumberPersonsFixed(False)
+        counterLabel = self.canvas.create_text(self.screenX + 3 * offset, offset + 5, \
+                                               anchor="nw", font=('Helvetica', 14))
+        labelCounter = "Number of people: [" + "{0:.2f}".format(personFloat) + ", " + \
+                    str(personFix)  + "]"
+        self.canvas.itemconfig(counterLabel, text=labelCounter)
 
     # executes the tracking
     def trackPersonsAndFusion(self):
@@ -160,7 +168,7 @@ class TrackingFusionViewer:
 
         for i in range(0, len(positionData)):
             currentPositionData = self.adjustedCoordinates(positionData[i]);
-            # TODO: to be tested if it truly works well
+            # TODO: check effect on stability
             if (currentPositionData == [10, 10]):
                 currentPositionData = [-50, -50]
             # TODO

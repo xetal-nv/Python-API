@@ -133,6 +133,12 @@ class ViewerTrackingOnly:
         roomSizeLabel = self.canvas.create_text(offset + 5, offset + 5, anchor="nw", font=('Helvetica', 14))
         label = "Room envelop is " + str(int(self.roomSize[0] / 10)) + "cm x " + str(int(self.roomSize[1] / 10)) + "cm"
         self.canvas.itemconfig(roomSizeLabel, text=label)
+        personFloat = self.demoKit.getNumberPersonsFloat(False)
+        personFix = self.demoKit.getNumberPersonsFixed(False)
+        counterLabel = self.canvas.create_text(offset + 5, offset + 25, anchor="nw", font=('Helvetica', 14))
+        labelCounter = "Number of people: [" + "{0:.2f}".format(personFloat) + ", " + \
+                    str(personFix)  + "]"
+        self.canvas.itemconfig(counterLabel, text=labelCounter)
 
     # executes the tracking
     def trackPersons(self):
