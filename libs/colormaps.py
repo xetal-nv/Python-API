@@ -19,6 +19,8 @@ __status__ = "release"
 minimimTemp = 15
 maximumTemp = 40
 
+# provide scale in mm when relevant
+SCALE = 100
 
 # select linear in order to have a linear map from blue to red in the given range
 def linear(temp10):

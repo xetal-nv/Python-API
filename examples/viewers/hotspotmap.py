@@ -1,7 +1,8 @@
 #!/usr/bin/python3
 
 """hotspotmap.py: graphical viewer for persons tracking and fusion (raw data indicating
-    a possible detected person where probability of being a real person is proportional to the color brightness)"""
+    a possible detected person where probability of being a real person is proportional to the color brightness)
+    NOTE: that the script does not check if the number of sampled positions exceeds the maximum (float64.max)"""
 
 # import sys
 import numpy as np
@@ -9,22 +10,19 @@ import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 from tkinter import *
 
-
 sys.path.insert(0, '../../libs')
 import KinseiClient
 import gui
+from colormaps import *
 
 __author__ = "Francesco Pessolano"
 __copyright__ = "Copyright 2017, Xetal nv"
 __license__ = "MIT"
-__version__ = "1.0.0"
+__version__ = "1.0.1"
 __maintainer__ = "Francesco Pessolano"
 __email__ = "francesco@xetal.eu"
 __status__ = "release"
 __requiredfirmware__ = "february2017 or later"
-
-# provide scale in mm
-SCALE = 100
 
 
 class HotSpotMap:
@@ -66,9 +64,11 @@ class HotSpotMap:
                     positionData = self.demoKit.getPersonsPositions(False);
                     if positionData:
                         positionData = list(map(lambda x: [int(x[0] / SCALE), int(x[1] / SCALE)], positionData))
+                    print(positionData)
                     for x in positionData:
                         if x != [0, 0]:
                             heatmapMatrix[x[1]][x[0]] += 1
+                            print(heatmapMatrix[x[1]][x[0]])
                     if heatmapMatrix.max() > 0:
                         yield heatmapMatrix / heatmapMatrix.max()
                     else:
@@ -82,7 +82,7 @@ class HotSpotMap:
                     dimensions[1]) + "cm.\n")
                 print("Starting persons tracking")
 
-                ani = animation.FuncAnimation(fig, update, data_gen, interval=350)
+                ani = animation.FuncAnimation(fig, update, data_gen, interval=1)
 
                 plt.show()
 
