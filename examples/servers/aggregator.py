@@ -68,11 +68,6 @@ class AggregatorServer(ThreadedServer):
                     for x in positionData:
                         if x != [0, 0]:
                             self.hotSpotMatrix[x[1]][x[0]] += 1.0
-
-                            # if self.hotSpotMatrix.max() > 0:
-                            #     self.hotSpotMatrix /= self.hotSpotMatrix.max()
-                            # else:
-                            #     self.hotSpotMatrix = np.zeros((self.dimensions[0], self.dimensions[1]))
                 time.sleep(SKIMSAMPLES * self.demoKit.getTimeIntervalMS())
             print("AggregateData terminated at iteration " + str(self.hotSpotMatrix.max()))
             nameFile = str(time.time()) + ".log"
@@ -90,11 +85,7 @@ class AggregatorServer(ThreadedServer):
             # this is enable testing with nc
             if message[-1] == 10:
                 message = message[0:-1]
-            # print("Received ", message, " from ", client)
             if message == b'hm':
-                # send matrix dimensions
-                # client.send(struct.pack('I', self.size[0]))
-                # client.send(struct.pack('I', self.size[1]))
                 # send matrix values
                 if self.hotSpotMatrix.max() > 0:
                     matrix = self.hotSpotMatrix / self.hotSpotMatrix.max()

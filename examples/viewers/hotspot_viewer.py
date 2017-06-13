@@ -61,12 +61,9 @@ class HotSpotMapWithServer:
 
             def getDatagetData():
                 try:
-                    # Send data
                     message = b'hm'
                     self.server.sendall(message)
                     size = dimension0 * dimension1
-                    # print (np.fromstring(data, dtype=float).reshape(40,40).max())
-                    # data = sock.recv(size)
                     d = []
                     for i in range(size):
                         data = self.server .recv(4)
@@ -82,6 +79,7 @@ class HotSpotMapWithServer:
             fig.canvas.set_window_title("Hot Spot Map (scale: " + str(SCALE) + "mm:1)")
             im = plt.imshow(heatmapMatrix, cmap='inferno', interpolation='nearest')
             plt.colorbar()
+            # noinspection PyUnusedLocal
             heatmapMatrix = np.zeros((dimension0, dimension1))
 
             def data_gen():
@@ -99,6 +97,7 @@ class HotSpotMapWithServer:
             print("\nThe DemoKit is online. \nRoom size is " + str(dimension0) + "cm by " + str(dimension1) + "cm.\n")
             print("Starting persons tracking")
 
+            # noinspection PyUnusedLocal
             ani = animation.FuncAnimation(fig, update, data_gen, interval=1000)
 
             plt.show()
