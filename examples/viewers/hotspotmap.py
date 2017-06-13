@@ -18,7 +18,7 @@ from colormaps import *
 __author__ = "Francesco Pessolano"
 __copyright__ = "Copyright 2017, Xetal nv"
 __license__ = "MIT"
-__version__ = "1.0.1"
+__version__ = "1.0.2"
 __maintainer__ = "Francesco Pessolano"
 __email__ = "francesco@xetal.eu"
 __status__ = "release"
@@ -64,11 +64,9 @@ class HotSpotMap:
                     positionData = self.demoKit.getPersonsPositions(False);
                     if positionData:
                         positionData = list(map(lambda x: [int(x[0] / SCALE), int(x[1] / SCALE)], positionData))
-                    print(positionData)
                     for x in positionData:
                         if x != [0, 0]:
                             heatmapMatrix[x[1]][x[0]] += 1
-                            print(heatmapMatrix[x[1]][x[0]])
                     if heatmapMatrix.max() > 0:
                         yield heatmapMatrix / heatmapMatrix.max()
                     else:
