@@ -15,7 +15,7 @@ from colormaps import *
 __author__ = "Francesco Pessolano"
 __copyright__ = "Copyright 2017, Xetal nv"
 __license__ = "MIT"
-__version__ = "1.0.0"
+__version__ = "1.0.1"
 __maintainer__ = "Francesco Pessolano"
 __email__ = "francesco@xetal.eu"
 __status__ = "release"
@@ -68,7 +68,7 @@ class AggregatorServer(ThreadedServer):
                     for x in positionData:
                         if x != [0, 0]:
                             self.hotSpotMatrix[x[1]][x[0]] += 1.0
-                time.sleep(SKIMSAMPLES * self.demoKit.getTimeIntervalMS())
+                time.sleep(SKIMSAMPLES * self.demoKit.getTimeIntervalMS() / 1000)
             print("AggregateData terminated at iteration " + str(self.hotSpotMatrix.max()))
             nameFile = str(time.time()) + ".log"
             print("Latest aggregated data saved to file " + nameFile)
