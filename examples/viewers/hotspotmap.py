@@ -24,8 +24,13 @@ __email__ = "francesco@xetal.eu"
 __status__ = "in testing"
 __requiredfirmware__ = "february2017 or later"
 
-# Turn on experimental mode based on all possible data points, please use SKIMSAMPLES > 5
+# TODO Turn on experimental mode based on all possible data points
+# please use SKIMSAMPLES > 5 and set a RAWTHRESHOLD to ignore false data points
 EXPMODE = True
+RAWTHRESHOLD = 10
+
+# Highlight most prominent samples above a give threshold
+CLEANMIN = 0
 
 # How many samples needs to be skipped, this cna be used to dilute aggregation
 SKIMSAMPLES = 10
@@ -78,9 +83,12 @@ class HotSpotMap:
                             positionData = list(map(lambda x: [int(x[0] / SCALE), int(x[1] / SCALE)], positionData))
                     for x in positionData:
                         if x != [0, 0]:
-                            heatmapMatrix[x[1]][x[0]] += 1
+                            if (not EXPMODE) or (fusionData[i][2] > RAWTHRESHOLD):
+                                heatmapMatrix[x[1]][x[0]] += 1
                     if heatmapMatrix.max() > 0:
-                        yield heatmapMatrix / heatmapMatrix.max()
+                        result = heatmapMatrix / heatmapMatrix.max()
+                        result[result <= CLEANMIN] = 0
+                        yield result
                     else:
                         yield np.zeros((dimensions[0], dimensions[1]))
 
