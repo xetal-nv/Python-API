@@ -18,11 +18,17 @@ from colormaps import *
 __author__ = "Francesco Pessolano"
 __copyright__ = "Copyright 2017, Xetal nv"
 __license__ = "MIT"
-__version__ = "1.0.2"
+__version__ = "1.1.0"
 __maintainer__ = "Francesco Pessolano"
 __email__ = "francesco@xetal.eu"
-__status__ = "release"
+__status__ = "in testing"
 __requiredfirmware__ = "february2017 or later"
+
+# Turn on experimental mode based on all possible data points, please use SKIMSAMPLES > 5
+EXPMODE = True
+
+# How many samples needs to be skipped, this cna be used to dilute aggregation
+SKIMSAMPLES = 10
 
 
 class HotSpotMap:
@@ -61,9 +67,15 @@ class HotSpotMap:
                 ax.set_yticklabels(labelY)
 
                 def data_gen():
-                    positionData = self.demoKit.getPersonsPositions(False);
-                    if positionData:
-                        positionData = list(map(lambda x: [int(x[0] / SCALE), int(x[1] / SCALE)], positionData))
+                    positionData = []
+                    if EXPMODE:
+                        fusionData = self.demoKit.getFusionValues(False)
+                        for i in range(0, len(fusionData)):
+                            positionData.append([int(fusionData[i][0]/SCALE), int(fusionData[i][1]/SCALE)])
+                    else:
+                        positionData = self.demoKit.getPersonsPositions(False)
+                        if positionData:
+                            positionData = list(map(lambda x: [int(x[0] / SCALE), int(x[1] / SCALE)], positionData))
                     for x in positionData:
                         if x != [0, 0]:
                             heatmapMatrix[x[1]][x[0]] += 1
@@ -80,7 +92,7 @@ class HotSpotMap:
                     dimensions[1]) + "cm.\n")
                 print("Starting persons tracking")
 
-                ani = animation.FuncAnimation(fig, update, data_gen, interval=1)
+                ani = animation.FuncAnimation(fig, update, data_gen, interval=1 + SKIMSAMPLES * self.demoKit.getTimeIntervalMS())
 
                 plt.show()
 

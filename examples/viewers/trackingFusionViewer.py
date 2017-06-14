@@ -71,7 +71,7 @@ class TrackingFusionViewer:
         screenRatio = maxScreenX / maxScreenY
         if (screenRatio < 1):
             # portrait screen
-            if ((boundingBoxRatio < 1) and (screenRatio > boundingBoxRatio)):
+            if (boundingBoxRatio < 1) and (screenRatio > boundingBoxRatio):
                 # We need to scale from the height
                 yMax = maxScreenY
                 yMin = 0
@@ -87,13 +87,13 @@ class TrackingFusionViewer:
                 yMax = yMin + theOtherDimension
         else:
             # landscape screen
-            if ((boundingBoxRatio > 1) and (screenRatio < boundingBoxRatio)):
+            if (boundingBoxRatio > 1) and (screenRatio < boundingBoxRatio):
                 # We need to scale from the width
                 xMin = 0
                 xMax = maxScreenX
-                theOtherDimension = trunc((xMax - xMin) / boundingBoxRatio);
-                yMin = 0;
-                yMax = yMin + theOtherDimension;
+                theOtherDimension = trunc((xMax - xMin) / boundingBoxRatio)
+                yMin = 0
+                yMax = yMin + theOtherDimension
 
             else:
                 # We need to scale from the height
@@ -108,7 +108,7 @@ class TrackingFusionViewer:
     # this function set-up the canvas and let the tracking start
     def start(self):
         if self.connected:
-            # the canvas is created and all elements initialisated
+            # the canvas is created and all elements initializated
             self.roomSize = self.demoKit.getRoomSize()
             self.defineCanvas()
             self.master = Tk()
@@ -132,7 +132,7 @@ class TrackingFusionViewer:
             self.canvas.itemconfig(titleId2, text="Fusion Canvas")
             self.realVertex = list(map(self.adjustedCoordinates, self.demoKit.getRoomCorners()))
             self.drawBackground()
-            positionData = self.demoKit.getPersonsPositions(False);
+            positionData = self.demoKit.getPersonsPositions(False)
 
             self.persons = []
             for i in range(0, len(positionData)):
@@ -161,15 +161,15 @@ class TrackingFusionViewer:
 
     # executes the tracking
     def trackPersonsAndFusion(self):
-        positionData = self.demoKit.getPersonsPositions();
-        fusionData = self.demoKit.getFusionValues(False);
+        positionData = self.demoKit.getPersonsPositions()
+        fusionData = self.demoKit.getFusionValues(False)
 
         self.updateFusionMap(fusionData)
 
         for i in range(0, len(positionData)):
-            currentPositionData = self.adjustedCoordinates(positionData[i]);
+            currentPositionData = self.adjustedCoordinates(positionData[i])
             # TODO: check effect on stability
-            if (currentPositionData == [10, 10]):
+            if currentPositionData == [10, 10]:
                 currentPositionData = [-50, -50]
             # TODO
             deltax = currentPositionData[0] - self.persons[i][1][0]
@@ -186,7 +186,7 @@ class TrackingFusionViewer:
             self.canvas.delete(self.fusionMap[i])
         self.fusionMap = []
         for i in range(0, len(fusionData)):
-            currentPositionData = self.adjustedCoordinates([fusionData[i][0], fusionData[i][1]]);
+            currentPositionData = self.adjustedCoordinates([fusionData[i][0], fusionData[i][1]])
             x0 = currentPositionData[0] + self.screenX + offset
             y0 = currentPositionData[1]
             x1 = currentPositionData[0] + self.screenX + 3 * offset
