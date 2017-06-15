@@ -145,7 +145,6 @@ class TrackingFusionViewer:
 
     # draw background
     def drawBackground(self):
-        # self.canvas.delete("all")
         self.canvas.create_polygon(*self.realVertex, fill='', outline='blue', width='2')
         fusionVertex = [[a + self.screenX + offset, b] for [a, b] in self.realVertex]
         self.canvas.create_polygon(*fusionVertex, fill='', outline='blue', width='2')
@@ -162,7 +161,6 @@ class TrackingFusionViewer:
 
     # executes the tracking
     def trackPersonsAndFusion(self):
-        # self.drawBackground()
         positionData = self.demoKit.getPersonsPositions()
         fusionData = self.demoKit.getFusionValues(False)
 
