@@ -32,7 +32,7 @@ RAWTHRESHOLD = 10
 # Highlight most prominent samples above a give threshold
 CLEANMIN = 0
 
-# How many samples needs to be skipped, this cna be used to dilute aggregation
+# How many samples needs to be skipped, this can be used to dilute aggregation
 SKIMSAMPLES = 10
 
 

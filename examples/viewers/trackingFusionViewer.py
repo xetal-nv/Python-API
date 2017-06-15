@@ -145,22 +145,24 @@ class TrackingFusionViewer:
 
     # draw background
     def drawBackground(self):
+        # self.canvas.delete("all")
         self.canvas.create_polygon(*self.realVertex, fill='', outline='blue', width='2')
         fusionVertex = [[a + self.screenX + offset, b] for [a, b] in self.realVertex]
         self.canvas.create_polygon(*fusionVertex, fill='', outline='blue', width='2')
         roomSizeLabel = self.canvas.create_text(offset + 5, offset + 5, anchor="nw", font=('Helvetica', 14))
         label = "Room envelop is " + str(int(self.roomSize[0] / 10)) + "cm x " + str(int(self.roomSize[1] / 10)) + "cm"
         self.canvas.itemconfig(roomSizeLabel, text=label)
-        personFloat = self.demoKit.getNumberPersonsFloat(False)
-        personFix = self.demoKit.getNumberPersonsFixed(False)
-        counterLabel = self.canvas.create_text(self.screenX + 3 * offset, offset + 5, \
-                                               anchor="nw", font=('Helvetica', 14))
-        labelCounter = "Number of people: [" + "{0:.2f}".format(personFloat) + ", " + \
-                    str(personFix)  + "]"
-        self.canvas.itemconfig(counterLabel, text=labelCounter)
+        # personFloat = self.demoKit.getNumberPersonsFloat(False)
+        # personFix = self.demoKit.getNumberPersonsFixed(False)
+        # counterLabel = self.canvas.create_text(self.screenX + 3 * offset, offset + 5, \
+        #                                        anchor="nw", font=('Helvetica', 14))
+        # labelCounter = "Number of people: [" + "{0:.2f}".format(personFloat) + ", " + \
+        #             str(personFix)  + "]"
+        # self.canvas.itemconfig(counterLabel, text=labelCounter)
 
     # executes the tracking
     def trackPersonsAndFusion(self):
+        # self.drawBackground()
         positionData = self.demoKit.getPersonsPositions()
         fusionData = self.demoKit.getFusionValues(False)
 
