@@ -41,6 +41,7 @@ class ViewerTrackingOnly:
         self.persons = []
         self.screenX = 0
         self.screenY = 0
+        self.counterLabel = None
 
     def connect(self, ip):
         try:
@@ -133,16 +134,21 @@ class ViewerTrackingOnly:
         roomSizeLabel = self.canvas.create_text(offset + 5, offset + 5, anchor="nw", font=('Helvetica', 14))
         label = "Room envelop is " + str(int(self.roomSize[0] / 10)) + "cm x " + str(int(self.roomSize[1] / 10)) + "cm"
         self.canvas.itemconfig(roomSizeLabel, text=label)
-        # personFloat = self.demoKit.getNumberPersonsFloat(False)
-        # personFix = self.demoKit.getNumberPersonsFixed(False)
-        # counterLabel = self.canvas.create_text(offset + 5, offset + 25, anchor="nw", font=('Helvetica', 14))
-        # labelCounter = "Number of people: [" + "{0:.2f}".format(personFloat) + ", " + \
-        #             str(personFix)  + "]"
-        # self.canvas.itemconfig(counterLabel, text=labelCounter)
+        personFloat = self.demoKit.getNumberPersonsFloat(False)
+        personFix = self.demoKit.getNumberPersonsFixed(False)
+        self.counterLabel = self.canvas.create_text(offset + 5, offset + 25, anchor="nw", font=('Helvetica', 14))
+        labelCounter = "Number of people: [" + "{0:.2f}".format(personFloat) + ", " + \
+                       str(personFix) + "]"
+        self.canvas.itemconfig(self.counterLabel, text=labelCounter)
 
     # executes the tracking
     def trackPersons(self):
         positionData = self.demoKit.getPersonsPositions();
+        personFloat = self.demoKit.getNumberPersonsFloat(False)
+        personFix = self.demoKit.getNumberPersonsFixed(False)
+        labelCounter = "Number of people: [" + "{0:.2f}".format(personFloat) + ", " + \
+                       str(personFix) + "]"
+        self.canvas.itemconfig(self.counterLabel, text=labelCounter)
 
         for i in range(0, len(positionData)):
             currentPositionData = self.adjustedCoordinates(positionData[i]);
