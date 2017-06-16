@@ -14,13 +14,12 @@ import gui
 __author__ = "Francesco Pessolano"
 __copyright__ = "Copyright 2017, Xetal nv"
 __license__ = "MIT"
-__version__ = "1.3.0"
+__version__ = "1.4.0"
 __maintainer__ = "Francesco Pessolano"
 __email__ = "francesco@xetal.eu"
 __status__ = "release"
 __requiredfirmware__ = "february2017 or later"
 
-# TODO add pause button like in trackingFusionViewer.py
 
 # the color array is used to simplify color assignment to the tracking balls
 colors = ["green", "blue", "magenta", "white", "cyan", "black", "yellow", "red"]
@@ -44,6 +43,7 @@ class ViewerTrackingOnly:
         self.screenX = 0
         self.screenY = 0
         self.counterLabel = None
+        self.run = None
 
     def connect(self, ip):
         try:
@@ -142,26 +142,38 @@ class ViewerTrackingOnly:
         labelCounter = "Number of people: [" + "{0:.2f}".format(personFloat) + ", " + \
                        str(personFix) + "]"
         self.canvas.itemconfig(self.counterLabel, text=labelCounter)
+        self.run = Button(self.master, text="RUNNING", command=self.togglePause)
+        self.run.pack(side=BOTTOM, padx=0, pady=5)
+
+    # toggle pause
+    def togglePause(self):
+        if self.run['text'] == "RUNNING":
+            if not self.demoKit.disconnect():
+                self.run['text'] = "PAUSED"
+                self.run.config(relief=SUNKEN)
+        else:
+            if self.demoKit.reconnect():
+                self.run['text'] = "RUNNING"
+                self.run.config(relief=RAISED)
 
     # executes the tracking
     def trackPersons(self):
-        positionData = self.demoKit.getPersonsPositions();
-        personFloat = self.demoKit.getNumberPersonsFloat(False)
-        personFix = self.demoKit.getNumberPersonsFixed(False)
-        labelCounter = "Number of people: [" + "{0:.2f}".format(personFloat) + ", " + \
-                       str(personFix) + "]"
-        self.canvas.itemconfig(self.counterLabel, text=labelCounter)
+        if self.run['text'] == "RUNNING":
+            positionData = self.demoKit.getPersonsPositions();
+            personFloat = self.demoKit.getNumberPersonsFloat(False)
+            personFix = self.demoKit.getNumberPersonsFixed(False)
+            labelCounter = "Number of people: [" + "{0:.2f}".format(personFloat) + ", " + \
+                           str(personFix) + "]"
+            self.canvas.itemconfig(self.counterLabel, text=labelCounter)
 
-        for i in range(0, len(positionData)):
-            currentPositionData = self.adjustedCoordinates(positionData[i]);
-            # TODO: to be tested if it truly works well
-            if currentPositionData == [10, 10]:
-                currentPositionData = [-50, -50]
-            # TODO
-            deltax = currentPositionData[0] - self.persons[i][1][0]
-            deltay = currentPositionData[1] - self.persons[i][1][1]
-            self.canvas.move(self.persons[i][0], deltax, deltay)
-            self.persons[i][1] = currentPositionData
+            for i in range(0, len(positionData)):
+                currentPositionData = self.adjustedCoordinates(positionData[i]);
+                if currentPositionData == [10, 10]:
+                    currentPositionData = [-50, -50]
+                deltax = currentPositionData[0] - self.persons[i][1][0]
+                deltay = currentPositionData[1] - self.persons[i][1][1]
+                self.canvas.move(self.persons[i][0], deltax, deltay)
+                self.persons[i][1] = currentPositionData
 
         self.canvas.after(10, self.trackPersons)  # delay must be larger than 0
 

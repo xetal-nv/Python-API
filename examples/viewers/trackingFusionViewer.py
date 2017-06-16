@@ -161,7 +161,7 @@ class TrackingFusionViewer:
                        str(personFix) + "]"
         self.canvas.itemconfig(self.counterLabel, text=labelCounter)
         self.run = Button(self.master, text="RUNNING", command=self.togglePause)
-        # self.run.pack(side=BOTTOM, padx=0, pady=5) # TODO commented out since not working
+        self.run.pack(side=BOTTOM, padx=0, pady=5)
 
     # toggle pause
     def togglePause(self):
@@ -170,7 +170,7 @@ class TrackingFusionViewer:
                 self.run['text'] = "PAUSED"
                 self.run.config(relief=SUNKEN)
         else:
-            if not self.demoKit.reconnect():
+            if self.demoKit.reconnect():
                 self.run['text'] = "RUNNING"
                 self.run.config(relief=RAISED)
 

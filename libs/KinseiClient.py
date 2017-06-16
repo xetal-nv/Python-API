@@ -47,7 +47,7 @@ class KinseiSocket(object):
         self.latencyMS = pauseMS
         try:
             self.server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            self.channelData = [host, timeout, port]
+            self.channelData = [(host, port), timeout]
             self.server.settimeout(timeout)
             self.server.connect((host, port))
             self.serverConnected = True
@@ -64,7 +64,7 @@ class KinseiSocket(object):
     """ disconnect:
     Disconnect from the device without removing the object"""
 
-    def disconnect(self): # TODO under test
+    def disconnect(self):
         if self.serverConnected:
             self.serverConnected = False
             self.server.close()
@@ -73,15 +73,17 @@ class KinseiSocket(object):
     """reconnect:
     Reconnect to the channel associated with the object"""
 
-    def reconnect(self): # TODO under test
+    def reconnect(self):
         if not self.serverConnected:
             try:
+                self.server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                 self.server.settimeout(self.channelData[1])
-                self.server.connect((self.channelData[0], self.channelData[2]))
+                self.server.connect(self.channelData[0])
                 self.serverConnected = True
             except socket.error as err:
                 self.serverConnected = False
-        return self.serverConnected
+            finally:
+                return self.serverConnected
 
     """ setTimeIntervalMS:
     Set the time interval between to messages forced when the methods below are executes with the flag wait
