@@ -17,7 +17,7 @@ from colormaps import *
 __author__ = "Francesco Pessolano"
 __copyright__ = "Copyright 2017, Xetal nv"
 __license__ = "MIT"
-__version__ = "1.4.0"
+__version__ = "1.5.0"
 __maintainer__ = "Francesco Pessolano"
 __email__ = "francesco@xetal.eu"
 __status__ = "release"
@@ -47,6 +47,7 @@ class TrackingFusionViewer:
         self.fusionMap = None
         self.numberPersons = [0.0, 0]
         self.counterLabel = None
+        self.run = None
 
     def connect(self, ip):
         try:
@@ -159,29 +160,41 @@ class TrackingFusionViewer:
         labelCounter = "Number of people: [" + "{0:.2f}".format(personFloat) + ", " + \
                        str(personFix) + "]"
         self.canvas.itemconfig(self.counterLabel, text=labelCounter)
+        self.run = Button(self.master, text="RUNNING", command=self.togglePause)
+        self.run.pack(side=BOTTOM, padx=0, pady=5)
+
+    # toggle pause
+    def togglePause(self):
+        if self.run['text'] == "RUNNING":
+            self.run['text'] = "PAUSED"
+            self.run.config(relief=SUNKEN)
+        else:
+            self.run['text'] = "RUNNING"
+            self.run.config(relief=RAISED)
 
     # executes the tracking
     def trackPersonsAndFusion(self):
-        positionData = self.demoKit.getPersonsPositions()
-        fusionData = self.demoKit.getFusionValues(False)
-        personFloat = self.demoKit.getNumberPersonsFloat(False)
-        personFix = self.demoKit.getNumberPersonsFixed(False)
-        labelCounter = "Number of people: [" + "{0:.2f}".format(personFloat) + ", " + \
-                       str(personFix) + "]"
-        self.canvas.itemconfig(self.counterLabel, text=labelCounter)
+        if self.run["text"] == "RUNNING":
+            positionData = self.demoKit.getPersonsPositions()
+            fusionData = self.demoKit.getFusionValues(False)
+            personFloat = self.demoKit.getNumberPersonsFloat(False)
+            personFix = self.demoKit.getNumberPersonsFixed(False)
+            labelCounter = "Number of people: [" + "{0:.2f}".format(personFloat) + ", " + \
+                           str(personFix) + "]"
+            self.canvas.itemconfig(self.counterLabel, text=labelCounter)
 
-        self.updateFusionMap(fusionData)
+            self.updateFusionMap(fusionData)
 
-        for i in range(0, len(positionData)):
-            currentPositionData = self.adjustedCoordinates(positionData[i])
-            # TODO: check effect on stability
-            if currentPositionData == [10, 10]:
-                currentPositionData = [-50, -50]
-            # TODO
-            deltax = currentPositionData[0] - self.persons[i][1][0]
-            deltay = currentPositionData[1] - self.persons[i][1][1]
-            self.canvas.move(self.persons[i][0], deltax, deltay)
-            self.persons[i][1] = currentPositionData
+            for i in range(0, len(positionData)):
+                currentPositionData = self.adjustedCoordinates(positionData[i])
+                # TODO: check effect on stability
+                if currentPositionData == [10, 10]:
+                    currentPositionData = [-50, -50]
+                # TODO
+                deltax = currentPositionData[0] - self.persons[i][1][0]
+                deltay = currentPositionData[1] - self.persons[i][1][1]
+                self.canvas.move(self.persons[i][0], deltax, deltay)
+                self.persons[i][1] = currentPositionData
 
         self.canvas.after(10, self.trackPersonsAndFusion)  # delay must be larger than 0
 
