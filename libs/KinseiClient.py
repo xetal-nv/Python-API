@@ -9,7 +9,7 @@ import math
 __author__ = "Francesco Pessolano"
 __copyright__ = "Copyright 2017, Xetal nv"
 __license__ = "MIT"
-__version__ = "2.0.1"
+__version__ = "2.1.1"
 __maintainer__ = "Francesco Pessolano"
 __email__ = "francesco@xetal.eu"
 __status__ = "release"
@@ -47,6 +47,7 @@ class KinseiSocket(object):
         self.latencyMS = pauseMS
         try:
             self.server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            self.channelData = [host, timeout, port]
             self.server.settimeout(timeout)
             self.server.connect((host, port))
             self.serverConnected = True
@@ -58,8 +59,29 @@ class KinseiSocket(object):
     """
 
     def __del__(self):
+        self.disconnect()
+
+    """ disconnect:
+    Disconnect from the device without removing the object"""
+
+    def disconnect(self): # TODO under test
         if self.serverConnected:
+            self.serverConnected = False
             self.server.close()
+        return self.serverConnected
+
+    """reconnect:
+    Reconnect to the channel associated with the object"""
+
+    def reconnect(self): # TODO under test
+        if not self.serverConnected:
+            try:
+                self.server.settimeout(self.channelData[1])
+                self.server.connect((self.channelData[0], self.channelData[2]))
+                self.serverConnected = True
+            except socket.error as err:
+                self.serverConnected = False
+        return self.serverConnected
 
     """ setTimeIntervalMS:
     Set the time interval between to messages forced when the methods below are executes with the flag wait
@@ -222,7 +244,7 @@ class KinseiSocket(object):
         # returns [[centroid X, centroid Y, sensed value]]
         data = self.executeCommand(self.kinseiCommand["fusionValues"], wait)
         if data == self.kinseiCommand["error"]:
-            return False
+            return []
         numberSensedLocations = data[1];
         sensedLocationsData = []
         for i in range(numberSensedLocations):

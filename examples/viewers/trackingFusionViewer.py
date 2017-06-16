@@ -161,20 +161,22 @@ class TrackingFusionViewer:
                        str(personFix) + "]"
         self.canvas.itemconfig(self.counterLabel, text=labelCounter)
         self.run = Button(self.master, text="RUNNING", command=self.togglePause)
-        self.run.pack(side=BOTTOM, padx=0, pady=5)
+        # self.run.pack(side=BOTTOM, padx=0, pady=5) # TODO commented out since not working
 
     # toggle pause
     def togglePause(self):
         if self.run['text'] == "RUNNING":
-            self.run['text'] = "PAUSED"
-            self.run.config(relief=SUNKEN)
+            if not self.demoKit.disconnect():
+                self.run['text'] = "PAUSED"
+                self.run.config(relief=SUNKEN)
         else:
-            self.run['text'] = "RUNNING"
-            self.run.config(relief=RAISED)
+            if not self.demoKit.reconnect():
+                self.run['text'] = "RUNNING"
+                self.run.config(relief=RAISED)
 
     # executes the tracking
     def trackPersonsAndFusion(self):
-        if self.run["text"] == "RUNNING":
+        if self.run['text'] == "RUNNING":
             positionData = self.demoKit.getPersonsPositions()
             fusionData = self.demoKit.getFusionValues(False)
             personFloat = self.demoKit.getNumberPersonsFloat(False)
@@ -187,10 +189,8 @@ class TrackingFusionViewer:
 
             for i in range(0, len(positionData)):
                 currentPositionData = self.adjustedCoordinates(positionData[i])
-                # TODO: check effect on stability
                 if currentPositionData == [10, 10]:
                     currentPositionData = [-50, -50]
-                # TODO
                 deltax = currentPositionData[0] - self.persons[i][1][0]
                 deltay = currentPositionData[1] - self.persons[i][1][1]
                 self.canvas.move(self.persons[i][0], deltax, deltay)

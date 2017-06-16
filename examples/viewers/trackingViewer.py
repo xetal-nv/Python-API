@@ -20,6 +20,8 @@ __email__ = "francesco@xetal.eu"
 __status__ = "release"
 __requiredfirmware__ = "february2017 or later"
 
+# TODO add pause button like in trackingFusionViewer.py
+
 # the color array is used to simplify color assignment to the tracking balls
 colors = ["green", "blue", "magenta", "white", "cyan", "black", "yellow", "red"]
 
