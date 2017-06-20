@@ -17,7 +17,7 @@ from colormaps import *
 __author__ = "Francesco Pessolano"
 __copyright__ = "Copyright 2017, Xetal nv"
 __license__ = "MIT"
-__version__ = "1.5.0"
+__version__ = "1.6.0"
 __maintainer__ = "Francesco Pessolano"
 __email__ = "francesco@xetal.eu"
 __status__ = "release"
@@ -48,6 +48,7 @@ class TrackingFusionViewer:
         self.numberPersons = [0.0, 0]
         self.counterLabel = None
         self.run = None
+        self.invertView = False;
 
     def connect(self, ip):
         try:
@@ -61,11 +62,18 @@ class TrackingFusionViewer:
     def isConnected(self):
         return self.connected
 
+    def invert(self):
+        self.invertView = not self.invertView
+
     # the KinseiClient class provides coordinates in mm and absolute
     # here we scalte to cm and made them relative to our 800x800 canvas
-    def adjustedCoordinates(self, coordinates):
-        coordX = int((coordinates[0] / 10) * ((self.screenX * 10) / self.roomSize[0])) + offset
-        coordY = int((coordinates[1] / 10) * ((self.screenY * 10) / self.roomSize[1])) + offset
+    def adjustedCoordinates(self, coordinates, bottomup = False):
+        if bottomup:
+            coordX = ((400 - int(coordinates[0] / 10)) * ((self.screenX * 10) / self.roomSize[0])) + offset
+            coordY = ((400 - int(coordinates[1] / 10)) * ((self.screenY * 10) / self.roomSize[1])) + offset
+        else:
+            coordX = int((coordinates[0] / 10) * ((self.screenX * 10) / self.roomSize[0])) + offset
+            coordY = int((coordinates[1] / 10) * ((self.screenY * 10) / self.roomSize[1])) + offset
         return [coordX, coordY]
 
     def defineCanvas(self):
@@ -188,7 +196,7 @@ class TrackingFusionViewer:
             self.updateFusionMap(fusionData)
 
             for i in range(0, len(positionData)):
-                currentPositionData = self.adjustedCoordinates(positionData[i])
+                currentPositionData = self.adjustedCoordinates(positionData[i], self.invertView)
                 if currentPositionData == [10, 10]:
                     currentPositionData = [-50, -50]
                 deltax = currentPositionData[0] - self.persons[i][1][0]
@@ -205,7 +213,7 @@ class TrackingFusionViewer:
             self.canvas.delete(self.fusionMap[i])
         self.fusionMap = []
         for i in range(0, len(fusionData)):
-            currentPositionData = self.adjustedCoordinates([fusionData[i][0], fusionData[i][1]])
+            currentPositionData = self.adjustedCoordinates([fusionData[i][0], fusionData[i][1]], self.invertView)
             x0 = currentPositionData[0] + self.screenX + offset
             y0 = currentPositionData[1]
             x1 = currentPositionData[0] + self.screenX + 3 * offset

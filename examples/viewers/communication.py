@@ -21,10 +21,10 @@ __requiredfirmware__ = "february2017 or later"
 
 # IP_DEVICE = "192.168.42.1" # remove comment to set as default the standard AP address
 # IP_DEVICE = "192.168.76.1" # remove comment to set as default the standard AP address
-IP_DEVICE = "192.168.2.156" # occasionally remotely available Xetal kit
+IP_DEVICE = "81.82.231.115" # occasionally remotely available Xetal kit
     
 def start():
-    # create a socket coinnection to the device
+    # create a socket connection to the device
     demoKit2 = KinseiClient.KinseiSocket(IP_DEVICE) 
     # check if the system is online before asking data
     if demoKit2.checkIfOnline():

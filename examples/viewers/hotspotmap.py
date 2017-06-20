@@ -18,22 +18,23 @@ from colormaps import *
 __author__ = "Francesco Pessolano"
 __copyright__ = "Copyright 2017, Xetal nv"
 __license__ = "MIT"
-__version__ = "1.1.0"
+__version__ = "1.1.1"
 __maintainer__ = "Francesco Pessolano"
 __email__ = "francesco@xetal.eu"
 __status__ = "in testing"
 __requiredfirmware__ = "february2017 or later"
 
 # TODO Turn on experimental mode based on all possible data points
+# TODO add outliers removal om max
 # please use SKIMSAMPLES > 5 and set a RAWTHRESHOLD to ignore false data points
-EXPMODE = True
+EXPMODE = False
 RAWTHRESHOLD = 10
 
-# Highlight most prominent samples above a give threshold
-CLEANMIN = 0
+# Highlight most prominent samples above a give threshold (0.0 - 1.0)
+CLEANMIN = 0.3
 
 # How many samples needs to be skipped, this can be used to dilute aggregation
-SKIMSAMPLES = 10
+SKIMSAMPLES = 0
 
 
 class HotSpotMap:
@@ -57,19 +58,13 @@ class HotSpotMap:
             dimensions = self.demoKit.getRoomSize()
             if dimensions:
                 dimensions = list(map(lambda x: int(x / SCALE), dimensions))
-                heatmapMatrix = np.random.rand(dimensions[0], dimensions[1])
+                heatmapMatrix = np.random.rand(dimensions[1], dimensions[0])
 
                 fig, ax = plt.subplots()
-                fig.canvas.set_window_title("Hot Spot Map")
+                fig.canvas.set_window_title("Hot Spot Map (SCALE : 1:" + str(SCALE) + " mm)" )
                 im = plt.imshow(heatmapMatrix, cmap='inferno', interpolation='nearest')
                 plt.colorbar()
-                heatmapMatrix = np.zeros((dimensions[0], dimensions[1]))
-                labelX = ['']
-                labelX.extend(list(map(lambda x: str(x), range(0, dimensions[0] * SCALE, 5 * SCALE))))
-                labelY = ['']
-                labelY.extend(list(map(lambda x: str(x), range(0, dimensions[1] * SCALE, 5 * SCALE))))
-                ax.set_xticklabels(labelX)
-                ax.set_yticklabels(labelY)
+                heatmapMatrix = np.zeros((dimensions[1], dimensions[0]))
 
                 def data_gen():
                     positionData = []
@@ -90,14 +85,14 @@ class HotSpotMap:
                         result[result <= CLEANMIN] = 0
                         yield result
                     else:
-                        yield np.zeros((dimensions[0], dimensions[1]))
+                        yield np.zeros((dimensions[1], dimensions[0]))
 
                 def update(heatmapMatrix):
                     im.set_data(heatmapMatrix)
                     return im
 
-                print("\nThe DemoKit is online. \nRoom size is " + str(dimensions[0]) + "cm by " + str(
-                    dimensions[1]) + "cm.\n")
+                print("\nThe DemoKit is online. \nRoom size is " + str(dimensions[0] * SCALE / 10) + "cm by " + str(
+                    dimensions[1] * SCALE / 10) + "cm.\n")
                 print("Starting persons tracking")
 
                 ani = animation.FuncAnimation(fig, update, data_gen, interval=1 + SKIMSAMPLES * self.demoKit.getTimeIntervalMS())

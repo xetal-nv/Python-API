@@ -14,7 +14,7 @@ import gui
 __author__ = "Francesco Pessolano"
 __copyright__ = "Copyright 2017, Xetal nv"
 __license__ = "MIT"
-__version__ = "1.4.0"
+__version__ = "1.6.0"
 __maintainer__ = "Francesco Pessolano"
 __email__ = "francesco@xetal.eu"
 __status__ = "release"
@@ -44,6 +44,7 @@ class ViewerTrackingOnly:
         self.screenY = 0
         self.counterLabel = None
         self.run = None
+        self.invertView = False;
 
     def connect(self, ip):
         try:
@@ -55,11 +56,18 @@ class ViewerTrackingOnly:
     def isConnected(self):
         return self.connected
 
+    def invert(self):
+        self.invertView = not self.invertView
+
     # the KinseiClient class provides coordinates in mm and absolute
-    # here we scalte to cm and made them relative to our 800x800 canvas    
-    def adjustedCoordinates(self, coordinates):
-        coordX = int((coordinates[0] / 10) * ((self.screenX * 10) / self.roomSize[0])) + offset
-        coordY = int((coordinates[1] / 10) * ((self.screenY * 10) / self.roomSize[1])) + offset
+    # here we scale to cm and made them relative to our 800x800 canvas
+    def adjustedCoordinates(self, coordinates, bottomup = False):
+        if bottomup:
+            coordX = ((400 - int(coordinates[0] / 10)) * ((self.screenX * 10) / self.roomSize[0])) + offset
+            coordY = ((400 - int(coordinates[1] / 10)) * ((self.screenY * 10) / self.roomSize[1])) + offset
+        else:
+            coordX = int((coordinates[0] / 10) * ((self.screenX * 10) / self.roomSize[0])) + offset
+            coordY = int((coordinates[1] / 10) * ((self.screenY * 10) / self.roomSize[1])) + offset
         return [coordX, coordY]
 
     def defineCanvas(self):
@@ -167,7 +175,7 @@ class ViewerTrackingOnly:
             self.canvas.itemconfig(self.counterLabel, text=labelCounter)
 
             for i in range(0, len(positionData)):
-                currentPositionData = self.adjustedCoordinates(positionData[i]);
+                currentPositionData = self.adjustedCoordinates(positionData[i], self.invertView);
                 if currentPositionData == [10, 10]:
                     currentPositionData = [-50, -50]
                 deltax = currentPositionData[0] - self.persons[i][1][0]

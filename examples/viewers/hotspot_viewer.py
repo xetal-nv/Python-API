@@ -18,7 +18,7 @@ from colormaps import *
 __author__ = "Francesco Pessolano"
 __copyright__ = "Copyright 2017, Xetal nv"
 __license__ = "MIT"
-__version__ = "1.0.0"
+__version__ = "1.0.1"
 __maintainer__ = "Francesco Pessolano"
 __email__ = "francesco@xetal.eu"
 __status__ = "release"
@@ -94,7 +94,8 @@ class HotSpotMapWithServer:
                 im.set_data(heatmapMatrix)
                 return im
 
-            print("\nThe DemoKit is online. \nRoom size is " + str(dimension0) + "cm by " + str(dimension1) + "cm.\n")
+            print("\nThe DemoKit is online. \nRoom size is " + str(dimension0 * SCALE/10) + "cm by " \
+                  + str(dimension1 * SCALE/10) + "cm.\n")
             print("Starting persons tracking")
 
             # noinspection PyUnusedLocal

@@ -15,7 +15,7 @@ from colormaps import *
 __author__ = "Francesco Pessolano"
 __copyright__ = "Copyright 2017, Xetal nv"
 __license__ = "MIT"
-__version__ = "1.0.1"
+__version__ = "1.0.2"
 __maintainer__ = "Francesco Pessolano"
 __email__ = "francesco@xetal.eu"
 __status__ = "release"
@@ -50,7 +50,7 @@ class AggregatorServer(ThreadedServer):
             self.dimensions = self.demoKit.getRoomSize()
             if self.dimensions:
                 self.dimensions = list(map(lambda x: int(x / SCALE), self.dimensions))
-                self.size = self.dimensions
+                self.size = self.dimensions [::-1]
                 self.hotSpotMatrix = np.zeros((self.dimensions[0], self.dimensions[1]))
         except:
             self.connected = False
