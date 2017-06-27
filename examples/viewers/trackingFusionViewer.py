@@ -3,9 +3,6 @@
 """trackingFusionViewer.py: graphical viewer for persons tracking and fusion (raw data indicating
     a possibe detected person where probability of being a real person is proportional to the color brightness)"""
 
-import sys
-import ipaddress
-# import math
 from tkinter import *
 from math import *
 
@@ -17,7 +14,7 @@ from colormaps import *
 __author__ = "Francesco Pessolano"
 __copyright__ = "Copyright 2017, Xetal nv"
 __license__ = "MIT"
-__version__ = "1.6.0"
+__version__ = "1.6.1"
 __maintainer__ = "Francesco Pessolano"
 __email__ = "francesco@xetal.eu"
 __status__ = "release"
@@ -49,9 +46,11 @@ class TrackingFusionViewer:
         self.counterLabel = None
         self.run = None
         self.invertView = False;
+        self.ip = ""
 
     def connect(self, ip):
         try:
+            self.ip = ip
             self.demoKit = KinseiClient.KinseiSocket(ip)
             self.connected = self.demoKit.checkIfOnline()
             # self.demoKit.setTimeIntervalMS(50) # maximum speed
@@ -122,7 +121,7 @@ class TrackingFusionViewer:
             self.roomSize = self.demoKit.getRoomSize()
             self.defineCanvas()
             self.master = Tk()
-            self.master.title("Kinsei Viewer Demo")
+            self.master.title("Kinsei Viewer Demo at " + self.ip)
 
             # bind escape to terminate
             self.master.bind('<Escape>', quit)

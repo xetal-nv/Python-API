@@ -27,14 +27,14 @@ __requiredfirmware__ = "february2017 or later"
 # TODO Turn on experimental mode based on all possible data points
 # TODO add outliers removal om max
 # please use SKIMSAMPLES > 5 and set a RAWTHRESHOLD to ignore false data points
-EXPMODE = False
+EXPMODE = True
 RAWTHRESHOLD = 10
 
 # Highlight most prominent samples above a give threshold (0.0 - 1.0)
-CLEANMIN = 0.3
+CLEANMIN = 0
 
 # How many samples needs to be skipped, this can be used to dilute aggregation
-SKIMSAMPLES = 0
+SKIMSAMPLES = 5
 
 
 class HotSpotMap:

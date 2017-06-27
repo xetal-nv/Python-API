@@ -44,7 +44,7 @@ def start():
                 if positionData:
                     print ("Number of detected people is " + str(positionData) + "\n")
         else:
-            print("There has been an error in comunicating with the DemoKit")
+            print("There has been an error in communicating with the DemoKit")
     else:
         print("\nERROR: The DemoKit has not been found")
         
