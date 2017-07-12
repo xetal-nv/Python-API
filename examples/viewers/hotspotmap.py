@@ -24,10 +24,9 @@ __email__ = "francesco@xetal.eu"
 __status__ = "in testing"
 __requiredfirmware__ = "february2017 or later"
 
-# TODO Turn on experimental mode based on all possible data points
-# TODO add outliers removal om max
+# TODO add outliers removal
 # please use SKIMSAMPLES > 5 and set a RAWTHRESHOLD to ignore false data points
-EXPMODE = True
+EXPMODE = False
 RAWTHRESHOLD = 10
 
 # Highlight most prominent samples above a give threshold (0.0 - 1.0)

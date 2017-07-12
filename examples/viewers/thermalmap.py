@@ -56,7 +56,7 @@ class ThermalMap:
         return self.connected
 
     # the KinseiClient class provides coordinates in mm and absolute
-    # here we scalte to cm and made them relative to our canvas
+    # here we scale to cm and made them relative to our canvas
     def adjustedCoordinates(self, coordinates):
         coordX = int((coordinates[0] / 10) * ((self.screenX * 10) / self.roomSize[0])) + offset
         coordY = int((coordinates[1] / 10) * ((self.screenY * 10) / self.roomSize[1])) + offset
