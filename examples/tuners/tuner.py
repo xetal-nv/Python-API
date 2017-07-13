@@ -108,13 +108,10 @@ class TunerGui:
             self.scales.append(fusionThreshold)
 
             Button(frameButtons, text='SEND', width=8, command=self.sendConfig).pack(side=LEFT, padx=5, pady=5)
-            Button(frameButtons, text='FREEZE', width=8, command=self.freezeConfig).pack(side=LEFT, padx=5, pady=5)
-            Button(frameButtons, text='UNFREEZE', width=8, command=self.unfreezeConfig).pack(side=LEFT, padx=5, pady=5)
+            Button(frameButtons, text='FREEZE', width=8, command=self.freezeConfig, state=DISABLED).pack(side=LEFT, padx=5, pady=5)
+            Button(frameButtons, text='UNFREEZE', width=8, command=self.unfreezeConfig, state=DISABLED).pack(side=LEFT, padx=5, pady=5)
             Button(frameButtons, text='BGRESET', width=8, command=self.bgReset).pack(side=LEFT, padx=5, pady=5)
-            # Button(frameButtons, text='SAVE', width=8, command=self.saveConfig).pack(side=LEFT, padx=5, pady=5)
-            # Button(frameButtons, text='LOAD', width=8, command=self.loadConfig).pack(side=LEFT, padx=5, pady=5)
             Button(frameButtons, text='DISCARD', width=8, command=self.discard).pack(side=LEFT, padx=5, pady=5)
-            # Button(frameButtons, text='QUIT', width=8, command=self.master.quit).pack(side=LEFT, padx=5, pady=5)
 
     def popUpOk(self):
         toplevel = Toplevel()
