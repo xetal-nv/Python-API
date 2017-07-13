@@ -21,7 +21,7 @@ __license__ = "MIT"
 __version__ = "1.1.1"
 __maintainer__ = "Francesco Pessolano"
 __email__ = "francesco@xetal.eu"
-__status__ = "in testing"
+__status__ = "in development"
 __requiredfirmware__ = "february2017 or later"
 
 # TODO add outliers removal

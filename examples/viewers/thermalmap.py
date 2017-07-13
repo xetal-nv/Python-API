@@ -2,6 +2,8 @@
 
 """thermalmap.py: basic graphical viewer for the thermal map"""
 
+""" !! STILL IN DEVELOPMENT - MIGHT CRASH FOR SOME GEOMETRIES!! """
+
 import ipaddress
 from math import *
 from tkinter import *
@@ -13,10 +15,10 @@ import colormaps
 __author__ = "Francesco Pessolano"
 __copyright__ = "Copyright 2017, Xetal nv"
 __license__ = "MIT"
-__version__ = "1.0.0"
+__version__ = "1.0.3"
 __maintainer__ = "Francesco Pessolano"
 __email__ = "francesco@xetal.eu"
-__status__ = "release"
+__status__ = "alfa release"
 __requiredfirmware__ = "may2017 or later"
 
 

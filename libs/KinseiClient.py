@@ -9,10 +9,11 @@ import math
 __author__ = "Francesco Pessolano"
 __copyright__ = "Copyright 2017, Xetal nv"
 __license__ = "MIT"
-__version__ = "2.1.1"
+__version__ = "2.1.3"
 __maintainer__ = "Francesco Pessolano"
 __email__ = "francesco@xetal.eu"
 __status__ = "release"
+__requiredfirmware__ = "february2017 or later"
 
 
 # the class implmeneting the kinsei client
@@ -30,7 +31,6 @@ class KinseiSocket(object):
         "thermres": b'\x1A',
         "thermmap": b'\x1B',
         "error": b'\x65'
-
     }
 
     """ __init__:
@@ -299,8 +299,7 @@ class KinseiSocket(object):
         return zonesSpecs
 
     """ executeCommand:
-    Executes any comand and return the message from the devoce at it was received
-    
+    Executes any comand and return the message from the device at it was received
     False is returned in case or connection error
     """
 
@@ -363,6 +362,7 @@ class KinseiSocket(object):
         return False
 
     """ getThermalMapResolution:
+    !! STILL IN DEVELOPMENT - available only from firmware MAY2017 !!
     Returns the number of pixel per x and y axis and the pixel size in mm.
     False in case of comunication error
     """
@@ -374,6 +374,7 @@ class KinseiSocket(object):
         return [data[1], data[2], data[3]]
 
     """ getThermalMapPixels:
+    !! STILL IN DEVELOPMENT - available only from firmware MAY2017 !!
     Returns the pisel temperatures in row order
     False
     """

@@ -14,7 +14,7 @@ from colormaps import *
 __author__ = "Francesco Pessolano"
 __copyright__ = "Copyright 2017, Xetal nv"
 __license__ = "MIT"
-__version__ = "1.6.1"
+__version__ = "1.7.2"
 __maintainer__ = "Francesco Pessolano"
 __email__ = "francesco@xetal.eu"
 __status__ = "release"
@@ -24,8 +24,8 @@ __requiredfirmware__ = "february2017 or later"
 colors = ["green", "blue", "magenta", "white", "cyan", "black", "yellow", "red"]
 
 # set the viewing window
-maxScreenX = 1000  # maximum X size of screen window in pixels
-maxScreenY = 800  # maximum Y size of screen window in pixels
+SCALEX = 0.7  # scale from maximum X size of screen window
+SCALEY = 0.7  # scale from maximum X size of screen window
 offset = 10  # padding offset in pixels
 
 
@@ -66,7 +66,7 @@ class TrackingFusionViewer:
 
     # the KinseiClient class provides coordinates in mm and absolute
     # here we scalte to cm and made them relative to our 800x800 canvas
-    def adjustedCoordinates(self, coordinates, bottomup = False):
+    def adjustedCoordinates(self, coordinates, bottomup=False):
         if bottomup:
             coordX = ((400 - int(coordinates[0] / 10)) * ((self.screenX * 10) / self.roomSize[0])) + offset
             coordY = ((400 - int(coordinates[1] / 10)) * ((self.screenY * 10) / self.roomSize[1])) + offset
@@ -223,9 +223,14 @@ class TrackingFusionViewer:
 
 def start():
     root = Tk()
+    global maxScreenX
+    global maxScreenY
+    maxScreenX = root.winfo_screenwidth() * SCALEX
+    maxScreenY = root.winfo_screenheight() * SCALEY
     device = TrackingFusionViewer()
     gui.StartGUI(root, device)
     root.mainloop()
 
 
-if __name__ == "__main__": start()
+if __name__ == "__main__":
+    start()

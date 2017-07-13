@@ -1,0 +1,95 @@
+
+
+NOTE: This document described the tuning interface available in firmware July2017 and newer only.
+
+The kinsei system allows one single tuning client (at a time) to be connected to a secondary port specified in the config file (command CONFIG_SERVERPORT)
+ 
+The protocol is completely custom and it accepts a first byte in order to discern the kind of message followed by other info if required.
+The system will answer with a message that starts with the same byte followed by the required info.
+ 
+IMPORTANT:  All values are to be given and are receoved multiplier by a factor 100 and represented over two bytes (unsigned shorts)
+            Odd commands are used to get variables. Even commands are used to set variables
+
+Command:
+    Direction
+    command code
+    Direction
+    message (in bytes)
+
+Reset Background
+   Client -> MOCA
+   0x00
+   MOCA -> Client
+   0x00
+
+Get Background Alfa
+   Client -> MOCA
+   0x01
+   MOCA -> Client
+   0x01 0xYY 0xYY
+
+Set Background Alfa
+   Client -> MOCA
+   0x02 0xYY 0xYY
+   MOCA -> Client
+   0x02 0xYY 0xYY
+
+Get Background Threshold
+   Client -> MOCA
+   0x03
+   MOCA -> Client
+   0x03 0xYY 0xYY
+
+Set Background Threshold
+   Client -> MOCA
+   0x04 0xYY 0xYY
+   MOCA -> Client
+   0x04 0xYY 0xYY
+
+Get Background Temperature Threshold
+   Client -> MOCA
+   0x05
+   MOCA -> Client
+   0x05 0xYY 0xYY
+
+Set Background Temperature Threshold
+   Client -> MOCA
+   0x06 0xYY 0xYY
+   MOCA -> Client
+   0x06 0xYY 0xYY
+
+Get Fusion Background Threshold
+   Client -> MOCA
+   0x07
+   MOCA -> Client
+   0x07 0xYY 0xYY
+
+Set Fusion Background Threshold
+   Client -> MOCA
+   0x08 0xYY 0xYY
+   MOCA -> Client
+   0x08 0xYY 0xYY
+
+Get Fusion Consensum Factor
+   Client -> MOCA
+   0x09
+   MOCA -> Client
+   0x09 0xYY 0xYY
+
+Set Fusion Consensum Factor
+   Client -> MOCA
+   0x10 0xYY 0xYY
+   MOCA -> Client
+   0x10 0xYY 0xYY
+
+Get Fusion Threshold
+   Client -> MOCA
+   0x11
+   MOCA -> Client
+   0x11 0xYY 0xYY
+
+Set Fusion Threshold
+   Client -> MOCA
+   0x12 0xYY 0xYY
+   MOCA -> Client
+   0x12 0xYY 0xYY

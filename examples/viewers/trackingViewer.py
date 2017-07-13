@@ -2,8 +2,6 @@
 
 """trackingViewer.py: basic graphical viewer for persons tracking only"""
 
-# import sys
-# import ipaddress
 from tkinter import *
 from math import *
 
@@ -14,7 +12,7 @@ import gui
 __author__ = "Francesco Pessolano"
 __copyright__ = "Copyright 2017, Xetal nv"
 __license__ = "MIT"
-__version__ = "1.6.0"
+__version__ = "1.7.0"
 __maintainer__ = "Francesco Pessolano"
 __email__ = "francesco@xetal.eu"
 __status__ = "release"
@@ -25,8 +23,8 @@ __requiredfirmware__ = "february2017 or later"
 colors = ["green", "blue", "magenta", "white", "cyan", "black", "yellow", "red"]
 
 # set the viewing window
-maxScreenX = 1000  # maximum X size of screen window in pixels
-maxScreenY = 800  # maximum Y size of screen window in pixels
+SCALEX = 0.7  # scale from maximum X size of screen window
+SCALEY = 0.7  # scale from maximum X size of screen window
 offset = 10  # padding offset in pixels
 
 
@@ -188,9 +186,14 @@ class ViewerTrackingOnly:
 
 def start():
     root = Tk()
+    global maxScreenX
+    global maxScreenY
+    maxScreenX = root.winfo_screenwidth() * SCALEX
+    maxScreenY = root.winfo_screenheight() * SCALEY
     device = ViewerTrackingOnly()
     gui.StartGUI(root, device)
     root.mainloop()
 
 
-if __name__ == "__main__": start()
+if __name__ == "__main__":
+    start()
