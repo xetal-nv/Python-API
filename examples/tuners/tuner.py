@@ -137,18 +137,20 @@ class TunerGui:
         else:
             self.popUpNotOk()
 
-    def saveConfig(self): # development
+    def saveConfig(self):
         self.master.filename = filedialog.asksaveasfilename(initialdir="/", title="Select file",
                                                           filetypes=(("config files", "*.cfg"), ("all files", "*.*")))
         with (open(self.master.filename,'w')) as saveFile:
-            for i in range(0, len(self.config)):
+            for i in range(0, len(self.scales)):
                 saveFile.write(str(self.scales[i].get()) + "\n")
 
-
-    def loadConfig(self): # development
+    def loadConfig(self):
         self.master.filename = filedialog.askopenfilename(initialdir="/", title="Select file",
                                                    filetypes=(("config files", "*.cfg"), ("all files", "*.*")))
-        print(self.master.filename)
+        with (open(self.master.filename, 'r')) as loadFile:
+            for i in range(0, len(self.scales)):
+                data = float(loadFile.readline().strip('\n'))
+                self.scales[i].set(data)
 
     def discard(self):
         for i in range(0,len(self.config)):
