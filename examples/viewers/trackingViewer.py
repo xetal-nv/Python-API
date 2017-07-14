@@ -12,7 +12,7 @@ import gui
 __author__ = "Francesco Pessolano"
 __copyright__ = "Copyright 2017, Xetal nv"
 __license__ = "MIT"
-__version__ = "1.7.0"
+__version__ = "1.8.0"
 __maintainer__ = "Francesco Pessolano"
 __email__ = "francesco@xetal.eu"
 __status__ = "release"
@@ -43,11 +43,13 @@ class ViewerTrackingOnly:
         self.counterLabel = None
         self.run = None
         self.invertView = False;
+        self.ip = None
 
     def connect(self, ip):
         try:
             self.demoKit = KinseiClient.KinseiSocket(ip)
             self.connected = self.demoKit.checkIfOnline()
+            self.ip = ip
         except:
             self.connected = False
 
@@ -115,7 +117,7 @@ class ViewerTrackingOnly:
             self.roomSize = self.demoKit.getRoomSize()
             self.defineCanvas()
             self.master = Tk()
-            self.master.title("Kinsei Viewer Demo")
+            self.master.title("Kinsei Viewer Demo: " +  self.ip)
 
             # bind escape to terminate
             self.master.bind('<Escape>', quit)

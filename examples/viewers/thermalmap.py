@@ -10,15 +10,16 @@ from tkinter import *
 
 sys.path.insert(0, '../../libs')
 import KinseiClient
+import gui
 import colormaps
 
 __author__ = "Francesco Pessolano"
 __copyright__ = "Copyright 2017, Xetal nv"
 __license__ = "MIT"
-__version__ = "1.0.3"
+__version__ = "1.2.4"
 __maintainer__ = "Francesco Pessolano"
 __email__ = "francesco@xetal.eu"
-__status__ = "alfa release"
+__status__ = "beta release"
 __requiredfirmware__ = "july2017 or later"
 
 
@@ -45,12 +46,24 @@ if (showAverageTemp):
 
 # this class shows how to visualise tracking with tkinter
 class ThermalMap:
-    def __init__(self, ip, whichMap=whichcoloring):
+    def __init__(self):
+        self.demoKit = None
+        self.connected = False
+        self.canvas = None
+        self.roomSize = None
+        self.master = None
+        self.realVertex = None
+        self.screenX = 0
+        self.screenY = 0
+        self.ip = None
+
+    def connect(self, ip, whichMap=whichcoloring):
         try:
             self.coloring = whichMap
             self.demoKit = KinseiClient.KinseiSocket(ip)
             self.connected = self.demoKit.checkIfOnline()
             self.averageTemp = 0
+            self.ip = ip
         except:
             self.connected = False
 
@@ -110,7 +123,7 @@ class ThermalMap:
             self.roomSize = self.demoKit.getRoomSize()
             self.defineCanvas()
             self.master = Tk()
-            self.master.title("Kinsei Thermal Map Demo")
+            self.master.title("Kinsei Thermal Map Demo: " + self.ip)
 
             # bind escape to terminate
             self.master.bind('<Escape>', quit)
@@ -206,59 +219,10 @@ class ThermalMap:
         self.canvas.after(10, self.drawMapTemps)  # delay must be larger than 0
 
 
-# this class is used to get the IP of the device from the user
-class StartGUI:
-    def __init__(self, master):
-        self.master = master
-        master.title("Kinsei Viewer Demo")
-        Label(master, text='Insert the device IP').pack(side=TOP, padx=130, pady=10)
-
-        self.ipEntry = Entry(master, width=20)
-        self.ipEntry.pack(side=TOP, padx=10, pady=10)
-        # self.ipEntry.insert(0,"192.168.42.1") # remove comment to set as default the standard AP address
-        # self.ipEntry.insert(0,"192.168.76.1") # remove comment to set as default the standard AP address
-        self.ipEntry.insert(0, "81.82.231.115")  # occasionally remotely available Xetal kit
-
-        # bind escape to terminate
-        master.bind('<Escape>', quit)
-
-        Button(master, text='Connect IP', command=self.connectDeviceIP).pack(side=LEFT, padx=10, pady=5)
-        Button(master, text='Connect DNS', command=self.connectDeviceDNS).pack(side=LEFT, padx=10, pady=5)
-        Button(master, text='Quit', command=master.quit).pack(side=RIGHT, padx=10, pady=5)
-
-    def connectDeviceIP(self):
-        # the module ipaddress is used to verify the validity of the entered IP address
-        try:
-            ipaddress.ip_address(self.ipEntry.get())
-        except:
-            self.ipEntry.configure(fg="red")
-            return
-
-        self.ipEntry.configure(fg="black")
-        self.device = ThermalMap(self.ipEntry.get())
-
-        if self.device.isConnected():
-            self.master.destroy()
-            self.device.start()
-        else:
-            self.ipEntry.configure(fg="red")
-
-    def connectDeviceDNS(self):
-        # the module ipaddress is used to verify the validity of the entered IP address
-
-        self.ipEntry.configure(fg="black")
-        self.device = ThermalMap(self.ipEntry.get())
-
-        if self.device.isConnected():
-            self.master.destroy()
-            self.device.start()
-        else:
-            self.ipEntry.configure(fg="red")
-
-
 def start():
     root = Tk()
-    kinseiStart = StartGUI(root)
+    device = ThermalMap()
+    gui.StartGUI(root, device)
     root.mainloop()
 
 

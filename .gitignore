@@ -11,3 +11,4 @@ lib/
 /.Python
 /usr/*
 .idea/
+*.ip
