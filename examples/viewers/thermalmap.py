@@ -19,7 +19,7 @@ __version__ = "1.0.3"
 __maintainer__ = "Francesco Pessolano"
 __email__ = "francesco@xetal.eu"
 __status__ = "alfa release"
-__requiredfirmware__ = "may2017 or later"
+__requiredfirmware__ = "july2017 or later"
 
 
 # set the viewing window

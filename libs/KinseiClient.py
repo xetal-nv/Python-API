@@ -362,7 +362,7 @@ class KinseiSocket(object):
         return False
 
     """ getThermalMapResolution:
-    !! STILL IN DEVELOPMENT - available only from firmware MAY2017 !!
+    !! BETA - useable only from firmware july2017 !!
     Returns the number of pixel per x and y axis and the pixel size in mm.
     False in case of comunication error
     """
@@ -374,7 +374,7 @@ class KinseiSocket(object):
         return [data[1], data[2], data[3]]
 
     """ getThermalMapPixels:
-    !! STILL IN DEVELOPMENT - available only from firmware MAY2017 !!
+    !! BETA - available only from firmware july2017 !!
     Returns the pisel temperatures in row order
     False
     """
