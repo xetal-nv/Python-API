@@ -27,6 +27,7 @@ colors = ["green", "blue", "magenta", "white", "cyan", "black", "yellow", "red"]
 class TunerGui:
     def __init__(self):
         self.demoKit = None
+        self.ip = None
         self.connected = False
         self.canvas = None
         self.config = None
@@ -38,6 +39,7 @@ class TunerGui:
             self.demoKit = KinseiTuner(ip)
             self.connected = self.demoKit.serverConnected
             self.config = self.demoKit.readFullConfiguration()
+            self.ip = ip
         except:
             self.connected = False
 
@@ -49,7 +51,10 @@ class TunerGui:
 
         if self.connected:
             self.master = Tk()
-            self.master.title("Kinsei Tuner Demo")
+            self.master.title("Kinsei Tuner Demo: " + self.ip )
+
+            # bind escape to terminate
+            self.master.bind('<Escape>', quit)
 
             menubar = Menu(self.master)
             filemenu = Menu(menubar, tearoff=0)
@@ -108,8 +113,8 @@ class TunerGui:
             self.scales.append(fusionThreshold)
 
             Button(frameButtons, text='SEND', width=8, command=self.sendConfig).pack(side=LEFT, padx=5, pady=5)
-            Button(frameButtons, text='FREEZE', width=8, command=self.freezeConfig, state=DISABLED).pack(side=LEFT, padx=5, pady=5)
-            Button(frameButtons, text='UNFREEZE', width=8, command=self.unfreezeConfig, state=DISABLED).pack(side=LEFT, padx=5, pady=5)
+            Button(frameButtons, text='FREEZE', width=8, command=self.freezeConfig).pack(side=LEFT, padx=5, pady=5)
+            Button(frameButtons, text='UNFREEZE', width=8, command=self.unfreezeConfig).pack(side=LEFT, padx=5, pady=5)
             Button(frameButtons, text='BGRESET', width=8, command=self.bgReset).pack(side=LEFT, padx=5, pady=5)
             Button(frameButtons, text='DISCARD', width=8, command=self.discard).pack(side=LEFT, padx=5, pady=5)
 
@@ -160,11 +165,16 @@ class TunerGui:
             self.popUpNotOk()
 
     def freezeConfig(self): # wait new fw
-        print("freezeConfig")
+        if self.demoKit.saveOveride():
+            self.popUpOk()
+        else:
+            self.popUpNotOk()
 
     def unfreezeConfig(self): # wait new fw
-        print("unfreezeConfig")
-
+        if self.demoKit.removeOveride():
+            self.popUpOk()
+        else:
+            self.popUpNotOk()
 def start():
     root = Tk()
     device = TunerGui()

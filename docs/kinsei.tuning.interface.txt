@@ -93,3 +93,15 @@ Set Fusion Threshold
    0x12 0xYY 0xYY
    MOCA -> Client
    0x12 0xYY 0xYY
+
+Save override
+   Client -> MOCA
+   0xfe
+   MOCA -> Client
+   0xfe
+
+Delete override
+   Client -> MOCA
+   0xff
+   MOCA -> Client
+   0xff

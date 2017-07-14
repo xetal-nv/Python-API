@@ -41,6 +41,8 @@ orderedKeys = ["backgroundAlfa", "backgroundThreshold", "temperatureThreshold", 
 class KinseiTuner(object):
     internalCommands = {
         "reset": b'\x00',
+        "saveOverride": b'\xfe',
+        "deleteOverride": b'\xff',
         "error": b'\x65'
     }
 
@@ -203,5 +205,29 @@ class KinseiTuner(object):
             for i in range(0, len(orderedKeys)):
                 self.execSet(setCommand[orderedKeys[i]],configData[i])
             return True
+        except:
+            return False
+
+    """ saveOveride:
+    Save the current configuration as overide in the device
+    False is returned in case or connection error, true otherwise
+    """
+
+    def saveOveride(self):
+        try:
+            answer = self.exec(self.internalCommands["saveOverride"])
+            return answer == self.internalCommands["saveOverride"]
+        except:
+            return False
+
+    """ saveOveride:
+    Remove the current overide file from the device
+    False is returned in case or connection error, true otherwise
+    """
+
+    def removeOveride(self):
+        try:
+            answer = self.exec(self.internalCommands["deleteOverride"])
+            return answer == self.internalCommands["deleteOverride"]
         except:
             return False
