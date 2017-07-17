@@ -3,7 +3,6 @@
 """guy.py: methods for gui interfaces"""
 
 import os
-import ipaddress
 from tkinter import *
 
 __author__ = "Francesco Pessolano"
