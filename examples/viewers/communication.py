@@ -46,6 +46,7 @@ def start():
     if demoKit.checkIfOnline():
         # get room boundig box dimensions
         dimensions = demoKit.getRoomSize()
+        print (demoKit.getZones())
         if dimensions:
             print("\nThe DemoKit is online. \nRoom size is " + str(dimensions[0]) + "mm by " + str(
                 dimensions[1]) + "mm.\n")

@@ -33,7 +33,7 @@ class StartGUI:
                 ip = savedIP.read().strip('\n')
                 self.ipEntry.insert(0, ip)
         else:
-            self.ipEntry.insert(0, "192.168.76.1")  # remove comment to set as default the standard AP address
+            self.ipEntry.insert(0, "192.168.76.1")
 
         # bind escape to terminate
         master.bind('<Escape>', quit)
