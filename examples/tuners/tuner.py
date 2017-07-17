@@ -62,7 +62,11 @@ class TunerGui:
             filemenu.add_command(label="Save", command=self.saveConfig)
             filemenu.add_separator()
             filemenu.add_command(label="Exit", command=self.master.quit)
+
+            # helpmenu = Menu(menubar, tearoff=0)
+
             menubar.add_cascade(label="File", menu=filemenu)
+            # menubar.add_cascade(label="Help", menu=helpmenu)
             self.master.config(menu=menubar)
 
             frameSliders = Frame(self.master)
