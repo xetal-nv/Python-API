@@ -35,7 +35,7 @@ FT = "The position temperature and the background must have a difference greater
 SEND = "Sends configuration to the device"
 FREEZE = "Stores current configuration as start override"
 UNFREEZE = "Removes current start override, resetting to factory default"
-BGRESET = "Reser the temoerature background"
+BGRESET = "Reset the temperature background"
 DISCARD = "Discards any change made from application start"
 
 
