@@ -9,7 +9,7 @@ The API for extracting data and using the device functionality is implmeneted in
 The API for tuning device functionality is implmeneted in the file "KinseiTuner.py".
 Refer to the various examples for illustrayions of the most common usages of these API
 
-EXAMPLES of usage of the libraries can be found in the folder "examples" including inline documentation. 
+EXAMPLES of usage of the libraries can be found in the folder "examples" including inline documentation. Use main.py to select the core examples.
 
 The INTERFACE documentation can be found in the folder "docs" where both the TCP interface for data (kindei.interface.txt) and for tuning (kindei.tuning.interface.txt) are provided.
 
