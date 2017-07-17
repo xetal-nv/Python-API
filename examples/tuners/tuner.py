@@ -168,12 +168,14 @@ class TunerGui:
 
     def popUpOk(self):
         toplevel = Toplevel()
+        toplevel.title("")
         label1 = Label(toplevel, text="Operation was succesfull", height=5, width=20)
         label1.pack()
         Button(toplevel, text='CLOSE', width=8, command=toplevel.destroy).pack(side=BOTTOM, padx=5, pady=5)
 
     def popUpNotOk(self):
         toplevel = Toplevel()
+        toplevel.title("")
         label1 = Label(toplevel, text="Operation has failed", height=5, width=20)
         label1.pack()
         Button(toplevel, text='CLOSE', width=8, command=toplevel.destroy).pack(side=BOTTOM, padx=5, pady=5)
@@ -207,10 +209,20 @@ class TunerGui:
             self.scales[i].set(self.config[i])
 
     def bgReset(self):
-        if self.demoKit.resetBackground():
-            self.popUpOk()
-        else:
-            self.popUpNotOk()
+        toplevel = Toplevel()
+        toplevel.title("Background reset")
+
+        def reset():
+            if self.demoKit.resetBackground():
+                self.popUpOk()
+            else:
+                self.popUpNotOk()
+            toplevel.destroy()
+
+        label1 = Label(toplevel, text="Make sure nobody is in front of the device", height=3, width=34)
+        label1.pack()
+        Button(toplevel, text='Continue', width=8, command=reset).pack(side=BOTTOM, padx=5, pady=5)
+
 
     def freezeConfig(self):  # wait new fw
         if self.demoKit.saveOveride():
