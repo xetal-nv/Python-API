@@ -23,6 +23,7 @@ class StartGUI:
         self.master = master
         self.device = device
         master.title("Connect to a Kinsei device")
+        self.master.attributes("-topmost", True)
         Label(master, text='Insert the device IP').pack(side=TOP, padx=130, pady=10)
 
         self.ipEntry = Entry(master, width=20)

@@ -3,9 +3,9 @@
 """main.py: main for all examples, please enable only one by selecting the proper item of the availableDemos
 dictionary """
 
-import sys, collections
+import sys, collections, subprocess
 import tkinter as tk
-import subprocess
+
 
 sys.path.insert(0, '../libs')
 
@@ -27,7 +27,7 @@ availableDemos = {
     # shows an example of graphical viewer for tracking and raw data (fusion)
     "Tracking & fusion viewer": lambda: subprocess.Popen(["python", "./viewers/trackingFusionViewer.py"]),
     # shows an example of http server reporting number of people
-    "Presence http server": lambda: subprocess.Popen(["python", "./servers/presencehttp.py"]),
+    "Presence http server ": lambda: subprocess.Popen(["python", "./servers/presencehttp.py"]),
     # shows a thermal map based on the settings in the source files
     "Thermal map": lambda: subprocess.Popen(["python", "./viewers/thermalmap.py"]),
     # shows a an hot spot map based on people position
