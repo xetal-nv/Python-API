@@ -168,7 +168,7 @@ class TunerGui:
             Tooltip(bDiscard, text=DISCARD, wraplength=wraplength)
 
     def popUpOk(self):
-        messagebox.showinfo("Information","Operation was succesfull")
+        messagebox.showinfo("Information", "Operation was succesfull")
 
     def popUpNotOk(self):
         messagebox.showinfo("Error", "Operation has failed")
@@ -202,27 +202,12 @@ class TunerGui:
             self.scales[i].set(self.config[i])
 
     def bgReset(self):
-        # toplevel = Toplevel()
-        # toplevel.title("Background reset")
-
-        def reset():
-            if self.demoKit.resetBackground():
-                self.popUpOk()
-            else:
-                self.popUpNotOk()
-        #     toplevel.destroy()
-        #
-        # label1 = Label(toplevel, text="Make sure nobody is in front of the device", height=3, width=34)
-        # label1.pack()
-        # Button(toplevel, text='Continue', width=8, command=reset).pack(side=BOTTOM, padx=5, pady=5)
-
         if messagebox.askyesno('Reser Background', "Make sure nobody is in front of the device. Continue?", \
-                            icon=messagebox.QUESTION, default=messagebox.YES):
+                               icon=messagebox.QUESTION, default=messagebox.YES):
             if self.demoKit.resetBackground():
                 self.popUpOk()
             else:
                 self.popUpNotOk()
-
 
     def freezeConfig(self):  # wait new fw
         if self.demoKit.saveOveride():
