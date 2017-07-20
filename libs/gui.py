@@ -37,6 +37,8 @@ class StartGUI:
 
         # bind escape to terminate
         master.bind('<Escape>', quit)
+        # bind enter to accept entry
+        master.bind('<Return>', lambda _x: self.connectDevice())
 
         Button(master, text='Connect', command=self.connectDevice).pack(side=LEFT, padx=10, pady=5)
         Button(master, text='Quit', command=master.quit).pack(side=RIGHT, padx=10, pady=5)
