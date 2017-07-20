@@ -37,7 +37,7 @@ SEND = "Sends configuration to the device"
 FREEZE = "Stores current configuration as start override"
 UNFREEZE = "Removes current start override, resetting to factory default"
 BGRESET = "Reset the temperature background"
-OFFRESET = "Reset offset of all sensor for temperature reset"
+OFFRESET = "Reset offset of all sensors for initial calibration"
 DISCARD = "Discards any change made from application start"
 
 
@@ -174,7 +174,7 @@ class TunerGui:
             bBgreset.pack(side=LEFT, padx=5, pady=5)
             Tooltip(bBgreset, text=BGRESET, wraplength=wraplength)
 
-            offReset = Button(frameButtons, text='OFFSETRST', width=8, command=self.bgReset, state = DISABLED)
+            offReset = Button(frameButtons, text='OFFSETRST', width=8, command=self.offsetReset)
             offReset.pack(side=LEFT, padx=5, pady=5)
             Tooltip(offReset, text=OFFRESET, wraplength=wraplength)
 
@@ -214,6 +214,15 @@ class TunerGui:
         if messagebox.askyesno('Reset Background', "Make sure nobody is in front of the device. Continue?", \
                                icon=messagebox.QUESTION, default=messagebox.YES):
             if self.demoKit.resetBackground():
+                popUpOk()
+            else:
+                popUpNotOk()
+
+    def offsetReset(self):
+        if messagebox.askyesno('Reset Sensors \' Offsets',
+                               'Make sure no predominant heat source is in front of the device. Continue?', \
+                               icon=messagebox.QUESTION, default=messagebox.YES):
+            if self.demoKit.resetOffset():
                 popUpOk()
             else:
                 popUpNotOk()

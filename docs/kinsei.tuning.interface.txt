@@ -105,3 +105,9 @@ Delete override
    0xff
    MOCA -> Client
    0xff
+
+Reset Offset
+   Client -> MOCA
+   0xfd
+   MOCA -> Client
+   0xfd

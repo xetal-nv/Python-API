@@ -43,6 +43,7 @@ class KinseiTuner(object):
         "reset": b'\x00',
         "saveOverride": b'\xfe',
         "deleteOverride": b'\xff',
+        "resetOffset": b'\xfd',
         "error": b'\x65'
     }
 
@@ -133,7 +134,7 @@ class KinseiTuner(object):
         else:
             return self.internalCommands["error"]
 
-    """ reset:
+    """ resetBackground:
     Returns True if the tracking and fusion server has been sucesfully resetted
     False otherwise
     """
@@ -143,6 +144,19 @@ class KinseiTuner(object):
         if data == self.internalCommands["error"]:
             return False
         if data == self.internalCommands["reset"]:
+            return True
+        return False
+
+    """ resetOffset:
+    Returns True if the tracking and fusion server has been sucesfully resetted
+    False otherwise
+    """
+
+    def resetOffset(self, wait=True):
+        data = self.exec(self.internalCommands["resetOffset"], wait)
+        if data == self.internalCommands["error"]:
+            return False
+        if data == self.internalCommands["resetOffset"]:
             return True
         return False
 
