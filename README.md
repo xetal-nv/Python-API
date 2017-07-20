@@ -1,4 +1,4 @@
-# Python Kinsei Client
+# Python Kinsei Client v.4.0.0 ALFA
 
 NOTE => PLEASE INSTALL ALL DEPENDENCIES WITH PIP INSTALL -R REQUIREMENTS.TXT
 
