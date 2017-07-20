@@ -40,7 +40,17 @@ BGRESET = "Reset the temperature background"
 DISCARD = "Discards any change made from application start"
 
 
+# Support functions
+def popUpOk():
+    messagebox.showinfo("Information", "Operation was succesfull")
+
+
+def popUpNotOk():
+    messagebox.showinfo("Error", "Operation has failed")
+
+
 # this class shows how to visualise tracking with tkinter
+
 class TunerGui:
     def __init__(self):
         self.demoKit = None
@@ -167,20 +177,14 @@ class TunerGui:
             bDiscard.pack(side=LEFT, padx=5, pady=5)
             Tooltip(bDiscard, text=DISCARD, wraplength=wraplength)
 
-    def popUpOk(self):
-        messagebox.showinfo("Information", "Operation was succesfull")
-
-    def popUpNotOk(self):
-        messagebox.showinfo("Error", "Operation has failed")
-
     def sendConfig(self):  # check negatives again!
         newConfig = []
         for i in range(0, len(self.config)):
             newConfig.append(self.scales[i].get())
         if self.demoKit.writeFullConfiguration(newConfig):
-            self.popUpOk()
+            popUpOk()
         else:
-            self.popUpNotOk()
+            popUpNotOk()
 
     def saveConfig(self):
         self.master.filename = filedialog.asksaveasfilename(initialdir="/", title="Select file",
@@ -202,24 +206,24 @@ class TunerGui:
             self.scales[i].set(self.config[i])
 
     def bgReset(self):
-        if messagebox.askyesno('Reser Background', "Make sure nobody is in front of the device. Continue?", \
+        if messagebox.askyesno('Reset Background', "Make sure nobody is in front of the device. Continue?", \
                                icon=messagebox.QUESTION, default=messagebox.YES):
             if self.demoKit.resetBackground():
-                self.popUpOk()
+                popUpOk()
             else:
-                self.popUpNotOk()
+                popUpNotOk()
 
     def freezeConfig(self):  # wait new fw
         if self.demoKit.saveOveride():
-            self.popUpOk()
+            popUpOk()
         else:
-            self.popUpNotOk()
+            popUpNotOk()
 
     def unfreezeConfig(self):  # wait new fw
         if self.demoKit.removeOveride():
-            self.popUpOk()
+            popUpOk()
         else:
-            self.popUpNotOk()
+            popUpNotOk()
 
 
 def start():
