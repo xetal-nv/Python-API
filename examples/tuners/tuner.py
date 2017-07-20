@@ -37,6 +37,7 @@ SEND = "Sends configuration to the device"
 FREEZE = "Stores current configuration as start override"
 UNFREEZE = "Removes current start override, resetting to factory default"
 BGRESET = "Reset the temperature background"
+OFFRESET = "Reset offset of all sensor for temperature reset"
 DISCARD = "Discards any change made from application start"
 
 
@@ -172,6 +173,10 @@ class TunerGui:
             bBgreset = Button(frameButtons, text='BGRESET', width=8, command=self.bgReset)
             bBgreset.pack(side=LEFT, padx=5, pady=5)
             Tooltip(bBgreset, text=BGRESET, wraplength=wraplength)
+
+            offReset = Button(frameButtons, text='OFFSETRST', width=8, command=self.bgReset, state = DISABLED)
+            offReset.pack(side=LEFT, padx=5, pady=5)
+            Tooltip(offReset, text=OFFRESET, wraplength=wraplength)
 
             bDiscard = Button(frameButtons, text='DISCARD', width=8, command=self.discard)
             bDiscard.pack(side=LEFT, padx=5, pady=5)
