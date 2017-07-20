@@ -8,6 +8,7 @@ sys.path.insert(0, '../../libs')
 from KinseiTuner import *
 import gui
 from tooltip import *
+from tkinter import messagebox
 from tkinter import filedialog
 from tkinter import *
 
@@ -167,18 +168,20 @@ class TunerGui:
             Tooltip(bDiscard, text=DISCARD, wraplength=wraplength)
 
     def popUpOk(self):
-        toplevel = Toplevel()
-        toplevel.title("")
-        label1 = Label(toplevel, text="Operation was succesfull", height=5, width=20)
-        label1.pack()
-        Button(toplevel, text='CLOSE', width=8, command=toplevel.destroy).pack(side=BOTTOM, padx=5, pady=5)
+        # toplevel = Toplevel()
+        # toplevel.title("")
+        # label1 = Label(toplevel, text="Operation was succesfull", height=5, width=20)
+        # label1.pack()
+        # Button(toplevel, text='CLOSE', width=8, command=toplevel.destroy).pack(side=BOTTOM, padx=5, pady=5)
+        messagebox.showinfo("Information","Operation was succesfull")
 
     def popUpNotOk(self):
-        toplevel = Toplevel()
-        toplevel.title("")
-        label1 = Label(toplevel, text="Operation has failed", height=5, width=20)
-        label1.pack()
-        Button(toplevel, text='CLOSE', width=8, command=toplevel.destroy).pack(side=BOTTOM, padx=5, pady=5)
+        # toplevel = Toplevel()
+        # toplevel.title("")
+        # label1 = Label(toplevel, text="Operation has failed", height=5, width=20)
+        # label1.pack()
+        # Button(toplevel, text='CLOSE', width=8, command=toplevel.destroy).pack(side=BOTTOM, padx=5, pady=5)
+        messagebox.showinfo("Error", "Operation has failed")
 
     def sendConfig(self):  # check negatives again!
         newConfig = []
