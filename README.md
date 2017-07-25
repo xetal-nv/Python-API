@@ -53,6 +53,7 @@ trackingViewer.py*: graphically shows the tracking data in real time. Provides a
 
 ## Kinsei Applications
 Applications are script that can be used to optimize and tune a kinsei device. Furthermore, they show advanced features (such as real time tuning) that can be used to implement open and closed loop control systems for application requiring more precise data or working in unpredictable environments.
+
 Currently the following applications are provided and can be accessed by running the script deviceconfig.py in folder ‘examples’:
 
 tuner.py: this script can be used to retrieve and set parameters that affect the behavior of the device in real time (e.g. maximum person speed, temperature thresholds and so on).
