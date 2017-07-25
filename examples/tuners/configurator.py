@@ -12,6 +12,8 @@ from tkinter import messagebox
 
 sys.path.insert(0, '../../libs')
 from KinseiSSHclient import *
+import gui
+
 
 __author__ = "Francesco Pessolano"
 __copyright__ = "Copyright 2017, Xetal nv"
@@ -22,6 +24,7 @@ __email__ = "francesco@xetal.eu"
 __status__ = "release"
 __requiredfirmware__ = "july2017 or later"
 
+# This DICT holds the available configuration commands with type and range
 # 'name parameter' : [range type, min, max]
 parameters = {
     'MONITORED_AREA': ['', None, None],
@@ -61,6 +64,7 @@ parameters = {
     'CZONE': [None, None, None]
 }
 
+# This DICT holds the colors for syntax highlight
 tags = {
     'comment': 'slate gray',
     'command': 'blue',
@@ -69,10 +73,34 @@ tags = {
 }
 
 
-class Configurator(object):
-    def __init__(self, root, ssh):
-        self.ssh = ssh
-        self.root = root
+# This class creates and manages the configurator GUI and operations
+class Configurator:
+    def __init__(self):
+        self.ssh = None
+        self.connected = False
+        self.root = None
+        self.toolmenu = None
+        self.configEditor = None
+
+    def __del__(self):
+        if self.ssh is not None:
+            self.ssh.disconnect()
+
+    # creates the SSH connection
+    def connect(self, username, password, hostname):
+        try:
+            self.ssh = KinseiSSHclient(username, password, hostname)
+            self.connected = self.ssh.connected
+        except:
+            print ("ee")
+            self.connected = False
+
+    def isConnected(self):
+        return self.connected
+
+    # creates the GUI
+    def start(self, connected=True):
+        self.root = Tk()
         self.root.title("Kinsei Configuration Editor")
         self.root.resizable(width=True, height=True)
 
@@ -93,16 +121,17 @@ class Configurator(object):
         filemenu.add_separator()
         filemenu.add_command(label="Exit", command=self.exit)
         self.toolmenu = Menu(menu)
-        menu.add_cascade(label="Device Controls", menu=self.toolmenu)
-        self.toolmenu.add_command(label="Connect", command=self.forceConnect)
-        self.toolmenu.add_command(label="Disconnect", command=self.forceDisconnect)
-        self.toolmenu.add_separator()
-        self.toolmenu.add_command(label="Read configuration", command=self.readConfig)
-        self.toolmenu.add_command(label="Send configuration", command=self.sendConfig)
-        self.toolmenu.add_separator()
-        self.toolmenu.add_command(label="Restart service", command=self.restartService)
-        self.toolmenu.add_command(label="Stop service", command=self.stopService)
-        self.toolmenu.add_command(label="Start service", command=self.startService)
+        if connected:
+            menu.add_cascade(label="Device Controls", menu=self.toolmenu)
+            self.toolmenu.add_command(label="Connect", command=self.forceConnect)
+            self.toolmenu.add_command(label="Disconnect", command=self.forceDisconnect)
+            self.toolmenu.add_separator()
+            self.toolmenu.add_command(label="Read configuration", command=self.readConfig)
+            self.toolmenu.add_command(label="Send configuration", command=self.sendConfig)
+            self.toolmenu.add_separator()
+            self.toolmenu.add_command(label="Restart service", command=self.restartService)
+            self.toolmenu.add_command(label="Stop service", command=self.stopService)
+            self.toolmenu.add_command(label="Start service", command=self.startService)
         helpmenu = Menu(menu)
         menu.add_cascade(label="Help", menu=helpmenu)
         helpmenu.add_command(label="About", command=self.about)
@@ -115,12 +144,10 @@ class Configurator(object):
         self.configEditor.tag_configure("order_error", background="yellow")
         self.config_tags()
 
-        self.setDeviceTools(self.ssh.connected)
+        if connected:
+            self.setDeviceTools(self.ssh.connected)
 
-    def __del__(self):
-        self.ssh.disconnect()
-
-    # coloring
+    # The followinf methods are used for syntax highlight and current line coloring
     def config_tags(self):
         for tag, val in tags.items():
             self.configEditor.tag_config(tag, foreground=val)
@@ -189,7 +216,7 @@ class Configurator(object):
         line = self.configEditor.get("insert linestart", "insert lineend")
         self.colorizeLine(line)
 
-    # gui
+    # enables or disable device tools depending on connection state
     def setDeviceTools(self, flag):
         if flag:
             enabled = 'normal'
@@ -202,9 +229,10 @@ class Configurator(object):
         self.toolmenu.entryconfig("Stop service", state=enabled)
         self.toolmenu.entryconfig("Start service", state=enabled)
 
+    # generic methods for file management and help
     @staticmethod
     def about():
-        messagebox.showinfo("About", "Kinsei Configuration Editor v.1.0.0\n\n Copyright@2017 Xetal nv")
+        messagebox.showinfo("About", "Kinsei Configuration Editor v.1.0.0\n\nCopyright Xetal@2017")
 
     def new(self):
         if messagebox.askokcancel("New Configuration", "Any modification that has not been "
@@ -244,6 +272,7 @@ class Configurator(object):
                                           "saved will be lost, proceed?"):
             self.root.destroy()
 
+    # methods for device tool execution
     def forceConnect(self):
         self.ssh.disconnect()
         state = self.ssh.connect(True)
@@ -299,10 +328,11 @@ class Configurator(object):
                                 self.ssh.hostname + " has been restarted")
 
 
-if __name__ == '__main__':
-    hostname, username, password = '192.168.1.23', 'root', 'pippopluto'
-
+def start():
     root = Tk()
-    ssh = KinseiSSHclient(username, password, hostname)
-    configurator = Configurator(root, ssh)
+    configurator = Configurator()
+    gui.LoginGUI(root, configurator)
     root.mainloop()
+
+if __name__ == '__main__':
+    start()

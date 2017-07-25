@@ -33,7 +33,7 @@ class KinseiSSHclient(object):
         self.trace = None
         self.connected = False
         self.ssh = paramiko.SSHClient()
-        if offline:
+        if not offline:
             self.connect()
 
     """ __del__:
