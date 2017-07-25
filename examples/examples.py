@@ -31,9 +31,9 @@ availableDemos = {
     # shows a thermal map based on the settings in the source files
     "Thermal map": lambda: subprocess.Popen(["python", "./viewers/thermalmap.py"]),
     # shows a an hot spot map based on people position
-    "Hotspot map": lambda: subprocess.Popen(["python", "./viewers/hotspotmap.py"]),
+    "Hotspot map": lambda: subprocess.Popen(["python", "./viewers/hotspotmap.py"])
     # starts the device tuner
-    "Tuner GUI": lambda: subprocess.Popen(["python", "./tuners/tuner.py"])
+    # "Tuner GUI": lambda: subprocess.Popen(["python", "./tuners/tuner.py"])
 }
 
 
