@@ -1,5 +1,7 @@
 # Python Kinsei Client, Examples and Applications 
-### version 4.0.0 BETA
+### Version 4.0.0 BETA
+### Preferef kinsei firmware July2017
+### In case of further help please contact us at contact@xetal.eu
 
 NOTE => PLEASE INSTALL ALL DEPENDENCIES WITH PIP INSTALL -R REQUIREMENTS.TXT
 
@@ -20,4 +22,3 @@ EXAMPLES of usage of the libraries can be found in the folder "examples" includi
 
 ## Kinsei Applications
 
-#### In case of further help please contact us at contact@xetal.eu
