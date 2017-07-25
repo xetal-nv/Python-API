@@ -20,7 +20,7 @@ KinseiTuner.py :
 This library is used for real-time tuning of the device functionality aiming at optimizing the results coming from the above library
 
 KinseiSSHCcient.py :
-This library is used to access the device SSH commands. It is normally used for advanced non-real time and destructing configuration and its usage is advised only after consultation with a Kinsei specialist
+This library is used to access the device SSH commands. It is normally used for advanced non-real time and destructive configuration and its usage is advised only after consultation with a Kinsei specialist
 
 ## Kinsei Interface documentation
 A kinsei device can be controlled by means of a simple TCP protocol for most of its functions. Currently the provided TCP interfaces are described in the following documents in the folder ‘docs’:
@@ -53,6 +53,7 @@ trackingViewer.py*: graphically shows the tracking data in real time. Provides a
 
 ## Kinsei Applications
 Applications are scripts that can be used to optimize and tune a kinsei device. Furthermore, they show advanced features (such as real time tuning) that can be used to implement open and closed loop control systems for application requiring more precise data or working in unpredictable environments. 
+
 These applications also allow operations that were previously only possible by means of a manual SSH connetion to the device.
 
 Currently the following applications are provided and can be accessed by running the script deviceconfig.py in folder ‘examples’:
