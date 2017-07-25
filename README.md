@@ -52,7 +52,7 @@ trackingFusionViewer.py*: graphically shows the tracking and fusion data in real
 trackingViewer.py*: graphically shows the tracking data in real time. Provides also the number of detected people
 
 ## Kinsei Applications
-Applications are script that can be used to optimize and tune a kinsei device. Furthermore, they show advanced features (such as real time tuning) that can be used to implement open and closed loop control systems for application requiring more precise data or working in unpredictable environments.
+Applications are scripts that can be used to optimize and tune a kinsei device. Furthermore, they show advanced features (such as real time tuning) that can be used to implement open and closed loop control systems for application requiring more precise data or working in unpredictable environments.
 
 Currently the following applications are provided and can be accessed by running the script deviceconfig.py in folder ‘examples’:
 
