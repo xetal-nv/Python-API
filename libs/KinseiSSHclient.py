@@ -14,14 +14,18 @@ __status__ = "release"
 __requiredfirmware__ = "july2017 or later"
 
 
-OFFLINE = False
-
-# the class implmeneting the kinsei client
 class KinseiSSHclient(object):
     """ __init__:
+    The costructor creates and opens SSH channel.
+
+    Arguments are as follows:
+    username:           username to login to the device
+    password:           password to login to the device
+    hostname:           device IP for SSH (assume standard port 22)
+    offline:              True only when the app is to be used offline
     """
 
-    def __init__(self, username, password, hostname='192.168.76.1'):
+    def __init__(self, username, password, hostname='192.168.76.1', offline=False):
         self.username = username
         self.password = password
         self.hostname = hostname
@@ -29,16 +33,21 @@ class KinseiSSHclient(object):
         self.trace = None
         self.connected = False
         self.ssh = paramiko.SSHClient()
-        if not OFFLINE:
+        if offline:
             self.connect()
 
     """ __del__:
+    Destructor
     """
 
     def __del__(self):
         self.disconnect()
 
-    def sendCommand(self, command, debug=False):
+    """sendCommand:
+    Sends the command to the device via the SSH channel.
+    When 'offline' is True, the answer is printed on console, ignore otherwise"""
+
+    def sendCommand(self, command, offline=False):
         if self.ssh:
             stdin, stdout, stderr = self.ssh.exec_command(command)
             while not stdout.channel.exit_status_ready():
@@ -49,8 +58,12 @@ class KinseiSSHclient(object):
                     while prevdata:
                         prevdata = stdout.channel.recv(1024)
                         alldata += prevdata
-                    if debug:
+                    if offline:
                         print(str(alldata, "utf8"))
+
+    """connect:
+    Reconnect to the channel associated with the object.
+    When 'forced' is True, it ignores the current channel state"""
 
     def connect(self, forced=False):
         if (not self.connected) or forced:
@@ -63,10 +76,16 @@ class KinseiSSHclient(object):
                 self.ssh = None
         return self.connected
 
+    """ disconnect:
+    Disconnect from the device without removing the object"""
+
     def disconnect(self, forced=False):
         if self.connected or forced:
             self.ssh.close()
             self.connected = False
+
+    """ readFile:
+    Read file filename (including path) from the device"""
 
     def readFile(self, filename):
         if self.connected:
@@ -78,6 +97,9 @@ class KinseiSSHclient(object):
             except:
                 pass
         return None
+
+    """ archiveFile:
+    Make a .archive copy of file filename (including path) on the device"""
 
     def archiveFile(self, fullFileName):
         if self.connected:
@@ -91,6 +113,12 @@ class KinseiSSHclient(object):
                 pass
         return None
 
+    """ service:
+    Manage the Kinsei server via the service interface. 
+    Accepted actions are START, STOP, RESTART, RELOAD (confguration file).
+    Shortcut methids are provided for readability (stopServer, startServer,
+    restartServer, reloadServerConfiguration) """
+
     def service(self, comand, delay=0):
         if self.connected:
             try:
@@ -103,8 +131,27 @@ class KinseiSSHclient(object):
                 pass
         return None
 
+    def stopServer(self):
+        return self.service('stop')
+
+    def startServer(self):
+        return self.service('start', 3)
+
+    def restartServer(self):
+        return self.service('restart', 4)
+
+    def reloadServerConfiguration(self):
+        return self.service('reload', 2)
+
+    """ readConfiguration:
+    Read the kinsei server configuration file"""
+
     def readConfiguration(self):
         return self.readFile('TrackingServer.conf')
+
+    """ writeConfiguration:
+    Writes a new kinsei server configuration file.
+    The previous file is archived"""
 
     def writeConfiguration(self, configuration):
         if self.connected:
@@ -119,17 +166,8 @@ class KinseiSSHclient(object):
                 pass
         return None
 
+    """ readStoredTrace:
+    Read the trace file, if it exists"""
+
     def readStoredTrace(self):
         return self.readFile('data.raw')
-
-    def stopServer(self):
-        return self.service('stop')
-
-    def startServer(self):
-        return self.service('start', 3)
-
-    def restartServer(self):
-        return self.service('restart', 4)
-
-    def reloadServerConfiguration(self):
-        return self.service('reload', 2)
