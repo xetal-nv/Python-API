@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 
-"""main.py: main for all examples, please enable only one by selecting the proper item of the availableDemos
+"""examples.py: main for all examples, please enable only one by selecting the proper item of the availableDemos
 dictionary """
 
 import sys, collections, subprocess
@@ -14,24 +14,32 @@ sys.path.insert(0, '../libs')
 __author__ = "Francesco Pessolano"
 __copyright__ = "Copyright 2017, Xetal nv"
 __license__ = "MIT"
-__version__ = "1.0.0"
+__version__ = "2.0.0"
 __maintainer__ = "Francesco Pessolano"
 __email__ = "francesco@xetal.eu"
 __status__ = "release"
 
-availableApps = {
-    # starts the device tuner
-    "Runtime Tuner": lambda: subprocess.Popen(["python", "./tuners/tuner.py"]),
-    # starts the device configurator
-    "Configurator": lambda: subprocess.Popen(["python", "./tuners/configurator.py"])
+availableDemos = {
+    # shows an example of communication and tracking, not graphical
+    # "Console data": lambda: subprocess.Popen(["python", "./viewers/communication.py"]),
+    # shows an example of graphical viewer for tracking
+    "Tracking viewer": lambda: subprocess.Popen(["python", "./viewers/trackingViewer.py"]),
+    # shows an example of graphical viewer for tracking and raw data (fusion)
+    "Tracking & fusion viewer": lambda: subprocess.Popen(["python", "./viewers/trackingFusionViewer.py"]),
+    # shows an example of http server reporting number of people
+    "Presence http server ": lambda: subprocess.Popen(["python", "./servers/presencehttp.py"]),
+    # shows a thermal map based on the settings in the source files
+    "Thermal map": lambda: subprocess.Popen(["python", "./viewers/thermalmap.py"]),
+    # shows a an hot spot map based on people position
+    "Hotspot map": lambda: subprocess.Popen(["python", "./viewers/hotspotmap.py"])
 }
 
 
 def main():
 
-    orderedAvailableDemos = collections.OrderedDict(sorted(availableApps.items()))
+    orderedAvailableDemos = collections.OrderedDict(sorted(availableDemos.items()))
     root = tk.Tk()
-    root.title("Configuration utilities")
+    root.title("Demo Selector")
 
     # bind escape to terminate
     root.bind('<Escape>', quit)
