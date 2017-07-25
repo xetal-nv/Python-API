@@ -132,6 +132,10 @@ class Configurator:
             self.toolmenu.add_command(label="Restart service", command=self.restartService)
             self.toolmenu.add_command(label="Stop service", command=self.stopService)
             self.toolmenu.add_command(label="Start service", command=self.startService)
+            self.toolmenu.add_separator()
+            self.toolmenu.add_command(label="Upload new firmware", state=DISABLED)
+            self.toolmenu.add_command(label="Reboot device", state=DISABLED)
+
         helpmenu = Menu(menu)
         menu.add_cascade(label="Help", menu=helpmenu)
         helpmenu.add_command(label="About", command=self.about)
