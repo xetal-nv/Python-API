@@ -1,0 +1,308 @@
+#!/usr/bin/python3
+
+# !/usr/bin/python3
+
+"""configurator.py: allows reading and editing of the configuration file; stopping, starting and restarting
+    of the kinsei server on the device"""
+
+from tkinter import *
+from tkinter.scrolledtext import *
+from tkinter import filedialog
+from tkinter import messagebox
+
+sys.path.insert(0, '../../libs')
+from KinseiSSHclient import *
+
+__author__ = "Francesco Pessolano"
+__copyright__ = "Copyright 2017, Xetal nv"
+__license__ = "MIT"
+__version__ = "1.0.0"
+__maintainer__ = "Francesco Pessolano"
+__email__ = "francesco@xetal.eu"
+__status__ = "release"
+__requiredfirmware__ = "july2017 or later"
+
+# 'name parameter' : [range type, min, max]
+parameters = {
+    'MONITORED_AREA': ['', None, None],
+    'SAMPLES_AVERAGE': ['num', 1, None],
+    'NOTMONITORED_CZONE': ['', None, None],
+    'TRACKING_CONSENSUM_FACTOR': ['num', 0, None],
+    'TRACKING_HIGH_FALLBACK_DELAY': ['num', 0, None],
+    'COMPORT': ['', None, None],
+    'TRACKING_LOW_FALLBACK_DELAY': ['num', 0, None],
+    'BACKGROUND_THRESHOLD': ['num', 0, None],
+    'ONLINE': ['bool', 0, 1],
+    'SAVE_VALUES': ['bool', 0, 1],
+    'FUSION_BACKGROUND_THRESHOLD': ['num', 0, None],
+    'TRACKING_PERSON_MAXSPEED': ['num', 0, None],
+    'TRACKING_FALLBACK_TH_UP': ['num', 0, None],
+    'NSENS': ['num', 2, 10],
+    'TRACKING_EDGE_DISTANCE': ['num', 0, None],
+    'TRACKING_MAX_#PERSONS': ['num', 0, None],
+    'TRACKING_MIN_DISTANCE_PERSONS': ['num', 0, None],
+    'SEN': ['num', 2, None],
+    'FUSION_THRESHOLD': ['num', 0, None],
+    'THERMALMAP': ['bool', 0, 1],
+    'FUSION_BACKGROUND_MAX_TEMP': ['num', 0, None],
+    'BACKGROUND_RESET_DELAY': ['num', 0, None],
+    'FUSION_CONSENSUM_FACTOR': ['num', 0, 1],
+    'TRACKING_MODE': ['bool', 0, 1],
+    'BACKGROUND_ALFA': ['num', 0, 1],
+    'BACKGROUND_TEMPERATURE_THRESHOLD': ['num', -10, +10],
+    'SENSORANGLE_NR': ['set', 'NR', None],
+    'CONFIG_SERVERPORT': ['num', 0, None],
+    'SENSOR_SAMPLING': ['num', 110, None],
+    'SERVERPORT': ['num', 0, None],
+    'TRACKING_FALLBACK': [1, 0, 1],
+    'TRACKING_FALLBACK_TH_DOWN': ['num', 0, None],
+    'NOTMONITORED_PZONE': [None, None, None],
+    'PZONE': [None, None, None],
+    'CZONE': [None, None, None]
+}
+
+tags = {
+    'comment': 'slate gray',
+    'command': 'blue',
+    'syntaxerror': 'red',
+    'valuerror': 'magenta2'
+}
+
+
+class Configurator(object):
+    def __init__(self, root, ssh):
+        self.ssh = ssh
+        self.root = root
+        self.root.title("Kinsei Configuration Editor")
+        self.root.resizable(width=True, height=True)
+
+        # bind escape to terminate
+        self.root.bind('<Escape>', self.exit)
+
+        # bind any key to colorize and highlight the current line
+        self.root.bind('<Key>', self.highlight)
+
+        # make and set the configurator editor GUI
+        menu = Menu(self.root)
+        self.root.config(menu=menu)
+        filemenu = Menu(menu)
+        menu.add_cascade(label="File", menu=filemenu)
+        filemenu.add_command(label="New", command=self.new)
+        filemenu.add_command(label="Open", command=self.open)
+        filemenu.add_command(label="Save", command=self.save)
+        filemenu.add_separator()
+        filemenu.add_command(label="Exit", command=self.exit)
+        self.toolmenu = Menu(menu)
+        menu.add_cascade(label="Device Controls", menu=self.toolmenu)
+        self.toolmenu.add_command(label="Connect", command=self.forceConnect)
+        self.toolmenu.add_command(label="Disconnect", command=self.forceDisconnect)
+        self.toolmenu.add_separator()
+        self.toolmenu.add_command(label="Read configuration", command=self.readConfig)
+        self.toolmenu.add_command(label="Send configuration", command=self.sendConfig)
+        self.toolmenu.add_separator()
+        self.toolmenu.add_command(label="Restart service", command=self.restartService)
+        self.toolmenu.add_command(label="Stop service", command=self.stopService)
+        self.toolmenu.add_command(label="Start service", command=self.startService)
+        helpmenu = Menu(menu)
+        menu.add_cascade(label="Help", menu=helpmenu)
+        helpmenu.add_command(label="About", command=self.about)
+
+        self.configEditor = ScrolledText(self.root, heigh=30, width=100)
+        self.configEditor.pack(fill=BOTH, expand=True)
+
+        # set for highlighting the current line and coloring
+        self.configEditor.tag_configure("current_line", background="#e9e9e9")
+        self.configEditor.tag_configure("order_error", background="yellow")
+        self.config_tags()
+
+        self.setDeviceTools(self.ssh.connected)
+
+    def __del__(self):
+        self.ssh.disconnect()
+
+    # coloring
+    def config_tags(self):
+        for tag, val in tags.items():
+            self.configEditor.tag_config(tag, foreground=val)
+
+    def remove_tags(self, start, end):
+        for tag in self.tags.keys():
+            self.configEditor.tag_remove(tag, start, end)
+
+    def highlight_pattern(self, pattern, tag, start="1.0", end="end",
+                          regexp=False):
+        start = self.configEditor.index(start)
+        end = self.configEditor.index(end)
+        self.configEditor.mark_set("matchStart", start)
+        self.configEditor.mark_set("matchEnd", start)
+        self.configEditor.mark_set("searchLimit", end)
+
+        count = IntVar()
+        while True:
+            index = self.configEditor.search(pattern, "matchEnd", "searchLimit",
+                                             count=count, regexp=regexp)
+            if index == "":
+                break
+            if count.get() == 0:
+                break  # degenerate pattern which matches zero-length strings
+            self.configEditor.mark_set("matchStart", index)
+            self.configEditor.mark_set("matchEnd", "%s+%sc" % (index, count.get()))
+            self.configEditor.tag_add(tag, "matchStart", "matchEnd")
+
+    def colorizeLine(self, line):
+        if line is not '':
+            line.strip()
+            if line[0] == '#':
+                self.configEditor.tag_add('comment', "insert linestart", "insert lineend+1c")
+            else:
+                confLineData = line.split('=')
+                if confLineData[0] not in parameters:
+                    self.highlight_pattern(line.split('=')[0], 'syntaxerror')
+                else:
+                    commandCheck = parameters[confLineData[0]]
+                    color = 'command'
+                    if commandCheck[0] == 'num':
+                        if confLineData[1].strip().lstrip('-').replace('.', '', 1).isdigit():
+                            value = float(confLineData[1].strip())
+                            if value < commandCheck[1]:
+                                color = 'valuerror'
+                            elif commandCheck[2] is not None:
+                                if value < commandCheck[2]:
+                                    color = 'valuerror'
+                        else:
+                            color = 'valuerror'
+                    elif commandCheck[0] == 'bool':
+                        if (confLineData[1].strip() != '1') and (confLineData[1].strip() != '0'):
+                            color = 'valuerror'
+                        pass
+                    elif commandCheck[0] == 'set':
+                        for angle in confLineData[1].strip():
+                            if angle not in commandCheck[1]:
+                                color = 'valuerror'
+                    self.configEditor.tag_add(color, "insert linestart", "insert lineend+1c")
+
+    def highlight(self, _unused):
+        self.configEditor.tag_remove("current_line", 1.0, "end")
+        for tag in tags:
+            self.configEditor.tag_remove(tag, "insert linestart", "insert lineend")
+        self.configEditor.tag_add("current_line", "insert linestart", "insert lineend+1c")
+        line = self.configEditor.get("insert linestart", "insert lineend")
+        self.colorizeLine(line)
+
+    # gui
+    def setDeviceTools(self, flag):
+        if flag:
+            enabled = 'normal'
+        else:
+            enabled = 'disabled'
+        self.toolmenu.entryconfig("Disconnect", state=enabled)
+        self.toolmenu.entryconfig("Read configuration", state=enabled)
+        self.toolmenu.entryconfig("Send configuration", state=enabled)
+        self.toolmenu.entryconfig("Restart service", state=enabled)
+        self.toolmenu.entryconfig("Stop service", state=enabled)
+        self.toolmenu.entryconfig("Start service", state=enabled)
+
+    @staticmethod
+    def about():
+        messagebox.showinfo("About", "Kinsei Configuration Editor v.1.0.0\n\n Copyright@2017 Xetal nv")
+
+    def new(self):
+        if messagebox.askokcancel("New Configuration", "Any modification that has not been "
+                                                       "saved will be lost, proceed?"):
+            self.configEditor.delete(1.0, END)
+
+    def open(self):
+        if messagebox.askokcancel("New Configuration", "Any modification that has not been "
+                                                       "saved will be lost, proceed?"):
+            self.configEditor.delete(1.0, END)
+            file = filedialog.askopenfile(parent=self.root, mode='rb', title='Select a file')
+            if file is not None:
+                for line in file.readlines():
+                    line = line.decode('utf-8')
+                    tag = 'command'
+                    if line is not '':
+                        line.strip()
+                        if line[0] == '#':
+                            tag = 'comment'
+                        else:
+                            if line.split('=')[0] not in parameters:
+                                tag = 'syntaxerror'
+                    self.configEditor.insert(END, line, tag)
+                file.close()
+
+    def save(self):
+        file = filedialog.asksaveasfile(mode='w')
+        if file is not None:
+            # slice off the last character from get, as an extra return is added
+            data = self.configEditor.get('1.0', END + '-1c')
+            file.write(data)
+            file.close()
+
+    # noinspection PyUnusedLocal
+    def exit(self, _notUSed=0):
+        if messagebox.askokcancel("Quit", "Any modification that has not been "
+                                          "saved will be lost, proceed?"):
+            self.root.destroy()
+
+    def forceConnect(self):
+        self.ssh.disconnect()
+        state = self.ssh.connect(True)
+        self.setDeviceTools(state)
+
+    def forceDisconnect(self):
+        self.ssh.disconnect(True)
+        self.setDeviceTools(False)
+
+    def readConfig(self):
+        config = self.ssh.readConfiguration()
+        if config is None:
+            messagebox.showerror("Error", "Failed to read the configuration file of the device at " + self.ssh.hostname)
+        else:
+            for line in config:
+                tag = 'command'
+                if line is not '':
+                    line.strip()
+                    if line[0] == '#':
+                        tag = 'comment'
+                    else:
+                        if line.split('=')[0] not in parameters:
+                            tag = 'syntaxerror'
+                self.configEditor.insert(END, line + '\n', tag)
+
+    def sendConfig(self):
+        config = self.configEditor.get(1.0, END)
+        if self.ssh.writeConfiguration(config) is None:
+            messagebox.showerror("Error", "Failed to send the configuration to device " + self.ssh.hostname)
+        else:
+            messagebox.showinfo("Operation completed", "The configuration has been sent to device " +
+                                self.ssh.hostname)
+
+    def stopService(self):
+        if self.ssh.stopServer() is None:
+            messagebox.showerror("Error", "Failed to stop the kinsei server of device " + self.ssh.hostname)
+        else:
+            messagebox.showinfo("Operation completed", "The Kinser server of device " +
+                                self.ssh.hostname + " has been stopped")
+
+    def startService(self):
+        if self.ssh.startServer() is None:
+            messagebox.showerror("Error", "Failed to start the kinsei server of device " + self.ssh.hostname)
+        else:
+            messagebox.showinfo("Operation completed", "The Kinser server of device " +
+                                self.ssh.hostname + " has been started")
+
+    def restartService(self):
+        if self.ssh.restartServer() is None:
+            messagebox.showerror("Error", "Failed to restart the kinsei server of device " + self.ssh.hostname)
+        else:
+            messagebox.showinfo("Operation completed", "The Kinser server of device " +
+                                self.ssh.hostname + " has been restarted")
+
+
+if __name__ == '__main__':
+    hostname, username, password = '192.168.1.23', 'root', 'pippopluto'
+
+    root = Tk()
+    ssh = KinseiSSHclient(username, password, hostname)
+    configurator = Configurator(root, ssh)
+    root.mainloop()

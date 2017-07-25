@@ -9,7 +9,7 @@ import math
 __author__ = "Francesco Pessolano"
 __copyright__ = "Copyright 2017, Xetal nv"
 __license__ = "MIT"
-__version__ = "2.1.3"
+__version__ = "2.1.4"
 __maintainer__ = "Francesco Pessolano"
 __email__ = "francesco@xetal.eu"
 __status__ = "release"
@@ -43,7 +43,7 @@ class KinseiSocket(object):
     port:             device port, 2005 is the default port if not manually changed in the device itself
     """
 
-    def __init__(self, host='192.168.42.1', timeout=15.0, pauseMS=350, port=2005):
+    def __init__(self, host='192.168.76.1', timeout=15.0, pauseMS=350, port=2005):
         self.latencyMS = pauseMS
         try:
             self.server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)

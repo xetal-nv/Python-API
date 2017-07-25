@@ -18,7 +18,7 @@ __license__ = "MIT"
 __version__ = "0.9.0"
 __maintainer__ = "Francesco Pessolano"
 __email__ = "francesco@xetal.eu"
-__status__ = "development"
+__status__ = "release"
 __requiredfirmware__ = "july2017 or later"
 
 # tips for commands
@@ -37,7 +37,7 @@ SEND = "Sends configuration to the device"
 FREEZE = "Stores current configuration as start override"
 UNFREEZE = "Removes current start override, resetting to factory default"
 BGRESET = "Reset the temperature background"
-OFFRESET = "Reset offset of all sensors for initial calibration"
+OFFRESET = "Reset offset of all sensors for hardware calibration (NOTE: offset persist also after turniong on and on)"
 DISCARD = "Discards any change made from application start"
 
 
