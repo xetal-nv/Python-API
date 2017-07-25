@@ -1,5 +1,5 @@
 # Python Kinsei Client, Examples and Applications 
-###version 4.0.0 BETA
+### version 4.0.0 BETA
 
 NOTE => PLEASE INSTALL ALL DEPENDENCIES WITH PIP INSTALL -R REQUIREMENTS.TXT
 
