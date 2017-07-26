@@ -9,41 +9,36 @@ sys.path.insert(0, '../../libs')
 import KinseiClient
 from http.server import BaseHTTPRequestHandler, HTTPServer
 
-__author__      =   "Francesco Pessolano"
-__copyright__   =   "Copyright 2017, Xetal nv"
-__license__     =   "MIT"
-__version__     =   "0.5.0"
-__maintainer__  =   "Francesco Pessolano"
-__email__       =   "francesco@xetal.eu"
-__status__      =   "pre release"
+__author__ = "Francesco Pessolano"
+__copyright__ = "Copyright 2017, Xetal nv"
+__license__ = "MIT"
+__version__ = "1.0.0"
+__maintainer__ = "Francesco Pessolano"
+__email__ = "francesco@xetal.eu"
+__status__ = "release"
 __requiredfirmware__ = "february2017 or later"
 
-    
 PORT_NUMBER = 8080
-# it accespt also DNS addresses
-
-# IP_DEVICE = "192.168.42.1" # remove comment to set as default the standard AP address
 # IP_DEVICE = "192.168.76.1" # remove comment to set as default the standard AP address
-IP_DEVICE = "81.82.231.115" # occasionally remotely available Xetal kit
+IP_DEVICE = "81.82.231.115"  # occasionally remotely available Xetal kit
 
 
-class myHandler(BaseHTTPRequestHandler):
-    
-    def getNumberPersonsPresent(self):
+class MyHandler(BaseHTTPRequestHandler):
+    @staticmethod
+    def getNumberPersonsPresent():
         # create a socket coinnection to the device
-        #demoKit2 = KinseiClient.KinseiSocket('192.168.1.42') # change the IP with the one used by the kit
-        demoKit2 = KinseiClient.KinseiSocket(IP_DEVICE) # change the IP with the one used by the kit
+        demoKit2 = KinseiClient.KinseiSocket(IP_DEVICE)  # change the IP with the one used by the kit
         # check if the system is online before asking data
         if demoKit2.checkIfOnline():
             numberPeopleFixed = demoKit2.getNumberPersonsFixed()
             numberPeopleFloat = demoKit2.getNumberPersonsFloat()
             return [numberPeopleFixed, numberPeopleFloat]
         return False
-        
-    #Handler for the GET requests
+
+    # Handler for the GET requests
     def do_GET(self):
         self.send_response(200)
-        self.send_header('Content-type','text/html')
+        self.send_header('Content-type', 'text/html')
         self.end_headers()
         # check present people
         presence = self.getNumberPersonsPresent()
@@ -51,7 +46,7 @@ class myHandler(BaseHTTPRequestHandler):
         self.wfile.write(bytes("<H1>Presence detection</H1>", "utf-8"))
         self.wfile.write(bytes("<br>", "utf-8"))
         self.wfile.write(bytes("Time is " + datetime.datetime.now().strftime("%y-%m-%d %H-%M"), "utf-8"))
-        self.wfile.write(bytes("<br>", "utf-8"))        
+        self.wfile.write(bytes("<br>", "utf-8"))
         self.wfile.write(bytes("Device at IP " + IP_DEVICE, "utf-8"))
         self.wfile.write(bytes("<br>", "utf-8"))
         self.wfile.write(bytes("Present persons (Fixed) " + str(presence[0]), "utf-8"))
@@ -60,19 +55,21 @@ class myHandler(BaseHTTPRequestHandler):
 
 
 def start():
+    server = None
     try:
-        #Create a web server and define the handler to manage the
-        #incoming request
-        server = HTTPServer(('', PORT_NUMBER), myHandler)
-        print ('Started httpserver on port ' + str(PORT_NUMBER))
-        
-        #Wait forever for incoming htto requests
-        server.serve_forever()
-    
-    except KeyboardInterrupt:
-        print ('^C received, shutting down the web server')
-        server.socket.close()
-        
-if __name__ == "__main__": start()
+        # Creates a web server and defines the handler to manage the
+        # incoming request
+        server = HTTPServer(('', PORT_NUMBER), MyHandler)
+        print('Started httpserver on port ' + str(PORT_NUMBER))
 
-        
+        # Waits forever for incoming http requests
+        server.serve_forever()
+
+    except KeyboardInterrupt:
+        print('^C received, shutting down the web server')
+        if server is not None:
+            server.socket.close()
+
+
+if __name__ == "__main__":
+    start()

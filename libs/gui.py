@@ -12,7 +12,7 @@ __license__ = "MIT"
 __version__ = "2.0.1"
 __maintainer__ = "Francesco Pessolano"
 __email__ = "francesco@xetal.eu"
-__status__ = "release"
+__status__ = "internal usage, not documented"
 
 # name of where the last used ip/dns is saved
 SAVEDIP = "../.ip"

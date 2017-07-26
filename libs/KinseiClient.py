@@ -9,7 +9,7 @@ import math
 __author__ = "Francesco Pessolano"
 __copyright__ = "Copyright 2017, Xetal nv"
 __license__ = "MIT"
-__version__ = "2.1.4"
+__version__ = "2.1.5"
 __maintainer__ = "Francesco Pessolano"
 __email__ = "francesco@xetal.eu"
 __status__ = "release"
@@ -86,9 +86,9 @@ class KinseiSocket(object):
                 return self.serverConnected
 
     """ setTimeIntervalMS:
-    Set the time interval between to messages forced when the methods below are executes with the flag wait
+    Set the time interval between two messages, forced when the methods below are executes with the flag wait
     set to True
-    It is adviced to keep this value not below 50 ms.
+    It is adviced to keep this value above 50 ms.
     """
 
     def setTimeIntervalMS(self, pauseMS):
@@ -111,7 +111,7 @@ class KinseiSocket(object):
         data = self.executeCommand(self.kinseiCommand["checkOnline"], wait)
         if data == self.kinseiCommand["error"]:
             return False
-        if (data[1] == 1):
+        if data[1] == 1:
             return True
         return False
 
@@ -156,7 +156,7 @@ class KinseiSocket(object):
     belog always to the same person until the moment it leaves the monitored space or it overlaps perfectly with another
     person
     
-    False is returned in case or connection error
+    False is returned in case of connection error
     """
 
     def getPersonsPositions(self, wait=True):
@@ -177,7 +177,7 @@ class KinseiSocket(object):
     """ getNumberPersonsFixed:
     Return the number of detected people as a fixed number.
     
-    False is returned in case or connection error
+    False is returned in case of connection error
     """
 
     def getNumberPersonsFixed(self, wait=True):
@@ -192,7 +192,7 @@ class KinseiSocket(object):
     This method is to be preferred to getNumberPersonsFixed as it allows to set thresholds for proper 
     tuning in determining the actualy number of detected persons.
     
-    False is returned in case or connection error
+    False is returned in case of connection error
     """
 
     def getNumberPersonsFloat(self, wait=True):
@@ -205,14 +205,14 @@ class KinseiSocket(object):
     Returns an array with the battery voltage levels of the connected sensors.
     If the sensors are connected to a fix supply, the array will report 0 for each sensor
     
-    False is returned in case or connection error
+    False is returned in case of connection error
     """
 
     def getBatteryLevels(self, wait=True):
         data = self.executeCommand(self.kinseiCommand["batteryLevels"], wait)
         if data == self.kinseiCommand["error"]:
             return False
-        numberSensors = data[1];
+        numberSensors = data[1]
         batteryLevels = []
         for x in range(numberSensors):
             singleBattery = [data[2 + 2 * x], data[3 + 2 * x]]
@@ -222,14 +222,14 @@ class KinseiSocket(object):
     """ checkIfSensorsOnline:
     Returns an array indicating which sensor is online and which not
     
-    False is returned in case or connection error
+    False is returned in case of connection error
     """
 
     def checkIfSensorsOnline(self, wait=True):
         data = self.executeCommand(self.kinseiCommand["checkSensorsOnline"], wait)
         if data == self.kinseiCommand["error"]:
             return False
-        numberSensors = data[1];
+        numberSensors = data[1]
         sensorsStatus = []
         for x in range(numberSensors):
             sensorsStatus.append(data[2 + 5 * x])
@@ -239,7 +239,7 @@ class KinseiSocket(object):
     Returns an array where each element is an array providing the X and Y coordinates of a possible person detection 
     and a value indicating the confidence level that thay is a real person or not.
     
-    False is returned in case or connection error
+    False is returned in case of connection error
     """
 
     def getFusionValues(self, wait=True):
@@ -247,7 +247,7 @@ class KinseiSocket(object):
         data = self.executeCommand(self.kinseiCommand["fusionValues"], wait)
         if data == self.kinseiCommand["error"]:
             return []
-        numberSensedLocations = data[1];
+        numberSensedLocations = data[1]
         sensedLocationsData = []
         for i in range(numberSensedLocations):
             locationStatus = []
@@ -265,16 +265,16 @@ class KinseiSocket(object):
     In case of circular, the X and Y coordinates and the radius will be provides
     In case of polygonal, the X and Y coordinates (in sequence) of each corner will be provided
     
-    False is returned in case or connection error
+    False is returned in case of connection error
     """
 
     def getZones(self, wait=True):
         data = self.executeCommand(self.kinseiCommand["zones"], wait)
         if data == self.kinseiCommand["error"]:
             return False
-        numberZones = data[1];
+        numberZones = data[1]
         zonesSpecs = []
-        indexData = 0;
+        indexData = 0
         for x in range(numberZones):
             currentZone = []
             if data[2 + indexData] == 0:
@@ -300,7 +300,8 @@ class KinseiSocket(object):
 
     """ executeCommand:
     Executes any comand and return the message from the device at it was received
-    False is returned in case or connection error
+    
+    False is returned in case of connection error
     """
 
     def executeCommand(self, command, wait=True):
@@ -320,7 +321,7 @@ class KinseiSocket(object):
     Executes any comand and return the message from the devoce at it was received assiming data size is int he second/third byte
     with data size given by size
     
-    False is returned in case or connection error
+    False is returned in case of connection error
     """
 
     def executeVariableCommand(self, command, size=2, wait=True):
@@ -341,6 +342,7 @@ class KinseiSocket(object):
     """ getStablePosition:    
     Returns a position, if possible, that is stable for a given ammount of time
     Arguments are as follows:
+    
     draw:                attempt to draw (depends on if the canvas was set up already)
     whichPerson:         which person to be checked
     timeMS:              time interval for stability 
@@ -362,8 +364,9 @@ class KinseiSocket(object):
         return False
 
     """ getThermalMapResolution:
-    !! BETA - useable only from firmware july2017 !!
+    !! useable only from firmware july2017 !!
     Returns the number of pixel per x and y axis and the pixel size in mm.
+    
     False in case of comunication error
     """
 
@@ -374,9 +377,10 @@ class KinseiSocket(object):
         return [data[1], data[2], data[3]]
 
     """ getThermalMapPixels:
-    !! BETA - available only from firmware july2017 !!
+    !! available only from firmware july2017 !!
     Returns the pisel temperatures in row order
-    False
+    
+    False in case of comunication error
     """
 
     def getThermalMapPixels(self, wait=True):

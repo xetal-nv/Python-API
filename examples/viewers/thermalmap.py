@@ -2,9 +2,6 @@
 
 """thermalmap.py: basic graphical viewer for the thermal map"""
 
-""" !! STILL IN DEVELOPMENT - MIGHT CRASH FOR SOME GEOMETRIES!! """
-
-import ipaddress
 from math import *
 from tkinter import *
 
@@ -16,10 +13,10 @@ import colormaps
 __author__ = "Francesco Pessolano"
 __copyright__ = "Copyright 2017, Xetal nv"
 __license__ = "MIT"
-__version__ = "1.2.4"
+__version__ = "1.2.5"
 __maintainer__ = "Francesco Pessolano"
 __email__ = "francesco@xetal.eu"
-__status__ = "beta release"
+__status__ = "release"
 __requiredfirmware__ = "july2017 or later"
 
 
@@ -40,7 +37,7 @@ showColorMapping = False
 # Error on average for textColorMapping
 minVariation = 0.1
 
-if (showAverageTemp):
+if showAverageTemp:
     from statistics import mean
 
 
@@ -56,6 +53,10 @@ class ThermalMap:
         self.screenX = 0
         self.screenY = 0
         self.ip = None
+        self.coloring = None
+        self.averageTemp = 0
+        self.thermalMapSettings = None
+        self.grid = None
 
     def connect(self, ip, whichMap=whichcoloring):
         try:
@@ -80,9 +81,9 @@ class ThermalMap:
     def defineCanvas(self):
         boundingBoxRatio = self.roomSize[0] / self.roomSize[1]
         screenRatio = maxScreenX / maxScreenY
-        if (screenRatio < 1):
+        if screenRatio < 1:
             # portrait screen
-            if ((boundingBoxRatio < 1) and (screenRatio > boundingBoxRatio)):
+            if (boundingBoxRatio < 1) and (screenRatio > boundingBoxRatio):
                 # We need to scale from the height
                 yMax = maxScreenY
                 yMin = 0
@@ -98,13 +99,13 @@ class ThermalMap:
                 yMax = yMin + theOtherDimension
         else:
             # landscape screen
-            if ((boundingBoxRatio > 1) and (screenRatio < boundingBoxRatio)):
+            if (boundingBoxRatio > 1) and (screenRatio < boundingBoxRatio):
                 # We need to scale from the width
                 xMin = 0
                 xMax = maxScreenX
-                theOtherDimension = trunc((xMax - xMin) / boundingBoxRatio);
-                yMin = 0;
-                yMax = yMin + theOtherDimension;
+                theOtherDimension = trunc((xMax - xMin) / boundingBoxRatio)
+                yMin = 0
+                yMax = yMin + theOtherDimension
 
             else:
                 # We need to scale from the height
@@ -116,7 +117,7 @@ class ThermalMap:
         self.screenX = xMax - xMin
         self.screenY = yMax - yMin
 
-    # this function set-up the canvas and let the tracking start
+    # this function sets up the canvas and let the measurement start
     def start(self):
         if self.connected:
             # the canvas is created and all elements initialisated
@@ -136,7 +137,7 @@ class ThermalMap:
             self.grid = self.canvas.grid(row=0, column=0)
             self.drawBackground()
 
-            if (showColorMapping):
+            if showColorMapping:
                 self.drawMapColor()
             else:
                 self.drawMapTemps()
@@ -150,7 +151,7 @@ class ThermalMap:
         roomSizeLabel = self.canvas.create_text(offset + 5, offset + 5, anchor="nw", font=('Helvetica', 14))
         label = "Room envelop is " + str(int(self.roomSize[0] / 10)) + "cm x " + str(int(self.roomSize[1] / 10)) + "cm"
         self.canvas.itemconfig(roomSizeLabel, text=label)
-        if (showAverageTemp):
+        if showAverageTemp:
             avgTempLabel = self.canvas.create_text(self.screenX, offset + 5, anchor="ne", font=('Helvetica', 14))
             labelTemp = "Average Temperature is " + "{0:.2f}".format(self.averageTemp) + "C"
             self.canvas.itemconfig(avgTempLabel, text=labelTemp)
@@ -161,9 +162,9 @@ class ThermalMap:
         w = self.screenX
         h = self.screenY
         pixelTemperatures10 = self.demoKit.getThermalMapPixels()
-        if (showAverageTemp):
+        if showAverageTemp:
             self.averageTemp = mean(filter(lambda a: a != 0, pixelTemperatures10)) / 10
-        if (self.coloring == colormaps.matplotlibScaleAdapted):
+        if self.coloring == colormaps.matplotlibScaleAdapted:
             frameMax = max(pixelTemperatures10)
             frameMin = min(filter(lambda a: a != 0, pixelTemperatures10))
             colors = [self.coloring(x, frameMin, frameMax) for x in pixelTemperatures10]
@@ -188,7 +189,7 @@ class ThermalMap:
         w = self.screenX
         h = self.screenY
         pixelTemperatures10 = self.demoKit.getThermalMapPixels()
-        if (showAverageTemp):
+        if showAverageTemp:
             self.averageTemp = mean(filter(lambda a: a != 0, pixelTemperatures10)) / 10
 
         # draws the map
@@ -196,11 +197,11 @@ class ThermalMap:
         cellheight = h / self.thermalMapSettings[1]
         for row in range(self.thermalMapSettings[1]):
             for col in range(self.thermalMapSettings[0]):
-                if (pixelTemperatures10[row * self.thermalMapSettings[0] + col] == 0):
+                if pixelTemperatures10[row * self.thermalMapSettings[0] + col] == 0:
                     outlineColor = ""
                 else:
                     outlineColor = "gray"
-                    if (showAverageTemp):
+                    if showAverageTemp:
                         colorText = colormaps.threeWayColor(
                             pixelTemperatures10[row * self.thermalMapSettings[0] + col] / 10, self.averageTemp, \
                             minVariation)
@@ -226,4 +227,5 @@ def start():
     root.mainloop()
 
 
-if __name__ == "__main__": start()
+if __name__ == "__main__":
+    start()

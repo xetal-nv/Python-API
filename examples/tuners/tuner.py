@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 
-"""tuner.py: example of graphical interface for real-time tuning of the paramenters"""
+"""tuner.py: graphical interface for real-time tuning of the paramenters"""
 
 import sys
 
@@ -15,30 +15,30 @@ from tkinter import *
 __author__ = "Francesco Pessolano"
 __copyright__ = "Copyright 2017, Xetal nv"
 __license__ = "MIT"
-__version__ = "0.9.0"
+__version__ = "1.0.0"
 __maintainer__ = "Francesco Pessolano"
 __email__ = "francesco@xetal.eu"
-__status__ = "development"
+__status__ = "release"
 __requiredfirmware__ = "july2017 or later"
 
 # tips for commands
 
-BA = "Indicates the minimum difference between the background temperature and the measured one in order to " \
-     "consider this a person "
+BA = "Indicates the minimum difference between the background and the measured temperature in order to " \
+     "assume there is a person at the measurement location"
 BT = "Represents the weight of the new background temperature versus the old one when caculating the new " \
      "background temperature"
-TT = "Represents the minimum background temperature with the respect of the average room temperature"
+TT = "Represents the minimum background temperature with the respect to the average room temperature"
 FBT = "This threshold must be high enough to clean the fusion. Increase to reduce noise, decrease to increase samples"
 FCF = "The higher the value, the greater priority is given to positions detected by more sensors"
 FT = "The position temperature and the background must have a difference greater this threshold" \
      "to be considered a person position candidate"
 
-SEND = "Sends configuration to the device"
-FREEZE = "Stores current configuration as start override"
+SEND = "Sends the edited configuration to the device"
+FREEZE = "Stores the current configuration as start override"
 UNFREEZE = "Removes current start override, resetting to factory default"
 BGRESET = "Reset the temperature background"
-OFFRESET = "Reset offset of all sensors for hardware calibration (NOTE: offset persist also after turniong on and on)"
-DISCARD = "Discards any change made from application start"
+OFFRESET = "Reset offset of all sensors for hardware calibration (NOTE: offset persist also after turning off/on)"
+DISCARD = "Discards all local change made from application start"
 
 
 # Support functions
@@ -50,8 +50,7 @@ def popUpNotOk():
     messagebox.showinfo("Error", "Operation has failed")
 
 
-# this class shows how to visualise tracking with tkinter
-
+# It implements the graphical interface for the tuner application
 class TunerGui:
     def __init__(self):
         self.demoKit = None
@@ -74,7 +73,7 @@ class TunerGui:
     def isConnected(self):
         return self.connected
 
-    # this function set-up the canvas and let the tracking start
+    # this function sets up the canvas and its functions
     def start(self):
 
         if self.connected:
@@ -91,10 +90,8 @@ class TunerGui:
             filemenu.add_separator()
             filemenu.add_command(label="Exit", command=self.master.quit)
 
-            # helpmenu = Menu(menubar, tearoff=0)
-
             menubar.add_cascade(label="File", menu=filemenu)
-            # menubar.add_cascade(label="Help", menu=helpmenu)
+
             self.master.config(menu=menubar)
 
             frameSliders = Frame(self.master)

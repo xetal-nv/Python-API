@@ -12,7 +12,7 @@ import gui
 __author__ = "Francesco Pessolano"
 __copyright__ = "Copyright 2017, Xetal nv"
 __license__ = "MIT"
-__version__ = "1.8.0"
+__version__ = "1.8.1"
 __maintainer__ = "Francesco Pessolano"
 __email__ = "francesco@xetal.eu"
 __status__ = "release"
@@ -42,7 +42,7 @@ class ViewerTrackingOnly:
         self.screenY = 0
         self.counterLabel = None
         self.run = None
-        self.invertView = False;
+        self.invertView = False
         self.ip = None
 
     def connect(self, ip):
@@ -96,8 +96,8 @@ class ViewerTrackingOnly:
                 xMin = 0
                 xMax = maxScreenX
                 theOtherDimension = trunc((xMax - xMin) / boundingBoxRatio);
-                yMin = 0;
-                yMax = yMin + theOtherDimension;
+                yMin = 0
+                yMax = yMin + theOtherDimension
 
             else:
                 # We need to scale from the height
@@ -167,7 +167,7 @@ class ViewerTrackingOnly:
     # executes the tracking
     def trackPersons(self):
         if self.run['text'] == "RUNNING":
-            positionData = self.demoKit.getPersonsPositions();
+            positionData = self.demoKit.getPersonsPositions()
             personFloat = self.demoKit.getNumberPersonsFloat(False)
             personFix = self.demoKit.getNumberPersonsFixed(False)
             labelCounter = "Number of people: [" + "{0:.2f}".format(personFloat) + ", " + \

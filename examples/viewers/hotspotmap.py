@@ -4,7 +4,6 @@
     a possible detected person where probability of being a real person is proportional to the color brightness)
     NOTE: that the script does not check if the number of sampled positions exceeds the maximum (float64.max)"""
 
-# import sys
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
@@ -18,10 +17,10 @@ from colormaps import *
 __author__ = "Francesco Pessolano"
 __copyright__ = "Copyright 2017, Xetal nv"
 __license__ = "MIT"
-__version__ = "1.1.1"
+__version__ = "1.1.2"
 __maintainer__ = "Francesco Pessolano"
 __email__ = "francesco@xetal.eu"
-__status__ = "in development"
+__status__ = "release"
 __requiredfirmware__ = "february2017 or later"
 
 # TODO add outliers removal
@@ -109,4 +108,5 @@ def start():
     root.mainloop()
 
 
-if __name__ == "__main__": start()
+if __name__ == "__main__":
+    start()

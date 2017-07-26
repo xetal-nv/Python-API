@@ -1,11 +1,16 @@
 #!/usr/bin/python3
 
 """aggregator.py: server that aggregates and transmits data from a kinsei kit
-    NOTE: it is assumed always the standard port 2005"""
+    NOTE: it is assumed the kit always uses the standard port 2005"""
 
-import sys, time, struct, os, re
-import numpy as np
+import os
+import re
+import struct
+import sys
 import threading as thread
+import time
+
+import numpy as np
 
 sys.path.insert(0, '../../libs')
 import KinseiClient
@@ -21,7 +26,7 @@ __email__ = "francesco@xetal.eu"
 __status__ = "release"
 __requiredfirmware__ = "february2017 or later"
 
-# The kist IP can be specified as a parameter to the command line or here
+# The kit IP can be specified as a parameter to the command line or here
 IP_DEVICE = "81.82.231.115"  # occasionally remotely available Xetal kit
 
 # How many samples needs to be skipped, this cna be used to dilute aggregation
@@ -69,7 +74,7 @@ class AggregatorServer(ThreadedServer):
                         if x != [0, 0]:
                             self.hotSpotMatrix[x[1]][x[0]] += 1.0
                 time.sleep(SKIMSAMPLES * self.demoKit.getTimeIntervalMS() / 1000)
-            print("AggregateData terminated at iteration " + str(self.hotSpotMatrix.max()))
+            print("Aggregated data terminated at iteration " + str(self.hotSpotMatrix.max()))
             nameFile = str(time.time()) + ".log"
             print("Latest aggregated data saved to file " + nameFile)
             np.savetxt(nameFile, self.hotSpotMatrix)
@@ -80,9 +85,9 @@ class AggregatorServer(ThreadedServer):
         t.daemon = True
         t.start()
 
-    def onMessage(self, message, client):  # does send anything, but it closes the connection
+    def onMessage(self, message, client):
         if (not self.dataLock.locked()) and (self.hotSpotMatrix is not None):
-            # this is enable testing with nc
+            # this is to enable testing with nc
             if message[-1] == 10:
                 message = message[0:-1]
             if message == b'hm':

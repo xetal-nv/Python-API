@@ -1,7 +1,5 @@
 #!/usr/bin/python3
 
-# !/usr/bin/python3
-
 """configurator.py: allows reading and editing of the configuration file; stopping, starting and restarting
     of the kinsei server on the device"""
 
@@ -158,7 +156,7 @@ class Configurator:
             self.configEditor.tag_config(tag, foreground=val)
 
     def remove_tags(self, start, end):
-        for tag in self.tags.keys():
+        for tag in self.configEditor.tags.keys():
             self.configEditor.tag_remove(tag, start, end)
 
     def highlight_pattern(self, pattern, tag, start="1.0", end="end",
@@ -188,7 +186,7 @@ class Configurator:
                 self.configEditor.tag_add('comment', "insert linestart", "insert lineend+1c")
             else:
                 confLineData = line.split('=')
-                # check for syntaxt error
+                # check for syntax error
                 if confLineData[0] not in parameters:
                     self.highlight_pattern(line.split('=')[0], 'syntaxerror')
                 else:
@@ -208,7 +206,7 @@ class Configurator:
         line = self.configEditor.get("insert linestart", "insert lineend")
         self.colorizeLine(line)
 
-    # enables or disable device tools depending on connection state
+    # enables or disables device tools depending on the connection state
     def setDeviceTools(self, flag):
         if flag:
             enabled = 'normal'
@@ -221,7 +219,11 @@ class Configurator:
         self.toolmenu.entryconfig("Stop service", state=enabled)
         self.toolmenu.entryconfig("Start service", state=enabled)
 
-    # generic methods for file management and help
+        # following items have not been implemented yet
+        # self.toolmenu.add_command(label="Upload new firmware", state=enabled)
+        # self.toolmenu.add_command(label="Reboot device", state=enabled)
+
+    # generic methods for the file and help menus
     @staticmethod
     def about():
         messagebox.showinfo("About", "Kinsei Configuration Editor v.1.0.0\n\nCopyright Xetal@2017")
@@ -320,7 +322,7 @@ class Configurator:
             messagebox.showinfo("Operation completed", "The Kinser server of device " +
                                 self.ssh.hostname + " has been restarted")
 
-    # check of there are value errors in the provided configuration line
+    # check if there are value errors in the provided configuration line
     @staticmethod
     def checkForValueErrorInLine(confLineData):
         commandCheck = parameters[confLineData[0]]
@@ -401,7 +403,7 @@ class Configurator:
             messagebox.showerror("Configuration Error", message)
         else:
             if showOK:
-                messagebox.showinfo("Operation Completed", "The configuration has no errors\n")
+                messagebox.showinfo("Operation Completed", "The configuration file has no errors\n")
         return error
 
 

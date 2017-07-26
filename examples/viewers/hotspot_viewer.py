@@ -2,14 +2,15 @@
 
 """hotspot_viewer.py: graphical viewer for persons tracking and fusion (raw data indicating
     a possible detected person where probability of being a real person is proportional to the color brightness)
-    NOTE: IT required an aggregator server"""
+    NOTE: It requires an aggregator server"""
 
 import socket
 import struct
-import numpy as np
-import matplotlib.pyplot as plt
-import matplotlib.animation as animation
 from tkinter import *
+
+import matplotlib.animation as animation
+import matplotlib.pyplot as plt
+import numpy as np
 
 sys.path.insert(0, '../../libs')
 import gui
@@ -18,7 +19,7 @@ from colormaps import *
 __author__ = "Francesco Pessolano"
 __copyright__ = "Copyright 2017, Xetal nv"
 __license__ = "MIT"
-__version__ = "1.0.1"
+__version__ = "1.0.2"
 __maintainer__ = "Francesco Pessolano"
 __email__ = "francesco@xetal.eu"
 __status__ = "release"
@@ -54,9 +55,9 @@ class HotSpotMapWithServer:
             # get room bounding box dimensions
             message = b'dm'
             self.server.sendall(message)
-            data = self.server .recv(4)
+            data = self.server.recv(4)
             dimension0 = struct.unpack('I', data)[0]
-            data = self.server .recv(4)
+            data = self.server.recv(4)
             dimension1 = struct.unpack('I', data)[0]
 
             def getDatagetData():
@@ -66,7 +67,7 @@ class HotSpotMapWithServer:
                     size = dimension0 * dimension1
                     d = []
                     for i in range(size):
-                        data = self.server .recv(4)
+                        data = self.server.recv(4)
                         value = struct.unpack('f', data)[0]
                         d.append(value)
                     newMatrix = np.array(d).reshape(dimension0, dimension1)
@@ -94,8 +95,8 @@ class HotSpotMapWithServer:
                 im.set_data(heatmapMatrix)
                 return im
 
-            print("\nThe DemoKit is online. \nRoom size is " + str(dimension0 * SCALE/10) + "cm by " \
-                  + str(dimension1 * SCALE/10) + "cm.\n")
+            print("\nThe DemoKit is online. \nRoom size is " + str(dimension0 * SCALE / 10) + "cm by " \
+                  + str(dimension1 * SCALE / 10) + "cm.\n")
             print("Starting persons tracking")
 
             # noinspection PyUnusedLocal
@@ -111,4 +112,5 @@ def start():
     root.mainloop()
 
 
-if __name__ == "__main__": start()
+if __name__ == "__main__":
+    start()

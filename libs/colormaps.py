@@ -10,7 +10,7 @@ from math import *
 __author__ = "Francesco Pessolano"
 __copyright__ = "Copyright 2017, Xetal nv"
 __license__ = "MIT"
-__version__ = "1.0.0"
+__version__ = "1.0.1"
 __maintainer__ = "Francesco Pessolano"
 __email__ = "francesco@xetal.eu"
 __status__ = "release"
@@ -22,15 +22,16 @@ maximumTemp = 40
 # provide scale in mm when relevant
 SCALE = 100
 
+
 # select linear in order to have a linear map from blue to red in the given range
 def linear(temp10):
     colors = [(0, 0, 255), (0, 255, 0), (255, 0, 0)]
     minval, maxval = 0, 4
     minTemp = minimimTemp * 10
     maxTemp = maximumTemp * 10
-    if (temp10 < minTemp):
+    if temp10 < minTemp:
         return ''
-    elif (temp10 > maxTemp):
+    elif temp10 > maxTemp:
         temp10 = maxTemp
     val = 3 * ((temp10 - minTemp) / maxTemp) + 1
 
@@ -45,7 +46,7 @@ def linear(temp10):
 
 # shows in red anything whose temoerature is above 25C
 def thresholdMap(temp10):
-    if (temp10 > 250):
+    if temp10 > 250:
         return "#FF0000"
     else:
         return ""
@@ -56,36 +57,37 @@ def thresholdMap(temp10):
 def matplotlibScale(temp10, modifier=1, colorScale="ocean"):
     minTemp = minimimTemp * 10
     maxTemp = maximumTemp * 10
-    if (temp10 < minTemp):
+    if temp10 < minTemp:
         return ''
-    elif (temp10 > maxTemp):
+    elif temp10 > maxTemp:
         temp10 = maxTemp
     val = (temp10 / maxTemp) ** modifier
     import matplotlib.pyplot as plt
     Scale = plt.get_cmap(colorScale)
     colors = (list(map(lambda x: trunc(x * 255), Scale(val))))
-    return ('#%02x%02x%02x' % (colors[0], colors[1], colors[2]))
+    return '#%02x%02x%02x' % (colors[0], colors[1], colors[2])
 
 
 # same as above but it uses the actual minimum and maximum values insteaf of the given range
 def matplotlibScaleAdapted(temp10, minTemp, maxTemp, modifier=1, colorScale="hot"):
-    if (temp10 == 0):
+    if temp10 == 0:
         return ''
     val = ((temp10 - minTemp) / (maxTemp - minTemp)) ** modifier
     import matplotlib.pyplot as plt
     Scale = plt.get_cmap(colorScale)
     colors = (list(map(lambda x: trunc(x * 255), Scale(val))))
-    return ('#%02x%02x%02x' % (colors[0], colors[1], colors[2]))
+    return '#%02x%02x%02x' % (colors[0], colors[1], colors[2])
 
 
 # uses three colors for the temperature text only with respect to a referebce value
 def threeWayColor(temp10, avgTemp, variation=0):
-    if (abs(temp10 - avgTemp) <= variation):
+    if abs(temp10 - avgTemp) <= variation:
         return "black"
-    elif (temp10 > (avgTemp + variation)):
+    elif temp10 > (avgTemp + variation):
         return "red"
     else:
         return "blue"
+
 
 # the following methods are used to properly shade a given color
 # as from KinseiClient the larger the value the more likely is the decetion

@@ -7,16 +7,13 @@ import tkinter as tk
 __author__ = "Francesco Pessolano, Victor Zaccardo, Alberto Vassena"
 __copyright__ = "none"
 __license__ = "MIT"
-__version__ = "0.1.0"
+__version__ = "1.0.0"
 __maintainer__ = "Francesco Pessolano"
 __email__ = "francesco@xetal.eu"
-__status__ = "development"
-__requiredfirmware__ = "any"
-
+__status__ = "internal usage, not documented"
 
 
 class Tooltip:
-
     def __init__(self, widget,
                  *,
                  bg='#FFFFEA',
@@ -115,12 +112,12 @@ class Tooltip:
                        background=bg,
                        borderwidth=0)
         label = tk.Label(win,
-                          text=self.text,
-                          justify=tk.LEFT,
-                          background=bg,
-                          relief=tk.SOLID,
-                          borderwidth=0,
-                          wraplength=self.wraplength)
+                         text=self.text,
+                         justify=tk.LEFT,
+                         background=bg,
+                         relief=tk.SOLID,
+                         borderwidth=0,
+                         wraplength=self.wraplength)
 
         label.grid(padx=(pad[0], pad[2]),
                    pady=(pad[1], pad[3]),

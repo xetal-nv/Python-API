@@ -1,11 +1,11 @@
 #!/usr/bin/python3
 
-"""examples.py: main for all examples, please enable only one by selecting the proper item of the availableDemos
-dictionary """
+"""examples.py: main for all examples"""
 
-import sys, collections, subprocess
+import collections
+import subprocess
+import sys
 import tkinter as tk
-
 
 sys.path.insert(0, '../libs')
 
@@ -20,8 +20,6 @@ __email__ = "francesco@xetal.eu"
 __status__ = "release"
 
 availableDemos = {
-    # shows an example of communication and tracking, not graphical
-    # "Console data": lambda: subprocess.Popen(["python", "./viewers/communication.py"]),
     # shows an example of graphical viewer for tracking
     "Tracking viewer": lambda: subprocess.Popen(["python", "./viewers/trackingViewer.py"]),
     # shows an example of graphical viewer for tracking and raw data (fusion)

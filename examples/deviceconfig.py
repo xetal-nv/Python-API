@@ -2,9 +2,10 @@
 
 """deviconfig.py: menu for all available configuration applications """
 
-import sys, collections, subprocess
+import collections
+import subprocess
+import sys
 import tkinter as tk
-
 
 sys.path.insert(0, '../libs')
 

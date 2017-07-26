@@ -8,7 +8,7 @@ __license__ = "MIT"
 __version__ = "0.5.0"
 __maintainer__ = "Francesco Pessolano"
 __email__ = "francesco@xetal.eu"
-__status__ = "in development"
+__status__ = "internal usage, not documented"
 
 import socket
 import threading

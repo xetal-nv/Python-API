@@ -6,7 +6,7 @@
 NOTE => PLEASE INSTALL ALL DEPENDENCIES WITH PIP INSTALL -R REQUIREMENTS.TXT
 
 ## Introduction
-This module provides the libraries/API for the standard use of a Kinsei system, examples illustrating their usage and applications that can be used either to optimize the device or as examples for more complex application requiring open/closed loop control.
+This module provides the Python3 libraries/API for the standard use of a Kinsei system, examples illustrating their usage and applications that can be used either to optimize the device or as examples for more complex application requiring open/closed loop control.
 
 ## Kinsei Libraries/API
 All Kinsei libraries (or API) can be found in the folder ‘libs’ together with various generic libraries used by the provided examples and applications. Every library is provided with inline documentation.

@@ -2,7 +2,8 @@
 
 """KinseiSSHCcient.py: client for SSH coontrol of a kinsei device"""
 
-import paramiko, time
+import paramiko
+import time
 
 __author__ = "Francesco Pessolano"
 __copyright__ = "Copyright 2017, Xetal nv"
@@ -99,7 +100,7 @@ class KinseiSSHclient(object):
         return None
 
     """ archiveFile:
-    Make a .archive copy of file filename (including path) on the device"""
+    Make a '.archive' copy of file filename (including path) on the device"""
 
     def archiveFile(self, fullFileName):
         if self.connected:

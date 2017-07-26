@@ -10,10 +10,10 @@ import struct
 __author__ = "Francesco Pessolano"
 __copyright__ = "Copyright 2017, Xetal nv"
 __license__ = "MIT"
-__version__ = "0.9.1"
+__version__ = "1.0.0"
 __maintainer__ = "Francesco Pessolano"
 __email__ = "francesco@xetal.eu"
-__status__ = "pre-release"
+__status__ = "release"
 __requiredfirmware__ = "july2017 or later"
 
 setCommand = {
@@ -102,7 +102,7 @@ class KinseiTuner(object):
     """ setTimeIntervalMS:
     Set the time interval between to messages forced when the methods below are executes with the flag wait
     set to True
-    It is adviced to keep this value not below 50 ms.
+    It is adviced to keep this value above 50 ms.
     """
 
     def setTimeIntervalMS(self, pauseMS):
@@ -118,7 +118,7 @@ class KinseiTuner(object):
 
     """ executeCommand:
     Executes any comand and return the message from the device at it was received
-    False is returned in case or connection error
+    False is returned in case of connection error
     """
 
     def exec(self, command, wait=True):
@@ -197,7 +197,7 @@ class KinseiTuner(object):
 
     """ readFullConfiguration:
     Returns the current configuraton into an ordered list as form list orderedKeys
-    False is returned in case or connection error
+    False is returned in case of connection error
     """
 
     def readFullConfiguration(self):
@@ -211,7 +211,7 @@ class KinseiTuner(object):
 
     """ writeFullConfiguration:
     Write the provided configuraton as an ordered list following the list orderedKeys
-    False is returned in case or connection error, true otherwise
+    False is returned in case of connection error
     """
 
     def writeFullConfiguration(self, configData):
@@ -224,7 +224,7 @@ class KinseiTuner(object):
 
     """ saveOveride:
     Save the current configuration as overide in the device
-    False is returned in case or connection error, true otherwise
+    False is returned in case of connection error
     """
 
     def saveOveride(self):
@@ -236,7 +236,7 @@ class KinseiTuner(object):
 
     """ saveOveride:
     Remove the current overide file from the device
-    False is returned in case or connection error, true otherwise
+    False is returned in case of connection error
     """
 
     def removeOveride(self):
