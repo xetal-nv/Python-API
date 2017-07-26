@@ -22,7 +22,7 @@ This library is used for real-time tuning of the device functionality aiming at 
 KinseiSSHCcient.py :
 This library is used to access the device SSH commands. It is normally used for advanced non-real time and destructive configuration and its usage is advised only after consultation with a Kinsei specialist
 
-## Kinsei Interface documentation
+## Kinsei documentation
 A kinsei device can be controlled by means of a simple TCP protocol for most of its functions. Currently the provided TCP interfaces are described in the following documents in the folder ‘docs’:
 
 kinsei.interface.txt:
@@ -30,6 +30,9 @@ Describes the TCP interface used in the library KinseiClient.py
 
 kinsei.tuning.interface.txt:
 Describes the TCP interface used in the library KinseiTuner.py
+
+sample.conf
+Is a standard configuration file to be used as sample and instructions for the command ordering, syntax and usage
 
 ## Kinsei examples
 Several examples are provided in the folder ‘example’ to illustrate how a kinsei system can be used and how to use its API. Most examples can be executed by starting the python script: examples.py.

@@ -1,6 +1,6 @@
 
 
-NOTE: This document described the tuning interface available in firmware July2017 and newer only.
+NOTE: This document describes the tuning interface available in firmware July2017 and newer only.
 
 The kinsei system allows one single tuning client (at a time) to be connected to a secondary port specified in the config file (command CONFIG_SERVERPORT)
  
