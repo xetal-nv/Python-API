@@ -14,7 +14,6 @@ sys.path.insert(0, '../../libs')
 from KinseiSSHclient import *
 import gui
 
-
 __author__ = "Francesco Pessolano"
 __copyright__ = "Copyright 2017, Xetal nv"
 __license__ = "MIT"
@@ -27,12 +26,12 @@ __requiredfirmware__ = "july2017 or later"
 # This DICT holds the available configuration commands with type and range
 # 'name parameter' : [range type, min, max]
 parameters = {
-    'MONITORED_AREA': ['', None, None],
+    'MONITORED_AREA': [None, None, None],
     'SAMPLES_AVERAGE': ['num', 1, None],
     'NOTMONITORED_CZONE': ['', None, None],
     'TRACKING_CONSENSUM_FACTOR': ['num', 0, None],
     'TRACKING_HIGH_FALLBACK_DELAY': ['num', 0, None],
-    'COMPORT': ['', None, None],
+    'COMPORT': [None, None, None],
     'TRACKING_LOW_FALLBACK_DELAY': ['num', 0, None],
     'BACKGROUND_THRESHOLD': ['num', 0, None],
     'ONLINE': ['bool', 0, 1],
@@ -44,7 +43,7 @@ parameters = {
     'TRACKING_EDGE_DISTANCE': ['num', 0, None],
     'TRACKING_MAX_#PERSONS': ['num', 0, None],
     'TRACKING_MIN_DISTANCE_PERSONS': ['num', 0, None],
-    'SEN': ['num', 2, None],
+    'SEN': [None, 2, None],
     'FUSION_THRESHOLD': ['num', 0, None],
     'THERMALMAP': ['bool', 0, 1],
     'FUSION_BACKGROUND_MAX_TEMP': ['num', 0, None],
@@ -92,7 +91,7 @@ class Configurator:
             self.ssh = KinseiSSHclient(username, password, hostname)
             self.connected = self.ssh.connected
         except:
-            print ("ee")
+            print("ee")
             self.connected = False
 
     def isConnected(self):
@@ -118,6 +117,8 @@ class Configurator:
         filemenu.add_command(label="New", command=self.new)
         filemenu.add_command(label="Open", command=self.open)
         filemenu.add_command(label="Save", command=self.save)
+        filemenu.add_separator()
+        filemenu.add_command(label="Verify", command=self.verify)
         filemenu.add_separator()
         filemenu.add_command(label="Exit", command=self.exit)
         self.toolmenu = Menu(menu)
@@ -151,7 +152,7 @@ class Configurator:
         if connected:
             self.setDeviceTools(self.ssh.connected)
 
-    # The followinf methods are used for syntax highlight and current line coloring
+    # The following methods are used for syntax highlight and current line coloring
     def config_tags(self):
         for tag, val in tags.items():
             self.configEditor.tag_config(tag, foreground=val)
@@ -187,29 +188,16 @@ class Configurator:
                 self.configEditor.tag_add('comment', "insert linestart", "insert lineend+1c")
             else:
                 confLineData = line.split('=')
+                # check for syntaxt error
                 if confLineData[0] not in parameters:
                     self.highlight_pattern(line.split('=')[0], 'syntaxerror')
                 else:
-                    commandCheck = parameters[confLineData[0]]
-                    color = 'command'
-                    if commandCheck[0] == 'num':
-                        if confLineData[1].strip().lstrip('-').replace('.', '', 1).isdigit():
-                            value = float(confLineData[1].strip())
-                            if value < commandCheck[1]:
-                                color = 'valuerror'
-                            elif commandCheck[2] is not None:
-                                if value < commandCheck[2]:
-                                    color = 'valuerror'
-                        else:
-                            color = 'valuerror'
-                    elif commandCheck[0] == 'bool':
-                        if (confLineData[1].strip() != '1') and (confLineData[1].strip() != '0'):
-                            color = 'valuerror'
-                        pass
-                    elif commandCheck[0] == 'set':
-                        for angle in confLineData[1].strip():
-                            if angle not in commandCheck[1]:
-                                color = 'valuerror'
+                    # check for value error
+                    error = self.checkForValueErrorInLine(confLineData)
+                    if error:
+                        color = 'command'
+                    else:
+                        color = 'valuerror'
                     self.configEditor.tag_add(color, "insert linestart", "insert lineend+1c")
 
     def highlight(self, _unused):
@@ -304,11 +292,12 @@ class Configurator:
 
     def sendConfig(self):
         config = self.configEditor.get(1.0, END)
-        if self.ssh.writeConfiguration(config) is None:
-            messagebox.showerror("Error", "Failed to send the configuration to device " + self.ssh.hostname)
-        else:
-            messagebox.showinfo("Operation completed", "The configuration has been sent to device " +
-                                self.ssh.hostname)
+        if not self.verify(False):
+            if self.ssh.writeConfiguration(config) is None:
+                messagebox.showerror("Error", "Failed to send the configuration to device " + self.ssh.hostname)
+            else:
+                messagebox.showinfo("Operation completed", "The configuration has been sent to device " +
+                                    self.ssh.hostname)
 
     def stopService(self):
         if self.ssh.stopServer() is None:
@@ -331,12 +320,97 @@ class Configurator:
             messagebox.showinfo("Operation completed", "The Kinser server of device " +
                                 self.ssh.hostname + " has been restarted")
 
+    # check of there are value errors in the provided configuration line
+    @staticmethod
+    def checkForValueErrorInLine(confLineData):
+        commandCheck = parameters[confLineData[0]]
+        correct = True
+        if commandCheck[0] == 'num':
+            if confLineData[1].strip().lstrip('-').replace('.', '', 1).isdigit():
+                value = float(confLineData[1].strip())
+                if value < commandCheck[1]:
+                    correct = False
+                elif commandCheck[2] is not None:
+                    if value > commandCheck[2]:
+                        correct = False
+            else:
+                correct = False
+        elif commandCheck[0] == 'bool':
+            if (confLineData[1].strip() != '1') and (confLineData[1].strip() != '0'):
+                correct = False
+            pass
+        elif commandCheck[0] == 'set':
+            for angle in confLineData[1].strip():
+                if angle not in commandCheck[1]:
+                    correct = False
+        return correct
+
+    # used to check the code for consistency and syntax
+    def verify(self, showOK=True):
+
+        syntaxError = 0
+        valueError = 0
+        senError = {
+            'position': False,
+            'declared': 0,
+            'present': 0,
+            'angleposition': False
+        }
+
+        config = self.configEditor.get(1.0, END)
+        pureConfig = [x for x in config.split('\n') if x is not ""]
+        pureConfig = [x for x in pureConfig if x[0] != '#']
+
+        for line in pureConfig:
+            confLineData = line.split('=')
+            # check for syntax errors
+            if confLineData[0] not in parameters:
+                syntaxError += 1
+            else:
+                # check for value errors
+                if not self.checkForValueErrorInLine(confLineData):
+                    valueError += 1
+                if confLineData[0] == 'SEN':
+                    if senError['declared'] == 0:
+                        senError['position'] = True
+                    senError['present'] += 1
+                if confLineData[0] == 'NSENS':
+                    if senError['present'] != 0:
+                        senError['position'] = True
+                    senError['declared'] = int(confLineData[1])
+                if confLineData[0] == 'SENSORANGLE_NR':
+                    if senError['present'] != 0:
+                        senError['angleposition'] = True
+
+        error = (syntaxError != 0) or (valueError != 0) or senError['position'] or senError['angleposition'] \
+                or (senError['declared'] != senError['present'])
+
+        if error:
+            message = "The configuration file has errors:\n\n"
+            if syntaxError > 0:
+                message += "Syntax errors: " + str(syntaxError) + "\n"
+            if valueError > 0:
+                message += "Value errors: " + str(valueError) + "\n"
+            if senError['present'] != senError['declared']:
+                message += "Sensor error. Declared " + str(senError['declared']) + \
+                           " while defined " + str(senError['present']) + "\n"
+            if senError['position']:
+                message += "\nNSENS command placed after SEN \n"
+            if senError['angleposition']:
+                message += "\nSENSORANGLE_NR command placed after SEN \n"
+            messagebox.showerror("Configuration Error", message)
+        else:
+            if showOK:
+                messagebox.showinfo("Operation Completed", "The configuration has no errors\n")
+        return error
+
 
 def start():
     root = Tk()
     configurator = Configurator()
     gui.LoginGUI(root, configurator)
     root.mainloop()
+
 
 if __name__ == '__main__':
     start()
