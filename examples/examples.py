@@ -6,6 +6,7 @@ import collections
 import subprocess
 import sys
 import tkinter as tk
+import os
 
 sys.path.insert(0, '../libs')
 
@@ -19,21 +20,31 @@ __maintainer__ = "Francesco Pessolano"
 __email__ = "francesco@xetal.eu"
 __status__ = "release"
 
+absolutePath = os.path.dirname(__file__)
+viewersFolder = 'viewers'
+serverFolder = 'servers'
+
 availableDemos = {
     # shows an example of graphical viewer for tracking
-    "Tracking viewer": lambda: subprocess.Popen(["python", "./viewers/trackingViewer.py"]),
+    "Tracking viewer": lambda: subprocess.Popen(
+        ["python", os.path.join(absolutePath, viewersFolder, 'trackingViewer.py')]),
     # shows an example of graphical viewer for tracking and raw data (fusion)
-    "Tracking & fusion viewer": lambda: subprocess.Popen(["python", "./viewers/trackingFusionViewer.py"]),
+    "Tracking & fusion viewer": lambda: subprocess.Popen(
+        ["python", os.path.join(absolutePath, viewersFolder, 'trackingFusionViewer.py')]),
     # shows an example of http server reporting number of people
-    "Presence http server ": lambda: subprocess.Popen(["python", "./servers/presencehttp.py"]),
+    "Presence http server ": lambda: subprocess.Popen(
+        ["python", os.path.join(absolutePath, serverFolder, 'presencehttp.py')]),
     # shows a thermal map based on the settings in the source files
-    "Thermal map": lambda: subprocess.Popen(["python", "./viewers/thermalmap.py"]),
+    "Thermal map": lambda: subprocess.Popen(
+        ["python", os.path.join(absolutePath, viewersFolder, 'thermalmap.py')]),
     # shows a an hot spot map based on people position
-    "Hotspot map": lambda: subprocess.Popen(["python", "./viewers/hotspotmap.py"])
+    "Hotspot map": lambda: subprocess.Popen(
+        ["python", os.path.join(absolutePath, viewersFolder, 'hotspotmap.py')]),
 }
 
 
 def main():
+    print(absolutePath)
 
     orderedAvailableDemos = collections.OrderedDict(sorted(availableDemos.items()))
     root = tk.Tk()
@@ -46,7 +57,7 @@ def main():
     frame1.pack(side=tk.TOP, padx=5, pady=10)
     i = 1
     for name, func in orderedAvailableDemos.items():
-        tk.Button(frame1, text=name, command=func,  width=20).grid(row=i, padx=5)
+        tk.Button(frame1, text=name, command=func, width=20).grid(row=i, padx=5)
         i += 1
     root.mainloop()
 

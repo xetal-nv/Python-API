@@ -6,6 +6,7 @@ import collections
 import subprocess
 import sys
 import tkinter as tk
+import os
 
 sys.path.insert(0, '../libs')
 
@@ -19,11 +20,16 @@ __maintainer__ = "Francesco Pessolano"
 __email__ = "francesco@xetal.eu"
 __status__ = "release"
 
+absolutePath = os.path.dirname(__file__)
+tuneFolder = 'tuners'
+
 availableApps = {
     # starts the device tuner
-    "Runtime Tuner": lambda: subprocess.Popen(["python", "./tuners/tuner.py"]),
+    "Runtime Tuner": lambda: subprocess.Popen(
+        ["python", os.path.join(absolutePath, tuneFolder, 'tuner.py')]),
     # starts the device configurator
-    "Configurator": lambda: subprocess.Popen(["python", "./tuners/configurator.py"])
+    "Configurator": lambda: subprocess.Popen(
+        ["python", os.path.join(absolutePath, tuneFolder, 'configurator.py')]),
 }
 
 
