@@ -1,9 +1,11 @@
 # Python Kinsei Client, Examples and Applications 
-### Version: 4
+### Version: 4.1.0 (trunk development)
 ### Advised Kinsei firmware: July2017
 ### In case of further help please contact us at contact@xetal.eu
 
 NOTE => PLEASE INSTALL ALL DEPENDENCIES WITH PIP INSTALL -R REQUIREMENTS.TXT
+NOTE => DEPENDING ON YOUR SETTINGS RELEASE 4.0.0 MIGHT GENERATE AN ERROR ON RELATIVE PATHS
+        PLEASE INFORM US IF IT IS THE CASE AND USE THE TRUNK IN DEVELOPMENT VERSION INSTEAD
 
 ## Introduction
 This module provides the Python3 libraries/API for the standard use of a Kinsei system, examples illustrating their usage and applications that can be used either to optimize the device or as examples for more complex application requiring open/closed loop control.
