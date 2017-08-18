@@ -5,8 +5,10 @@
 from tkinter import *
 from math import *
 
-if __name__ == "__main__":
-    sys.path.insert(0, '../../libs')
+sys.path.insert(0, '../../libs')
+sys.path.insert(0, '../libs')
+
+
 import KinseiClient
 import gui
 
