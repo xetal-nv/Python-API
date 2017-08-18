@@ -4,7 +4,11 @@
 
 import sys
 import datetime
+import os
 
+absolutePath = os.path.abspath(__file__)
+processRoot = os.path.dirname(absolutePath)
+os.chdir(processRoot)
 sys.path.insert(0, '../../libs')
 import KinseiClient
 from http.server import BaseHTTPRequestHandler, HTTPServer

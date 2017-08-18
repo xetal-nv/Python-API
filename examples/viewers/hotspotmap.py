@@ -8,7 +8,11 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 from tkinter import *
+import os
 
+absolutePath = os.path.abspath(__file__)
+processRoot = os.path.dirname(absolutePath)
+os.chdir(processRoot)
 sys.path.insert(0, '../../libs')
 import KinseiClient
 import gui

@@ -5,7 +5,11 @@
 
 from tkinter import *
 from math import *
+import os
 
+absolutePath = os.path.abspath(__file__)
+processRoot = os.path.dirname(absolutePath)
+os.chdir(processRoot)
 sys.path.insert(0, '../../libs')
 import KinseiClient
 import gui

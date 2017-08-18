@@ -7,7 +7,11 @@ from tkinter import *
 from tkinter.scrolledtext import *
 from tkinter import filedialog
 from tkinter import messagebox
+import os
 
+absolutePath = os.path.abspath(__file__)
+processRoot = os.path.dirname(absolutePath)
+os.chdir(processRoot)
 sys.path.insert(0, '../../libs')
 from KinseiSSHclient import *
 import gui

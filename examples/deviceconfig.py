@@ -8,7 +8,7 @@ import sys
 import tkinter as tk
 import os
 
-sys.path.append('../libs')
+# sys.path.append('../libs')
 
 # from analyzers import
 
