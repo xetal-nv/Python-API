@@ -1,9 +1,11 @@
 # Python Kinsei Client, Examples and Applications 
-### Version: 4
+### Version: 4.1.0 (trunk development)
 ### Advised Kinsei firmware: July2017
 ### In case of further help please contact us at contact@xetal.eu
 
 NOTE => PLEASE INSTALL ALL DEPENDENCIES WITH PIP INSTALL -R REQUIREMENTS.TXT
+
+NOTE => PLEASE NOTE THAT TRUNK DEVELOPMENT MIGHT CONTAIN ADDITIONAL BUGS OR UNFINISHED CODE
 
 
 ## Introduction
