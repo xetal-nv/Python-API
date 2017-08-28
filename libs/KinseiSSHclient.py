@@ -120,10 +120,10 @@ class KinseiSSHclient(object):
     Shortcut methids are provided for readability (stopServer, startServer,
     restartServer, reloadServerConfiguration) """
 
-    def service(self, comand, delay=0):
+    def service(self, command, delay=0):
         if self.connected:
             try:
-                stdin, stdout, stderr = self.ssh.exec_command('/etc/init.d/xetal ' + comand)
+                stdin, stdout, stderr = self.ssh.exec_command('/etc/init.d/xetal ' + command)
                 returnValue = str(stdout.read()) == 'b\'\''
                 # Delay used to account for service delay
                 time.sleep(delay)

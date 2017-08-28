@@ -19,7 +19,7 @@ import gui
 __author__ = "Francesco Pessolano"
 __copyright__ = "Copyright 2017, Xetal nv"
 __license__ = "MIT"
-__version__ = "1.0.0"
+__version__ = "1.0.1"
 __maintainer__ = "Francesco Pessolano"
 __email__ = "francesco@xetal.eu"
 __status__ = "release"
@@ -310,21 +310,21 @@ class Configurator:
             messagebox.showerror("Error", "Failed to stop the kinsei server of device " + self.ssh.hostname)
         else:
             messagebox.showinfo("Operation completed", "The Kinser server of device " +
-                                self.ssh.hostname + " has been stopped")
+                                self.ssh.hostname + " has been stopped, if present")
 
     def startService(self):
         if self.ssh.startServer() is None:
             messagebox.showerror("Error", "Failed to start the kinsei server of device " + self.ssh.hostname)
         else:
             messagebox.showinfo("Operation completed", "The Kinser server of device " +
-                                self.ssh.hostname + " has been started")
+                                self.ssh.hostname + " has been started, if present")
 
     def restartService(self):
         if self.ssh.restartServer() is None:
             messagebox.showerror("Error", "Failed to restart the kinsei server of device " + self.ssh.hostname)
         else:
             messagebox.showinfo("Operation completed", "The Kinser server of device " +
-                                self.ssh.hostname + " has been restarted")
+                                self.ssh.hostname + " has been restarted, if present")
 
     # check if there are value errors in the provided configuration line
     @staticmethod
