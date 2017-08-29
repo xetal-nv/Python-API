@@ -9,7 +9,7 @@ from tkinter import messagebox
 __author__ = "Francesco Pessolano"
 __copyright__ = "Copyright 2017, Xetal nv"
 __license__ = "MIT"
-__version__ = "2.0.1"
+__version__ = "2.1.1"
 __maintainer__ = "Francesco Pessolano"
 __email__ = "francesco@xetal.eu"
 __status__ = "internal usage, not documented"
@@ -64,9 +64,10 @@ class StartGUI:
 # This class is used to get the SSH login informstion of the device from the user
 class LoginGUI:
     # not working
-    def __init__(self, master, device):
+    def __init__(self, master, device, platformCheck=True):
         self.master = master
         self.device = device
+        self.platformCheck = platformCheck
 
         frameEntry = Frame(self.master)
         frameEntry.pack(padx=20, pady=20)
@@ -114,6 +115,12 @@ class LoginGUI:
         username = self.username.get()
         password = self.password.get()
         hostname = self.hostip.get()
+
+        if self.platformCheck:
+            if messagebox.askyesno("Version verification", "Is your Device version 2.0 or older?"):
+                self.device.setPlatform(2.0)
+
+        # need to ask which device platform is it
 
         self.device.connect(username, password, hostname)
 

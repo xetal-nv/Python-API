@@ -141,6 +141,16 @@ class KinseiSSHclient(object):
     def restartServer(self):
         return self.service('restart', 4)
 
+    def killServer(self):
+        if self.connected:
+            try:
+                self.sendCommand('killall TrackingServer')
+                time.sleep(2)
+                return True
+            except:
+                pass
+        return None
+
     def reloadServerConfiguration(self):
         return self.service('reload', 2)
 

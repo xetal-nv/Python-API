@@ -19,7 +19,7 @@ import gui
 __author__ = "Francesco Pessolano"
 __copyright__ = "Copyright 2017, Xetal nv"
 __license__ = "MIT"
-__version__ = "1.0.2"
+__version__ = "1.1.2"
 __maintainer__ = "Francesco Pessolano"
 __email__ = "francesco@xetal.eu"
 __status__ = "release"
@@ -82,10 +82,16 @@ class Configurator:
         self.root = None
         self.toolmenu = None
         self.configEditor = None
+        self.platform = 2.1
 
     def __del__(self):
         if self.ssh is not None:
             self.ssh.disconnect()
+
+    # set platform type
+
+    def setPlatform(self, type):
+        self.platform = type
 
     # creates the SSH connection
     def connect(self, username, password, hostname):
@@ -132,9 +138,9 @@ class Configurator:
             self.toolmenu.add_command(label="Read configuration", command=self.readConfig)
             self.toolmenu.add_command(label="Send configuration", command=self.sendConfig)
             self.toolmenu.add_separator()
-            self.toolmenu.add_command(label="Restart service", command=self.restartService)
-            self.toolmenu.add_command(label="Stop service", command=self.stopService)
-            self.toolmenu.add_command(label="Start service", command=self.startService)
+            self.toolmenu.add_command(label="Restart service", state=DISABLED, command=self.restartService)
+            self.toolmenu.add_command(label="Stop service", state=DISABLED, command=self.stopService)
+            self.toolmenu.add_command(label="Start service", state=DISABLED, command=self.startService)
             self.toolmenu.add_separator()
             self.toolmenu.add_command(label="Upload new firmware", state=DISABLED)
             self.toolmenu.add_command(label="Reboot device", state=DISABLED)
@@ -220,8 +226,11 @@ class Configurator:
         self.toolmenu.entryconfig("Read configuration", state=enabled)
         self.toolmenu.entryconfig("Send configuration", state=enabled)
         self.toolmenu.entryconfig("Restart service", state=enabled)
-        self.toolmenu.entryconfig("Stop service", state=enabled)
-        self.toolmenu.entryconfig("Start service", state=enabled)
+
+        # needed to accomodate for hardware platform changes
+        if self.platform == 2.1:
+            self.toolmenu.entryconfig("Stop service", state=enabled)
+            self.toolmenu.entryconfig("Start service", state=enabled)
 
         # following items have not been implemented yet
         # self.toolmenu.add_command(label="Upload new firmware", state=enabled)
@@ -312,21 +321,26 @@ class Configurator:
             messagebox.showerror("Error", "Failed to stop the kinsei server of device " + self.ssh.hostname)
         else:
             messagebox.showinfo("Operation completed", "The Kinser server of device " +
-                                self.ssh.hostname + " has been stopped (from kit v2.1)")
+                                self.ssh.hostname + " has been stopped")
 
     def startService(self):
         if self.ssh.startServer() is None:
             messagebox.showerror("Error", "Failed to start the kinsei server of device " + self.ssh.hostname)
         else:
             messagebox.showinfo("Operation completed", "The Kinser server of device " +
-                                self.ssh.hostname + " has been started (from kit v2.1)")
+                                self.ssh.hostname + " has been started")
 
     def restartService(self):
-        if self.ssh.restartServer() is None:
-            messagebox.showerror("Error", "Failed to restart the kinsei server of device " + self.ssh.hostname)
-        else:
+        if self.platform < 2.1:
+            self.ssh.killServer()
             messagebox.showinfo("Operation completed", "The Kinser server of device " +
-                                self.ssh.hostname + " has been restarted (from kit v2.1)")
+                                self.ssh.hostname + " will restart within 30 seconds")
+        else:
+            if self.ssh.restartServer() is None:
+                    messagebox.showerror("Error", "Failed to restart the kinsei server of device " + self.ssh.hostname)
+            else:
+                messagebox.showinfo("Operation completed", "The Kinser server of device " +
+                                    self.ssh.hostname + " has been restarted")
 
     # check if there are value errors in the provided configuration line
     @staticmethod
