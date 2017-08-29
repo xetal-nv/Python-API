@@ -8,7 +8,7 @@ import time
 __author__ = "Francesco Pessolano"
 __copyright__ = "Copyright 2017, Xetal nv"
 __license__ = "MIT"
-__version__ = "1.0.0"
+__version__ = "1.0.1"
 __maintainer__ = "Francesco Pessolano"
 __email__ = "francesco@xetal.eu"
 __status__ = "release"
@@ -157,11 +157,14 @@ class KinseiSSHclient(object):
     def writeConfiguration(self, configuration):
         if self.connected:
             try:
-                self.archiveFile('/root/TrackingServer/TrackingServer.conf')
+                # self.archiveFile('/root/TrackingServer/TrackingServer.conf')
+                self.archiveFile('TrackingServer/TrackingServer.conf')
                 conf = configuration.split("\n")
-                self.sendCommand('rm /root/TrackingServer/TrackingServer.conf')
+                # self.sendCommand('rm /root/TrackingServer/TrackingServer.conf')
+                self.sendCommand('rm TrackingServer/TrackingServer.conf')
                 for line in conf:
-                    self.sendCommand('printf \'' + line + '\n\' >> ' + '/root/TrackingServer/TrackingServer.conf')
+                    # self.sendCommand('printf \'' + line + '\n\' >> ' + '/root/TrackingServer/TrackingServer.conf')
+                    self.sendCommand('printf \'' + line + '\n\' >> ' + 'TrackingServer/TrackingServer.conf')
                 return True
             except:
                 pass

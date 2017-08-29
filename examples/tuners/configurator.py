@@ -19,7 +19,7 @@ import gui
 __author__ = "Francesco Pessolano"
 __copyright__ = "Copyright 2017, Xetal nv"
 __license__ = "MIT"
-__version__ = "1.0.1"
+__version__ = "1.0.2"
 __maintainer__ = "Francesco Pessolano"
 __email__ = "francesco@xetal.eu"
 __status__ = "release"
@@ -299,7 +299,9 @@ class Configurator:
     def sendConfig(self):
         config = self.configEditor.get(1.0, END)
         if not self.verify(False):
-            if self.ssh.writeConfiguration(config) is None:
+            test = self.ssh.writeConfiguration(config)
+            print (test)
+            if test is None:
                 messagebox.showerror("Error", "Failed to send the configuration to device " + self.ssh.hostname)
             else:
                 messagebox.showinfo("Operation completed", "The configuration has been sent to device " +
@@ -310,21 +312,21 @@ class Configurator:
             messagebox.showerror("Error", "Failed to stop the kinsei server of device " + self.ssh.hostname)
         else:
             messagebox.showinfo("Operation completed", "The Kinser server of device " +
-                                self.ssh.hostname + " has been stopped, if present")
+                                self.ssh.hostname + " has been stopped (from kit v2.1)")
 
     def startService(self):
         if self.ssh.startServer() is None:
             messagebox.showerror("Error", "Failed to start the kinsei server of device " + self.ssh.hostname)
         else:
             messagebox.showinfo("Operation completed", "The Kinser server of device " +
-                                self.ssh.hostname + " has been started, if present")
+                                self.ssh.hostname + " has been started (from kit v2.1)")
 
     def restartService(self):
         if self.ssh.restartServer() is None:
             messagebox.showerror("Error", "Failed to restart the kinsei server of device " + self.ssh.hostname)
         else:
             messagebox.showinfo("Operation completed", "The Kinser server of device " +
-                                self.ssh.hostname + " has been restarted, if present")
+                                self.ssh.hostname + " has been restarted (from kit v2.1)")
 
     # check if there are value errors in the provided configuration line
     @staticmethod
