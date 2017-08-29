@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 
 """configurator.py: allows reading and editing of the configuration file; stopping, starting and restarting
-    of the kinsei server on the device"""
+    of the kinsei server on the device """
 
 from tkinter import *
 from tkinter.scrolledtext import *
