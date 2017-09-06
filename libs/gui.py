@@ -9,7 +9,7 @@ from tkinter import messagebox
 __author__ = "Francesco Pessolano"
 __copyright__ = "Copyright 2017, Xetal nv"
 __license__ = "MIT"
-__version__ = "2.1.1"
+__version__ = "2.1.2"
 __maintainer__ = "Francesco Pessolano"
 __email__ = "francesco@xetal.eu"
 __status__ = "internal usage, not documented"
@@ -69,6 +69,11 @@ class LoginGUI:
         self.device = device
         self.platformCheck = platformCheck
 
+        # bind escape to terminate
+        master.bind('<Escape>', quit)
+        # bind enter to accept entry
+        master.bind('<Return>', lambda _x: self.connectDevice())
+
         frameEntry = Frame(self.master)
         frameEntry.pack(padx=20, pady=20)
         frameButtons = Frame(self.master)
@@ -102,10 +107,15 @@ class LoginGUI:
         else:
             self.username.insert(0, "root")
 
-        # bind escape to terminate
-        master.bind('<Escape>', quit)
-        # bind enter to accept entry
-        master.bind('<Return>', lambda _x: self.connectDevice())
+        if self.platformCheck:
+            startingGrid = 3
+            Label(frameEntry, text="Kit version").grid(row=startingGrid, column=0, sticky=E)
+            self.version = DoubleVar()
+            self.version.set(2.1)
+            for text, mode in self.device.VERSIONS:
+                Radiobutton(frameEntry, text=text, variable=self.version, value=mode).grid(row=startingGrid,
+                                                                                               column=1, sticky=W)
+                startingGrid += 1
 
         Button(frameButtons, text='Connect', command=self.connectDevice).grid(row=1, column=0)
         Button(frameButtons, text='Open Editor', command=self.openEditor).grid(row=1, column=2, sticky=E)
@@ -114,11 +124,12 @@ class LoginGUI:
     def connectDevice(self):
         username = self.username.get()
         password = self.password.get()
+        if password == "":
+            password = None
         hostname = self.hostip.get()
 
         if self.platformCheck:
-            if messagebox.askyesno("Version verification", "Is your Device version 2.0 or older?"):
-                self.device.setPlatform(2.0)
+            self.device.setPlatform(self.version.get())
 
         # need to ask which device platform is it
 

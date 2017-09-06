@@ -19,7 +19,7 @@ import gui
 __author__ = "Francesco Pessolano"
 __copyright__ = "Copyright 2017, Xetal nv"
 __license__ = "MIT"
-__version__ = "1.1.2"
+__version__ = "1.2.2"
 __maintainer__ = "Francesco Pessolano"
 __email__ = "francesco@xetal.eu"
 __status__ = "release"
@@ -76,6 +76,11 @@ tags = {
 
 # This class creates and manages the configurator GUI and operations
 class Configurator:
+    VERSIONS = [
+        ("<2.0", 2.0),
+        (">2.0", 2.1),
+    ]
+
     def __init__(self):
         self.ssh = None
         self.connected = False
