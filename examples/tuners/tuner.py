@@ -4,6 +4,7 @@
 
 import sys
 import os
+import time
 
 absolutePath = os.path.abspath(__file__)
 processRoot = os.path.dirname(absolutePath)
@@ -19,7 +20,7 @@ from tkinter import *
 __author__ = "Francesco Pessolano"
 __copyright__ = "Copyright 2017, Xetal nv"
 __license__ = "MIT"
-__version__ = "1.0.0"
+__version__ = "1.1.0"
 __maintainer__ = "Francesco Pessolano"
 __email__ = "francesco@xetal.eu"
 __status__ = "release"
@@ -46,8 +47,9 @@ DISCARD = "Discards all local change made from application start"
 
 
 # Support functions
-def popUpOk():
-    messagebox.showinfo("Information", "Operation was succesfull")
+def popUpOk(showMessage):
+    if showMessage:
+        messagebox.showinfo("Information", "Operation was succesfull")
 
 
 def popUpNotOk():
@@ -64,6 +66,10 @@ class TunerGui:
         self.config = None
         self.master = None
         self.scales = []
+        self.showMessage = True
+        self.autoSend = False
+        self.bSend = None
+
 
     def connect(self, ip):
         try:
@@ -92,6 +98,9 @@ class TunerGui:
             filemenu.add_command(label="Load", command=self.loadConfig)
             filemenu.add_command(label="Save", command=self.saveConfig)
             filemenu.add_separator()
+            filemenu.add_command(label="Toggle success messages", command=self.toggleMessages)
+            filemenu.add_command(label="Toggle Auto send", command=self.toggleAutoSend)
+            filemenu.add_separator()
             filemenu.add_command(label="Exit", command=self.master.quit)
 
             menubar.add_cascade(label="File", menu=filemenu)
@@ -111,6 +120,7 @@ class TunerGui:
                                    from_=0.1, to=1.0, resolution=0.01)
             backgroundAlfa.grid(row=1, column=3)
             backgroundAlfa.set(self.config[0])
+            backgroundAlfa.bind("<ButtonRelease-1>", self.printValues)
             self.scales.append(backgroundAlfa)
             Tooltip(labelBA, text=BA, wraplength=wraplength)
 
@@ -120,6 +130,7 @@ class TunerGui:
                                         from_=0.1, to=10.0, resolution=0.01)
             backgroundThreshold.grid(row=2, column=3)
             backgroundThreshold.set(self.config[1])
+            backgroundThreshold.bind("<ButtonRelease-1>", self.printValues)
             self.scales.append(backgroundThreshold)
             Tooltip(labelBT, text=BT, wraplength=wraplength)
 
@@ -129,6 +140,7 @@ class TunerGui:
                                          from_=-10.0, to=10.0, resolution=0.01)
             temperatureThreshold.grid(row=3, column=3)
             temperatureThreshold.set(self.config[2])
+            temperatureThreshold.bind("<ButtonRelease-1>", self.printValues)
             self.scales.append(temperatureThreshold)
             Tooltip(labelTT, text=TT, wraplength=wraplength)
 
@@ -138,6 +150,7 @@ class TunerGui:
                                               from_=0.1, to=10.0, resolution=0.01)
             fusionBackgroundThreshold.grid(row=4, column=3)
             fusionBackgroundThreshold.set(self.config[3])
+            fusionBackgroundThreshold.bind("<ButtonRelease-1>", self.printValues)
             self.scales.append(fusionBackgroundThreshold)
             Tooltip(labelFBT, text=FBT, wraplength=wraplength)
 
@@ -147,6 +160,7 @@ class TunerGui:
                                           from_=0.1, to=5.0, resolution=0.01)
             fusionConsensumFactor.grid(row=5, column=3)
             fusionConsensumFactor.set(self.config[4])
+            fusionConsensumFactor.bind("<ButtonRelease-1>", self.printValues)
             self.scales.append(fusionConsensumFactor)
             Tooltip(labelFCF, text=FCF, wraplength=wraplength)
 
@@ -156,12 +170,13 @@ class TunerGui:
                                     from_=0.1, to=10.0, resolution=0.01)
             fusionThreshold.grid(row=6, column=3)
             fusionThreshold.set(self.config[5])
+            fusionThreshold.bind("<ButtonRelease-1>", self.printValues)
             self.scales.append(fusionThreshold)
             Tooltip(labelFT, text=FT, wraplength=wraplength)
 
-            bSend = Button(frameButtons, text='SEND', width=8, command=self.sendConfig)
-            bSend.pack(side=LEFT, padx=5, pady=5)
-            Tooltip(bSend, text=SEND, wraplength=wraplength)
+            self.bSend = Button(frameButtons, text='SEND', width=8, command=self.sendConfig)
+            self.bSend.pack(side=LEFT, padx=5, pady=5)
+            Tooltip(self.bSend, text=SEND, wraplength=wraplength)
 
             bFreeze = Button(frameButtons, text='FREEZE', width=8, command=self.freezeConfig)
             bFreeze.pack(side=LEFT, padx=5, pady=5)
@@ -183,12 +198,36 @@ class TunerGui:
             bDiscard.pack(side=LEFT, padx=5, pady=5)
             Tooltip(bDiscard, text=DISCARD, wraplength=wraplength)
 
-    def sendConfig(self):  # check negatives again!
+    def printValues(self, notUsed):
+        if self.autoSend:
+            for i in range(0, len(self.config)):
+                self.scales[i].config(state=DISABLED)
+            self.sendConfig(False)
+            for i in range(0, len(self.config)):
+                self.scales[i].config(state=NORMAL)
+
+    # The following method toggles on or off the messages
+    def toggleMessages(self):
+        self.showMessage = not self.showMessage
+
+    # The following method toggles on or off the automatic change send
+    def toggleAutoSend(self):
+        self.autoSend = not self.autoSend
+        if self.autoSend:
+            self.bSend.config(state=DISABLED)
+        else:
+            self.bSend.config(state=NORMAL)
+
+
+    # The following methods managing device configuration using the KinseiTuner API
+
+    def sendConfig(self, message=True):  # check negatives again!
         newConfig = []
         for i in range(0, len(self.config)):
             newConfig.append(self.scales[i].get())
         if self.demoKit.writeFullConfiguration(newConfig):
-            popUpOk()
+            if message:
+                popUpOk(self.showMessage)
         else:
             popUpNotOk()
 
@@ -210,12 +249,18 @@ class TunerGui:
     def discard(self):
         for i in range(0, len(self.config)):
             self.scales[i].set(self.config[i])
+        if self.autoSend:
+            for i in range(0, len(self.config)):
+                self.scales[i].config(state=DISABLED)
+            self.sendConfig(False)
+            for i in range(0, len(self.config)):
+                self.scales[i].config(state=NORMAL)
 
     def bgReset(self):
         if messagebox.askyesno('Reset Background', "Make sure nobody is in front of the device. Continue?", \
                                icon=messagebox.QUESTION, default=messagebox.YES):
             if self.demoKit.resetBackground():
-                popUpOk()
+                popUpOk(self.showMessage)
             else:
                 popUpNotOk()
 
@@ -224,19 +269,19 @@ class TunerGui:
                                'Make sure no predominant heat source is in front of the device. Continue?', \
                                icon=messagebox.QUESTION, default=messagebox.YES):
             if self.demoKit.resetOffset():
-                popUpOk()
+                popUpOk(self.showMessage)
             else:
                 popUpNotOk()
 
     def freezeConfig(self):  # wait new fw
         if self.demoKit.saveOveride():
-            popUpOk()
+            popUpOk(self.showMessage)
         else:
             popUpNotOk()
 
     def unfreezeConfig(self):  # wait new fw
         if self.demoKit.removeOveride():
-            popUpOk()
+            popUpOk(self.showMessage)
         else:
             popUpNotOk()
 
