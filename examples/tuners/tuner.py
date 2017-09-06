@@ -120,7 +120,7 @@ class TunerGui:
                                    from_=0.1, to=1.0, resolution=0.01)
             backgroundAlfa.grid(row=1, column=3)
             backgroundAlfa.set(self.config[0])
-            backgroundAlfa.bind("<ButtonRelease-1>", self.printValues)
+            backgroundAlfa.bind("<ButtonRelease-1>", self.updateAutoTuning)
             self.scales.append(backgroundAlfa)
             Tooltip(labelBA, text=BA, wraplength=wraplength)
 
@@ -130,7 +130,7 @@ class TunerGui:
                                         from_=0.1, to=10.0, resolution=0.01)
             backgroundThreshold.grid(row=2, column=3)
             backgroundThreshold.set(self.config[1])
-            backgroundThreshold.bind("<ButtonRelease-1>", self.printValues)
+            backgroundThreshold.bind("<ButtonRelease-1>", self.updateAutoTuning)
             self.scales.append(backgroundThreshold)
             Tooltip(labelBT, text=BT, wraplength=wraplength)
 
@@ -140,7 +140,7 @@ class TunerGui:
                                          from_=-10.0, to=10.0, resolution=0.01)
             temperatureThreshold.grid(row=3, column=3)
             temperatureThreshold.set(self.config[2])
-            temperatureThreshold.bind("<ButtonRelease-1>", self.printValues)
+            temperatureThreshold.bind("<ButtonRelease-1>", self.updateAutoTuning)
             self.scales.append(temperatureThreshold)
             Tooltip(labelTT, text=TT, wraplength=wraplength)
 
@@ -150,7 +150,7 @@ class TunerGui:
                                               from_=0.1, to=10.0, resolution=0.01)
             fusionBackgroundThreshold.grid(row=4, column=3)
             fusionBackgroundThreshold.set(self.config[3])
-            fusionBackgroundThreshold.bind("<ButtonRelease-1>", self.printValues)
+            fusionBackgroundThreshold.bind("<ButtonRelease-1>", self.updateAutoTuning)
             self.scales.append(fusionBackgroundThreshold)
             Tooltip(labelFBT, text=FBT, wraplength=wraplength)
 
@@ -160,7 +160,7 @@ class TunerGui:
                                           from_=0.1, to=5.0, resolution=0.01)
             fusionConsensumFactor.grid(row=5, column=3)
             fusionConsensumFactor.set(self.config[4])
-            fusionConsensumFactor.bind("<ButtonRelease-1>", self.printValues)
+            fusionConsensumFactor.bind("<ButtonRelease-1>", self.updateAutoTuning)
             self.scales.append(fusionConsensumFactor)
             Tooltip(labelFCF, text=FCF, wraplength=wraplength)
 
@@ -170,7 +170,7 @@ class TunerGui:
                                     from_=0.1, to=10.0, resolution=0.01)
             fusionThreshold.grid(row=6, column=3)
             fusionThreshold.set(self.config[5])
-            fusionThreshold.bind("<ButtonRelease-1>", self.printValues)
+            fusionThreshold.bind("<ButtonRelease-1>", self.updateAutoTuning)
             self.scales.append(fusionThreshold)
             Tooltip(labelFT, text=FT, wraplength=wraplength)
 
@@ -198,13 +198,17 @@ class TunerGui:
             bDiscard.pack(side=LEFT, padx=5, pady=5)
             Tooltip(bDiscard, text=DISCARD, wraplength=wraplength)
 
-    def printValues(self, notUsed):
+    def updateAutoTuning(self, notUsed):
         if self.autoSend:
+            # self.master.config(cursor="wait")
+            # self.master.update()
             for i in range(0, len(self.config)):
                 self.scales[i].config(state=DISABLED)
             self.sendConfig(False)
             for i in range(0, len(self.config)):
                 self.scales[i].config(state=NORMAL)
+            # self.master.config(cursor="")
+            # self.master.update()
 
     # The following method toggles on or off the messages
     def toggleMessages(self):
@@ -249,12 +253,8 @@ class TunerGui:
     def discard(self):
         for i in range(0, len(self.config)):
             self.scales[i].set(self.config[i])
-        if self.autoSend:
-            for i in range(0, len(self.config)):
-                self.scales[i].config(state=DISABLED)
-            self.sendConfig(False)
-            for i in range(0, len(self.config)):
-                self.scales[i].config(state=NORMAL)
+        self.updateAutoTuning(True)
+
 
     def bgReset(self):
         if messagebox.askyesno('Reset Background', "Make sure nobody is in front of the device. Continue?", \
