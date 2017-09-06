@@ -88,6 +88,7 @@ class Configurator:
         self.toolmenu = None
         self.configEditor = None
         self.platform = 2.1
+        self.showMessage = True
 
     def __del__(self):
         if self.ssh is not None:
@@ -133,6 +134,8 @@ class Configurator:
         filemenu.add_separator()
         filemenu.add_command(label="Verify", command=self.verify)
         filemenu.add_separator()
+        filemenu.add_command(label="Toggle success messages", command=self.toggleMessages)
+        filemenu.add_separator()
         filemenu.add_command(label="Exit", command=self.exit)
         self.toolmenu = Menu(menu)
         if connected:
@@ -142,6 +145,7 @@ class Configurator:
             self.toolmenu.add_separator()
             self.toolmenu.add_command(label="Read configuration", command=self.readConfig)
             self.toolmenu.add_command(label="Send configuration", command=self.sendConfig)
+            self.toolmenu.add_command(label="Send configuration and restart", command=self.sendConfigRestart)
             self.toolmenu.add_separator()
             self.toolmenu.add_command(label="Restart service", state=DISABLED, command=self.restartService)
             self.toolmenu.add_command(label="Stop service", state=DISABLED, command=self.stopService)
@@ -164,6 +168,10 @@ class Configurator:
 
         if connected:
             self.setDeviceTools(self.ssh.connected)
+
+    # The following method toggles on or off the messages
+    def toggleMessages(self):
+        self.showMessage = not self.showMessage
 
     # The following methods are used for syntax highlight and current line coloring
     def config_tags(self):
@@ -237,9 +245,9 @@ class Configurator:
             self.toolmenu.entryconfig("Stop service", state=enabled)
             self.toolmenu.entryconfig("Start service", state=enabled)
 
-        # following items have not been implemented yet
-        # self.toolmenu.add_command(label="Upload new firmware", state=enabled)
-        # self.toolmenu.add_command(label="Reboot device", state=enabled)
+            # following items have not been implemented yet
+            # self.toolmenu.add_command(label="Upload new firmware", state=enabled)
+            # self.toolmenu.add_command(label="Reboot device", state=enabled)
 
     # generic methods for the file and help menus
     @staticmethod
@@ -314,38 +322,44 @@ class Configurator:
         config = self.configEditor.get(1.0, END)
         if not self.verify(False):
             test = self.ssh.writeConfiguration(config)
-            print (test)
             if test is None:
                 messagebox.showerror("Error", "Failed to send the configuration to device " + self.ssh.hostname)
-            else:
+                return False
+            elif self.showMessage:
                 messagebox.showinfo("Operation completed", "The configuration has been sent to device " +
                                     self.ssh.hostname)
+                return True
 
     def stopService(self):
         if self.ssh.stopServer() is None:
             messagebox.showerror("Error", "Failed to stop the kinsei server of device " + self.ssh.hostname)
-        else:
+        elif self.showMessage:
             messagebox.showinfo("Operation completed", "The Kinser server of device " +
                                 self.ssh.hostname + " has been stopped")
 
     def startService(self):
         if self.ssh.startServer() is None:
             messagebox.showerror("Error", "Failed to start the kinsei server of device " + self.ssh.hostname)
-        else:
+        elif self.showMessage:
             messagebox.showinfo("Operation completed", "The Kinser server of device " +
                                 self.ssh.hostname + " has been started")
 
     def restartService(self):
         if self.platform < 2.1:
             self.ssh.killServer()
-            messagebox.showinfo("Operation completed", "The Kinser server of device " +
-                                self.ssh.hostname + " will restart within 30 seconds")
+            if self.showMessage:
+                messagebox.showinfo("Operation completed", "The Kinser server of device " +
+                                    self.ssh.hostname + " will restart within 30 seconds")
         else:
             if self.ssh.restartServer() is None:
-                    messagebox.showerror("Error", "Failed to restart the kinsei server of device " + self.ssh.hostname)
-            else:
+                messagebox.showerror("Error", "Failed to restart the kinsei server of device " + self.ssh.hostname)
+            elif self.showMessage:
                 messagebox.showinfo("Operation completed", "The Kinser server of device " +
                                     self.ssh.hostname + " has been restarted")
+
+    def sendConfigRestart(self):
+        if self.sendConfig():
+            self.restartService()
 
     # check if there are value errors in the provided configuration line
     @staticmethod
@@ -427,7 +441,7 @@ class Configurator:
                 message += "\nSENSORANGLE_NR command placed after SEN \n"
             messagebox.showerror("Configuration Error", message)
         else:
-            if showOK:
+            if showOK and self.showMessage:
                 messagebox.showinfo("Operation Completed", "The configuration file has no errors\n")
         return error
 
