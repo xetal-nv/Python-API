@@ -211,7 +211,7 @@ class Configurator:
                 confLineData = line.split('=')
                 # check for syntax error
                 if confLineData[0] not in parameters:
-                    self.highlight_pattern(line.split('=')[0], 'syntaxerror')
+                    self.highlight_pattern(line.split('=')[0]+"=", 'syntaxerror')
                 else:
                     # check for value error
                     error = self.checkForValueErrorInLine(confLineData)
@@ -228,6 +228,8 @@ class Configurator:
         self.configEditor.tag_add("current_line", "insert linestart", "insert lineend+1c")
         line = self.configEditor.get("insert linestart", "insert lineend")
         self.colorizeLine(line)
+        # try to make a full scan since the config file is small enough
+        # HERE
 
     # enables or disables device tools depending on the connection state
     def setDeviceTools(self, flag):
