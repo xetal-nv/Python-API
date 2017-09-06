@@ -114,7 +114,7 @@ class LoginGUI:
             self.version.set(2.1)
             for text, mode in self.device.VERSIONS:
                 Radiobutton(frameEntry, text=text, variable=self.version, value=mode).grid(row=startingGrid,
-                                                                                               column=1, sticky=W)
+                                                                                           column=1, sticky=W)
                 startingGrid += 1
 
         Button(frameButtons, text='Connect', command=self.connectDevice).grid(row=1, column=0)
