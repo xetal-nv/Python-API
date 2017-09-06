@@ -211,7 +211,7 @@ class Configurator:
                 confLineData = line.split('=')
                 # check for syntax error
                 if confLineData[0] not in parameters:
-                    self.highlight_pattern(line.split('=')[0]+"=", 'syntaxerror')
+                    self.highlight_pattern(line.split('=')[0], 'syntaxerror',"insert linestart", "insert lineend+1c")
                 else:
                     # check for value error
                     error = self.checkForValueErrorInLine(confLineData)
