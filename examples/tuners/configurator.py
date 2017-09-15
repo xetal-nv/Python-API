@@ -19,7 +19,7 @@ import gui
 __author__ = "Francesco Pessolano"
 __copyright__ = "Copyright 2017, Xetal nv"
 __license__ = "MIT"
-__version__ = "1.2.3"
+__version__ = "1.2.4"
 __maintainer__ = "Francesco Pessolano"
 __email__ = "francesco@xetal.eu"
 __status__ = "release"
@@ -235,8 +235,10 @@ class Configurator:
     def setDeviceTools(self, flag):
         if flag:
             enabled = 'normal'
+            self.toolmenu.entryconfig("Connect", state='disabled')
         else:
             enabled = 'disabled'
+            self.toolmenu.entryconfig("Connect", state='normal')
         self.toolmenu.entryconfig("Disconnect", state=enabled)
         self.toolmenu.entryconfig("Read configuration", state=enabled)
         self.toolmenu.entryconfig("Send configuration", state=enabled)
