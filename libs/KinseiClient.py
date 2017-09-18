@@ -9,7 +9,7 @@ import math
 __author__ = "Francesco Pessolano"
 __copyright__ = "Copyright 2017, Xetal nv"
 __license__ = "MIT"
-__version__ = "2.1.5"
+__version__ = "2.2.6"
 __maintainer__ = "Francesco Pessolano"
 __email__ = "francesco@xetal.eu"
 __status__ = "release"
@@ -43,8 +43,10 @@ class KinseiSocket(object):
     port:             device port, 2005 is the default port if not manually changed in the device itself
     """
 
-    def __init__(self, host='192.168.76.1', timeout=15.0, pauseMS=350, port=2005):
+    def __init__(self, host='192.168.76.1', timeout=15.0, pauseMS=150, port=2005):
         self.latencyMS = pauseMS
+        self.stablePositions = []
+        self.stablePositionsFrames = []
         try:
             self.server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             self.channelData = [(host, port), timeout]
@@ -343,7 +345,6 @@ class KinseiSocket(object):
     Returns a position, if possible, that is stable for a given ammount of time
     Arguments are as follows:
     
-    draw:                attempt to draw (depends on if the canvas was set up already)
     whichPerson:         which person to be checked
     timeMS:              time interval for stability 
     howManyTries:        maximum number of tries
@@ -362,6 +363,37 @@ class KinseiSocket(object):
             if stable:
                 return newPosition
         return False
+
+    """ getAlStablePositions:    
+        Returns all position as either stable for 'frame' number of samples or None
+        Arguments are as follows:
+
+        frames:              number of frames with frame periodicity defined by self.latencyMS
+        """
+
+    # TODO being done
+    def getAlStablePositions(self, frames=3, wait=True):
+        if not self.stablePositions:
+            self.stablePositions = self.getPersonsPositions(wait)
+            self.stablePositionsFrames = [0] * len(self.stablePositions)
+            return self.stablePositions
+        else:
+            # here
+            currentPositions = self.getPersonsPositions(wait)
+            returnedPositions = []
+            for i in range(0, len(currentPositions)):
+                if currentPositions[i] == self.stablePositions[i]:
+                    self.stablePositionsFrames[i] += 1
+                    if self.stablePositionsFrames[i] == frames:
+                        self.stablePositionsFrames[i] = 0
+                        returnedPositions.append(currentPositions[i])
+                    else:
+                        returnedPositions.append(None)
+                else:
+                    returnedPositions.append(None)
+                    self.stablePositionsFrames[i] = 0
+                    self.stablePositions[i] = currentPositions[i]
+            return returnedPositions
 
     """ getThermalMapResolution:
     !! useable only from firmware july2017 !!

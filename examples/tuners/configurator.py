@@ -19,7 +19,7 @@ import gui
 __author__ = "Francesco Pessolano"
 __copyright__ = "Copyright 2017, Xetal nv"
 __license__ = "MIT"
-__version__ = "1.2.4"
+__version__ = "1.2.6"
 __maintainer__ = "Francesco Pessolano"
 __email__ = "francesco@xetal.eu"
 __status__ = "release"
@@ -242,6 +242,7 @@ class Configurator:
         self.toolmenu.entryconfig("Disconnect", state=enabled)
         self.toolmenu.entryconfig("Read configuration", state=enabled)
         self.toolmenu.entryconfig("Send configuration", state=enabled)
+        self.toolmenu.entryconfig("Send configuration and restart", state=enabled)
         self.toolmenu.entryconfig("Restart service", state=enabled)
 
         # needed to accomodate for hardware platform changes
@@ -311,6 +312,7 @@ class Configurator:
         if config is None:
             messagebox.showerror("Error", "Failed to read the configuration file of the device at " + self.ssh.hostname)
         else:
+            self.new()
             for line in config:
                 tag = 'command'
                 if line is not '':

@@ -33,12 +33,12 @@ SCALEX = 0.7  # scale from maximum X size of screen window
 SCALEY = 0.7  # scale from maximum X size of screen window
 offset = 10  # padding offset in pixels
 
-# set the tracking line width
-LINEWIDTH = 1
-
-# set the maximum line variation (pixels)
+# programmatic parameters
+LINEWIDTH = 1       # set the tracking line width
 # TODO change into something related to the real room dimensions!
-MAXMOVE = 200
+MAXMOVE = 400       # set the maximum line variation (pixels)
+FRAMESRATE = 1      # set the periodicity of reading from the device
+STABLITYRATE = 3    # set the number of captures frames needed for a position to be stable
 
 
 # this class shows how to visualise tracking with tkinter
@@ -58,6 +58,7 @@ class DrawByMoving:
         self.run = None
         self.invertView = False
         self.ip = None
+        self.maxFrameRate = 0
 
     def connect(self, ip):
         try:
@@ -129,6 +130,8 @@ class DrawByMoving:
         if self.connected:
             # the canvas is created and all elements initialisated
             self.roomSize = self.demoKit.getRoomSize()
+            self.maxFrameRate = self.demoKit.getTimeIntervalMS()
+            self.demoKit.setTimeIntervalMS(self.maxFrameRate * FRAMESRATE)
             self.defineCanvas()
             self.master = Tk()
             self.master.title("Kinsei Viewer Demo: " + self.ip)
@@ -199,7 +202,10 @@ class DrawByMoving:
     # executes the tracking
     def trackPersons(self):
         if self.run['text'] == "RUNNING":
-            positionData = self.demoKit.getPersonsPositions()
+            if STABLITYRATE == 0:
+                positionData = self.demoKit.getPersonsPositions()
+            else:
+                positionData = self.demoKit.getAlStablePositions(STABLITYRATE)
             personFloat = self.demoKit.getNumberPersonsFloat(False)
             personFix = self.demoKit.getNumberPersonsFixed(False)
             labelCounter = "Number of people: [" + "{0:.2f}".format(personFloat) + ", " + \
@@ -207,16 +213,18 @@ class DrawByMoving:
             self.canvas.itemconfig(self.counterLabel, text=labelCounter)
 
             for i in range(0, len(positionData)):
-                currentPositionData = self.adjustedCoordinates(positionData[i], self.invertView)
-                if currentPositionData == [10, 10]:
-                    currentPositionData = [-50, -50]
-                deltax = currentPositionData[0] - self.persons[i][1][0]
-                deltay = currentPositionData[1] - self.persons[i][1][1]
-                self.canvas.move(self.persons[i][0], deltax, deltay)
-                if (abs(deltax) < MAXMOVE) and (abs(deltay) < MAXMOVE): # does not work
-                    self.canvas.create_line(self.persons[i][1][0], self.persons[i][1][1], currentPositionData[0],
-                                            currentPositionData[1], fill=colors[i % len(colors)], width=LINEWIDTH)
-                self.persons[i][1] = currentPositionData
+                if positionData[i]:
+                    print (positionData[i])
+                    currentPositionData = self.adjustedCoordinates(positionData[i], self.invertView)
+                    if currentPositionData == [10, 10]:
+                        currentPositionData = [-50, -50]
+                    deltax = currentPositionData[0] - self.persons[i][1][0]
+                    deltay = currentPositionData[1] - self.persons[i][1][1]
+                    self.canvas.move(self.persons[i][0], deltax, deltay)
+                    if (abs(deltax) < MAXMOVE) and (abs(deltay) < MAXMOVE): # does not work
+                        self.canvas.create_line(self.persons[i][1][0], self.persons[i][1][1], currentPositionData[0],
+                                                currentPositionData[1], fill=colors[i % len(colors)], width=LINEWIDTH)
+                    self.persons[i][1] = currentPositionData
 
         self.canvas.after(10, self.trackPersons)  # delay must be larger than 0
 

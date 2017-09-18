@@ -66,14 +66,12 @@ Fusion Values
     MOCA -> Client
     0x66 #cells(1) {index(2) center_x(2) center_y(2) value(1)}*#cells //the value must be divided by 10
 
-!! BETA - useable only from firmware july2017 !!
 Pixel Resolution and pixel size for the thermal map
     Client -> MOCA
     0x1A
     MOCA -> Client
     0x1A PixelNumber_X PixelNumber_Y PixelSizeInCm
 
-!! BETA - useable only from firmware july2017 !!
 Thermal map, pixel temperature (multiplied by 10 and trunced)
     Client -> MOCA
     0x1B
