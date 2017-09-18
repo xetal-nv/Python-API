@@ -49,8 +49,7 @@ class DrawByMoving:
         self.canvas = None
         self.roomSize = None
         self.master = None
-        self.canvasFrame = None
-        self.paramenetsFrame = None
+        self.masterFrame = None
         self.realVertex = None
         self.persons = []
         self.screenX = 0
@@ -137,6 +136,10 @@ class DrawByMoving:
             # bind escape to terminate
             self.master.bind('<Escape>', quit)
 
+            # set master frame
+            self.masterFrame = Frame(self.master)
+            self.masterFrame.pack(side=TOP)
+
             # prepare the tracking canvas frame
             self.setupTrackingCanvas()
 
@@ -159,9 +162,9 @@ class DrawByMoving:
 
     # setup the tracking canvas
     def setupTrackingCanvas(self):
-        self.canvasFrame = Frame(self.master, width=(self.screenX + 2 * offset), height=(self.screenY + 2 * offset))
-        self.canvasFrame.pack(expand=1, fill=X, pady=offset, padx=offset, side=TOP, anchor='e')
-        self.canvas = Canvas(self.canvasFrame, bg='white', width=self.screenX + offset, height=self.screenY + offset)
+        canvasFrame = Frame(self.masterFrame, width=(self.screenX + 2 * offset), height=(self.screenY + 2 * offset))
+        canvasFrame.pack(expand=1, fill=X, pady=offset, padx=offset, side=LEFT)
+        self.canvas = Canvas(canvasFrame, bg='white', width=self.screenX + offset, height=self.screenY + offset)
         self.canvas.pack()
         self.realVertex = list(map(self.adjustedCoordinates, self.demoKit.getRoomCorners()))
         self.canvas.create_rectangle(10, 10, self.screenX + offset, self.screenY + offset, dash=(5, 5), outline="red",
@@ -179,10 +182,8 @@ class DrawByMoving:
 
     # TODO setup parametric menu
     def setupParameterMenu(self):
-        # not positioning correctly
-        self.paramenetsFrame = Frame(self.master, width=100, height=(self.screenY + 2 * offset))
-        self.paramenetsFrame.pack(expand=1, fill=X, pady=offset, padx=offset, side=TOP, anchor='e')
-        pass
+        paramenetsFrame = Frame(self.masterFrame, width=300, height=(self.screenY + 2 * offset))
+        paramenetsFrame.pack(expand=1, fill=X, pady=offset, padx=offset, side=RIGHT)
 
     # toggle pause
     def togglePause(self):
