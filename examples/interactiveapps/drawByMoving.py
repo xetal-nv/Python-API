@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 
-"""trackingViewer.py: basic graphical viewer for persons tracking only"""
+"""drawByMoving.py: example of detecting a (stable) position to draw points or lines. It is the basic algorithm
+needed for defining entry and exit zones by moving around as well as it has a fun factor to it"""
 
 from tkinter import *
 from math import *
@@ -11,37 +12,45 @@ processRoot = os.path.dirname(absolutePath)
 os.chdir(processRoot)
 sys.path.insert(0, '../../libs')
 
-
 import KinseiClient
 import gui
 
 __author__ = "Francesco Pessolano"
 __copyright__ = "Copyright 2017, Xetal nv"
 __license__ = "MIT"
-__version__ = "1.8.2"
+__version__ = "0.1.0"
 __maintainer__ = "Francesco Pessolano"
 __email__ = "francesco@xetal.eu"
-__status__ = "release"
+__status__ = "in development"
 __requiredfirmware__ = "february2017 or later"
 
-
 # the color array is used to simplify color assignment to the tracking balls
-colors = ["green", "blue", "magenta", "white", "cyan", "black", "yellow", "red"]
+# change for changing colors
+colors = ["green", "blue", "magenta", "cyan", "black", "yellow", "red"]
 
 # set the viewing window
 SCALEX = 0.7  # scale from maximum X size of screen window
 SCALEY = 0.7  # scale from maximum X size of screen window
 offset = 10  # padding offset in pixels
 
+# set the tracking line width
+LINEWIDTH = 1
+
+# set the maximum line variation (pixels)
+# TODO change into something related to the real room dimensions!
+MAXMOVE = 200
+
 
 # this class shows how to visualise tracking with tkinter
-class ViewerTrackingOnly:
+class DrawByMoving:
     def __init__(self):
         self.demoKit = None
         self.connected = False
         self.canvas = None
         self.roomSize = None
         self.master = None
+        self.canvasFrame = None
+        self.paramenetsFrame = None
         self.realVertex = None
         self.persons = []
         self.screenX = 0
@@ -67,7 +76,7 @@ class ViewerTrackingOnly:
 
     # the KinseiClient class provides coordinates in mm and absolute
     # here we scale to cm and made them relative to our 800x800 canvas
-    def adjustedCoordinates(self, coordinates, bottomup = False):
+    def adjustedCoordinates(self, coordinates, bottomup=False):
         if bottomup:
             coordX = ((400 - int(coordinates[0] / 10)) * ((self.screenX * 10) / self.roomSize[0])) + offset
             coordY = ((400 - int(coordinates[1] / 10)) * ((self.screenY * 10) / self.roomSize[1])) + offset
@@ -123,17 +132,23 @@ class ViewerTrackingOnly:
             self.roomSize = self.demoKit.getRoomSize()
             self.defineCanvas()
             self.master = Tk()
-            self.master.title("Kinsei Viewer Demo: " +  self.ip)
+            self.master.title("Kinsei Viewer Demo: " + self.ip)
 
             # bind escape to terminate
             self.master.bind('<Escape>', quit)
 
-            self.canvas = Canvas(self.master, width=(self.screenX + 2 * offset), height=(self.screenY + 2 * offset))
-            self.canvas.pack()
-            self.realVertex = list(map(self.adjustedCoordinates, self.demoKit.getRoomCorners()))
-            self.drawBackground()
-            positionData = self.demoKit.getPersonsPositions(False)
+            # prepare the tracking canvas frame
+            self.setupTrackingCanvas()
 
+            # prepare paramenet frame
+            self.setupParameterMenu()
+
+            # preparing the pause button
+            self.run = Button(self.master, text="RUNNING", command=self.togglePause)
+            self.run.pack(side=BOTTOM, padx=0, pady=5)
+
+            # drawing initial position markers
+            positionData = self.demoKit.getPersonsPositions(False)
             for i in range(0, len(positionData)):
                 person = self.canvas.create_oval(0, 0, 20, 20, fill=colors[i % len(colors)])
                 self.persons.append([person, [0, 0]])
@@ -142,8 +157,13 @@ class ViewerTrackingOnly:
             self.trackPersons()
             self.master.mainloop()
 
-    # draw background
-    def drawBackground(self):
+    # setup the tracking canvas
+    def setupTrackingCanvas(self):
+        self.canvasFrame = Frame(self.master, width=(self.screenX + 2 * offset), height=(self.screenY + 2 * offset))
+        self.canvasFrame.pack(expand=1, fill=X, pady=offset, padx=offset, side=TOP, anchor='e')
+        self.canvas = Canvas(self.canvasFrame, bg='white', width=self.screenX + offset, height=self.screenY + offset)
+        self.canvas.pack()
+        self.realVertex = list(map(self.adjustedCoordinates, self.demoKit.getRoomCorners()))
         self.canvas.create_rectangle(10, 10, self.screenX + offset, self.screenY + offset, dash=(5, 5), outline="red",
                                      width='2')
         self.canvas.create_polygon(*self.realVertex, fill='', outline='blue', width='2')
@@ -156,8 +176,13 @@ class ViewerTrackingOnly:
         labelCounter = "Number of people: [" + "{0:.2f}".format(personFloat) + ", " + \
                        str(personFix) + "]"
         self.canvas.itemconfig(self.counterLabel, text=labelCounter)
-        self.run = Button(self.master, text="RUNNING", command=self.togglePause)
-        self.run.pack(side=BOTTOM, padx=0, pady=5)
+
+    # TODO setup parametric menu
+    def setupParameterMenu(self):
+        # not positioning correctly
+        self.paramenetsFrame = Frame(self.master, width=100, height=(self.screenY + 2 * offset))
+        self.paramenetsFrame.pack(expand=1, fill=X, pady=offset, padx=offset, side=TOP, anchor='e')
+        pass
 
     # toggle pause
     def togglePause(self):
@@ -187,6 +212,9 @@ class ViewerTrackingOnly:
                 deltax = currentPositionData[0] - self.persons[i][1][0]
                 deltay = currentPositionData[1] - self.persons[i][1][1]
                 self.canvas.move(self.persons[i][0], deltax, deltay)
+                if (abs(deltax) < MAXMOVE) and (abs(deltay) < MAXMOVE): # does not work
+                    self.canvas.create_line(self.persons[i][1][0], self.persons[i][1][1], currentPositionData[0],
+                                            currentPositionData[1], fill=colors[i % len(colors)], width=LINEWIDTH)
                 self.persons[i][1] = currentPositionData
 
         self.canvas.after(10, self.trackPersons)  # delay must be larger than 0
@@ -198,7 +226,7 @@ def start():
     global maxScreenY
     maxScreenX = root.winfo_screenwidth() * SCALEX
     maxScreenY = root.winfo_screenheight() * SCALEY
-    device = ViewerTrackingOnly()
+    device = DrawByMoving()
     gui.StartGUI(root, device)
     root.mainloop()
 

@@ -15,7 +15,7 @@ from KinseiTuner import *
 __author__ = "Francesco Pessolano"
 __copyright__ = "Copyright 2017, Xetal nv"
 __license__ = "MIT"
-__version__ = "2.0.1"
+__version__ = "2.0.2"
 __maintainer__ = "Francesco Pessolano"
 __email__ = "francesco@xetal.eu"
 __status__ = "release"
@@ -56,7 +56,7 @@ def start():
             print("Starting persons tracking")
             while True:
                 # get position data
-                positionData = demoKit.getPersonsPositions(False);
+                positionData = demoKit.getPersonsPositions(False)
                 if positionData:
                     print("Coordinates of present persons ")
                     print("\t\t", positionData)
