@@ -22,12 +22,12 @@ __license__ = "MIT"
 __version__ = "1.0.0"
 __maintainer__ = "Francesco Pessolano"
 __email__ = "francesco@xetal.eu"
-__status__ = "pre-releasea"
+__status__ = "pre-release B"
 __requiredfirmware__ = "february2017 or later"
 
 # the color array is used to simplify color assignment to the tracking balls
 # change for changing colors
-colors = ["green", "blue", "magenta", "cyan", "black", "yellow", "red"]
+colors = ["green", "blue", "magenta", "cyan", "black", "yellow", "red", "orange"]
 
 # set the viewing window
 SCALEX = 0.7  # scale from maximum X size of screen window
@@ -194,6 +194,7 @@ class DrawByMoving:
 
     # set-up the parametric menu as well as connect it to the proper class variable
     def setupParameterMenu(self):
+        #TODO needs to add the stability radius
         paramenetsFrame = Frame(self.masterFrame, width=300, height=(self.screenY + 2 * offset))
         paramenetsFrame.pack(expand=1, fill=X, pady=offset, padx=offset, side=RIGHT)
 
@@ -208,20 +209,24 @@ class DrawByMoving:
         self.MAXMOVE = StringVar(self.master, value=MAXMOVE)
         self.FRAMESRATE = StringVar(self.master, value=FRAMESRATE)
         self.STABILITYRATE = StringVar(self.master, value=STABLITYRATE)
+        self.STABILITYRADIUS = StringVar(self.master, value=self.demoKit.getStabilityRadius())
 
         Label(frameEntry, text="Line width").grid(row=0, sticky=E)
         Label(frameEntry, text="Max line length").grid(row=1, sticky=E)
         Label(frameEntry, text="Framerate").grid(row=2, sticky=E)
         Label(frameEntry, text="Stability rate").grid(row=3, sticky=E)
+        Label(frameEntry, text="Stability radius").grid(row=4, sticky=E)
 
         linewidth = Entry(frameEntry, textvariable=self.LINEWIDTH)
         maxmove = Entry(frameEntry, textvariable=self.MAXMOVE)
         framerate = Entry(frameEntry, textvariable=self.FRAMESRATE)
         stabilityrate = Entry(frameEntry, textvariable=self.STABILITYRATE)
+        stabilityradius = Entry(frameEntry, textvariable=self.STABILITYRADIUS)
         linewidth.grid(row=0, column=1)
         maxmove.grid(row=1, column=1)
         framerate.grid(row=2, column=1)
         stabilityrate.grid(row=3, column=1)
+        stabilityradius.grid(row=4, column=1)
 
         Label(frameRadio, text="Tracking").grid(row=0, column=0, sticky=E)
         for i in range(0, self.trackedPeople):

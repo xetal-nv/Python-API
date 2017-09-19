@@ -9,7 +9,7 @@ import math
 __author__ = "Francesco Pessolano"
 __copyright__ = "Copyright 2017, Xetal nv"
 __license__ = "MIT"
-__version__ = "2.2.6"
+__version__ = "2.3.6"
 __maintainer__ = "Francesco Pessolano"
 __email__ = "francesco@xetal.eu"
 __status__ = "release"
@@ -39,14 +39,15 @@ class KinseiSocket(object):
     Arguments are as follows:
     host:             device IP with default value valid for a device in Access Point mode
     timeout:          timeout of the connection in ms
-    pauseMS:          interval forced between commands to the device in ms
+    pauseMS:          interval forced between commands to the device in ms (>55ms)
     port:             device port, 2005 is the default port if not manually changed in the device itself
     """
 
-    def __init__(self, host='192.168.76.1', timeout=15.0, pauseMS=150, port=2005):
+    def __init__(self, host='192.168.76.1', timeout=15.0, pauseMS=55, port=2005):
         self.latencyMS = pauseMS
         self.stablePositions = []
         self.stablePositionsFrames = []
+        self.radiusStability = 200
         try:
             self.server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             self.channelData = [(host, port), timeout]
@@ -103,6 +104,23 @@ class KinseiSocket(object):
 
     def getTimeIntervalMS(self):
         return self.latencyMS
+
+
+    """ setTimeIntervalMS:
+    Set the space radius in mm for a position to be considered stable
+    It is adviced to keep this value above 5 mm.
+    """
+
+    def setStabilityRadius(self, radiusMM):
+        self.radiusStability = radiusMM
+
+    """ getTimeIntervalMS:
+    Returns the space radius in mm for a position to be considered stable
+    set to True
+    """
+
+    def getStabilityRadius(self):
+        return self.radiusStability
 
     """ checkIfOnline:
     Returns True is the device at the provided IP has been found and connection was possible.
@@ -371,18 +389,18 @@ class KinseiSocket(object):
         frames:              number of frames with frame periodicity defined by self.latencyMS
         """
 
-    # TODO being done
     def getAlStablePositions(self, frames=3, wait=True):
         if not self.stablePositions:
             self.stablePositions = self.getPersonsPositions(wait)
             self.stablePositionsFrames = [0] * len(self.stablePositions)
             return self.stablePositions
         else:
-            # here
             currentPositions = self.getPersonsPositions(wait)
             returnedPositions = []
             for i in range(0, len(currentPositions)):
-                if currentPositions[i] == self.stablePositions[i]:
+                deltaPosition = max(abs(currentPositions[i][0] - self.stablePositions[i][0]),
+                                    abs(currentPositions[i][1] - self.stablePositions[i][1]))
+                if deltaPosition < self.radiusStability:
                     self.stablePositionsFrames[i] += 1
                     if self.stablePositionsFrames[i] == frames:
                         self.stablePositionsFrames[i] = 0
