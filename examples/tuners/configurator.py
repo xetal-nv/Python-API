@@ -19,7 +19,7 @@ import gui
 __author__ = "Francesco Pessolano"
 __copyright__ = "Copyright 2017, Xetal nv"
 __license__ = "MIT"
-__version__ = "1.2.6"
+__version__ = "1.3.6"
 __maintainer__ = "Francesco Pessolano"
 __email__ = "francesco@xetal.eu"
 __status__ = "release"
@@ -62,7 +62,8 @@ parameters = {
     'TRACKING_FALLBACK_TH_DOWN': ['num', 0, None],
     'NOTMONITORED_PZONE': [None, None, None],
     'PZONE': [None, None, None],
-    'CZONE': [None, None, None]
+    'CZONE': [None, None, None],
+    'TRACKING_AVERAGE': ['num', 1, None]
 }
 
 # This DICT holds the colors for syntax highlight

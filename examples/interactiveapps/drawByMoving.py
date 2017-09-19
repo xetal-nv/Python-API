@@ -1,7 +1,8 @@
 #!/usr/bin/python3
 
-"""drawByMoving.py: example of detecting a (stable) position to draw points or lines. It is the basic algorithm
-needed for defining entry and exit zones by moving around as well as it has a fun factor to it"""
+"""drawByMoving.py: example of detecting a position to draw lines. It is the basic algorithm needed for defining
+entry and exit zones by moving around as well as it has a fun factor to it. Some parameters can be modified via GUI
+in order to alter the behaviour """
 
 from tkinter import *
 from math import *
@@ -33,9 +34,8 @@ SCALEX = 0.7  # scale from maximum X size of screen window
 SCALEY = 0.7  # scale from maximum X size of screen window
 offset = 10  # padding offset in pixels
 
-# programmatic parameters
+# programmatic parameters default values
 LINEWIDTH = 1       # set the tracking line width
-# TODO change into something related to the real room dimensions!
 MAXMOVE = 400       # set the maximum line variation (pixels)
 FRAMESRATE = 1      # set the periodicity of reading from the device
 STABLITYRATE = 3    # set the number of captures frames needed for a position to be stable
@@ -59,6 +59,14 @@ class DrawByMoving:
         self.invertView = False
         self.ip = None
         self.maxFrameRate = 0
+
+        # programmatic parameters
+        self.LINEWIDTH = None           # set the tracking line width
+        # TODO change into something related to the real room dimensions!
+        self.MAXMOVE = None             # set the maximum line variation (pixels)
+        self.FRAMESRATE = None          # set the periodicity of reading from the device
+        self.STABILITYRATE = None        # set the number of captures frames needed for a position to be stable
+        self.TRACKEDPEOPLE = []       # mask for tracker people
 
     def connect(self, ip):
         try:
@@ -130,8 +138,6 @@ class DrawByMoving:
         if self.connected:
             # the canvas is created and all elements initialisated
             self.roomSize = self.demoKit.getRoomSize()
-            self.maxFrameRate = self.demoKit.getTimeIntervalMS()
-            self.demoKit.setTimeIntervalMS(self.maxFrameRate * FRAMESRATE)
             self.defineCanvas()
             self.master = Tk()
             self.master.title("Kinsei Viewer Demo: " + self.ip)
@@ -148,6 +154,8 @@ class DrawByMoving:
 
             # prepare paramenet frame
             self.setupParameterMenu()
+            self.maxFrameRate = self.demoKit.getTimeIntervalMS()
+            self.demoKit.setTimeIntervalMS(self.maxFrameRate * self.FRAMESRATE.get())
 
             # preparing the pause button
             self.run = Button(self.master, text="RUNNING", command=self.togglePause)
@@ -158,6 +166,7 @@ class DrawByMoving:
             for i in range(0, len(positionData)):
                 person = self.canvas.create_oval(0, 0, 20, 20, fill=colors[i % len(colors)])
                 self.persons.append([person, [0, 0]])
+                self.TRACKEDPEOPLE.append(True)
 
             # the following method starts the tracking
             self.trackPersons()
@@ -183,10 +192,43 @@ class DrawByMoving:
                        str(personFix) + "]"
         self.canvas.itemconfig(self.counterLabel, text=labelCounter)
 
-    # TODO setup parametric menu
+    # set-up the parametric menu as well as connect it to the proper class variable
     def setupParameterMenu(self):
         paramenetsFrame = Frame(self.masterFrame, width=300, height=(self.screenY + 2 * offset))
         paramenetsFrame.pack(expand=1, fill=X, pady=offset, padx=offset, side=RIGHT)
+
+        frameEntry = Frame(paramenetsFrame)
+        frameEntry.pack(padx=20, pady=20)
+        frameButtons = Frame(paramenetsFrame)
+        frameButtons.pack(padx=20, pady=20)
+
+        self.LINEWIDTH = StringVar(self.master, value=LINEWIDTH)
+        self.MAXMOVE = StringVar(self.master, value=MAXMOVE)
+        self.FRAMESRATE = StringVar(self.master, value=FRAMESRATE)
+        self.STABILITYRATE = StringVar(self.master, value=STABLITYRATE)
+
+        Label(frameEntry, text="Line width").grid(row=0, sticky=E)
+        Label(frameEntry, text="Maxi X delta").grid(row=1, sticky=E)
+        Label(frameEntry, text="Framerate").grid(row=2, sticky=E)
+        Label(frameEntry, text="Stability rate").grid(row=3, sticky=E)
+
+        linewidth = Entry(frameEntry, textvariable=self.LINEWIDTH)
+        maxmove = Entry(frameEntry, textvariable=self.MAXMOVE)
+        framerate = Entry(frameEntry, textvariable=self.FRAMESRATE)
+        stabilityrate = Entry(frameEntry, textvariable=self.STABILITYRATE)
+        linewidth.grid(row=0, column=1)
+        maxmove.grid(row=1, column=1)
+        framerate.grid(row=2, column=1)
+        stabilityrate.grid(row=3, column=1)
+
+        Button(frameButtons, text='Reset', command=self.resetPArameters).grid(row=0, column=1)
+
+    # reset parameters
+    def resetPArameters(self):
+        self.LINEWIDTH.set(LINEWIDTH)
+        self.MAXMOVE.set(MAXMOVE)
+        self.FRAMESRATE.set(FRAMESRATE)
+        self.STABILITYRATE.set(STABLITYRATE)
 
     # toggle pause
     def togglePause(self):
@@ -201,11 +243,16 @@ class DrawByMoving:
 
     # executes the tracking
     def trackPersons(self):
-        if self.run['text'] == "RUNNING":
-            if STABLITYRATE == 0:
+        stabilityrate = self.STABILITYRATE.get()
+        framerate = self.FRAMESRATE.get()
+        if framerate != "":
+            self.demoKit.setTimeIntervalMS(self.maxFrameRate * int(framerate))
+
+        if self.run['text'] == "RUNNING" and stabilityrate:
+            if int(stabilityrate) == 0:
                 positionData = self.demoKit.getPersonsPositions()
             else:
-                positionData = self.demoKit.getAlStablePositions(STABLITYRATE)
+                positionData = self.demoKit.getAlStablePositions(int(stabilityrate))
             personFloat = self.demoKit.getNumberPersonsFloat(False)
             personFix = self.demoKit.getNumberPersonsFixed(False)
             labelCounter = "Number of people: [" + "{0:.2f}".format(personFloat) + ", " + \
@@ -213,17 +260,19 @@ class DrawByMoving:
             self.canvas.itemconfig(self.counterLabel, text=labelCounter)
 
             for i in range(0, len(positionData)):
-                if positionData[i]:
-                    print (positionData[i])
+                linewidth = self.LINEWIDTH.get()
+                maxmove = self.MAXMOVE.get()
+                if positionData[i] and self.TRACKEDPEOPLE[i] and (linewidth != "") and (maxmove != ""):
                     currentPositionData = self.adjustedCoordinates(positionData[i], self.invertView)
                     if currentPositionData == [10, 10]:
                         currentPositionData = [-50, -50]
                     deltax = currentPositionData[0] - self.persons[i][1][0]
                     deltay = currentPositionData[1] - self.persons[i][1][1]
                     self.canvas.move(self.persons[i][0], deltax, deltay)
-                    if (abs(deltax) < MAXMOVE) and (abs(deltay) < MAXMOVE): # does not work
+                    if (abs(deltax) < int(maxmove)) and (abs(deltay) < int(maxmove)):
                         self.canvas.create_line(self.persons[i][1][0], self.persons[i][1][1], currentPositionData[0],
-                                                currentPositionData[1], fill=colors[i % len(colors)], width=LINEWIDTH)
+                                                currentPositionData[1], fill=colors[i % len(colors)],
+                                                width=int(linewidth))
                     self.persons[i][1] = currentPositionData
 
         self.canvas.after(10, self.trackPersons)  # delay must be larger than 0
