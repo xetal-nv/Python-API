@@ -19,10 +19,10 @@ import gui
 __author__ = "Francesco Pessolano"
 __copyright__ = "Copyright 2017, Xetal nv"
 __license__ = "MIT"
-__version__ = "0.9.0"
+__version__ = "1.0.0"
 __maintainer__ = "Francesco Pessolano"
 __email__ = "francesco@xetal.eu"
-__status__ = "pre-release"
+__status__ = "pre-releasea"
 __requiredfirmware__ = "february2017 or later"
 
 # the color array is used to simplify color assignment to the tracking balls
