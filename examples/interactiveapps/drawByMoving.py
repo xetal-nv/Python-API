@@ -19,10 +19,10 @@ import gui
 __author__ = "Francesco Pessolano"
 __copyright__ = "Copyright 2017, Xetal nv"
 __license__ = "MIT"
-__version__ = "0.1.0"
+__version__ = "0.9.0"
 __maintainer__ = "Francesco Pessolano"
 __email__ = "francesco@xetal.eu"
-__status__ = "in development"
+__status__ = "in debug"
 __requiredfirmware__ = "february2017 or later"
 
 # the color array is used to simplify color assignment to the tracking balls
@@ -59,14 +59,14 @@ class DrawByMoving:
         self.invertView = False
         self.ip = None
         self.maxFrameRate = 0
+        self.trackedPeople = 0
 
         # programmatic parameters
         self.LINEWIDTH = None           # set the tracking line width
-        # TODO change into something related to the real room dimensions!
-        self.MAXMOVE = None             # set the maximum line variation (pixels)
+        self.MAXMOVE = None             # set the maximum line lenght (pixels)
         self.FRAMESRATE = None          # set the periodicity of reading from the device
-        self.STABILITYRATE = None        # set the number of captures frames needed for a position to be stable
-        self.TRACKEDPEOPLE = []       # mask for tracker people
+        self.STABILITYRATE = None       # set the number of captures frames needed for a position to be stable
+        self.TRACKEDPEOPLE = []         # mask for tracker people
 
     def connect(self, ip):
         try:
@@ -138,9 +138,11 @@ class DrawByMoving:
         if self.connected:
             # the canvas is created and all elements initialisated
             self.roomSize = self.demoKit.getRoomSize()
+            positionData = self.demoKit.getPersonsPositions(False)
+            self.trackedPeople = len(positionData)
             self.defineCanvas()
             self.master = Tk()
-            self.master.title("Kinsei Viewer Demo: " + self.ip)
+            self.master.title("Kinsei drawing by movement: " + self.ip)
 
             # bind escape to terminate
             self.master.bind('<Escape>', quit)
@@ -162,11 +164,9 @@ class DrawByMoving:
             self.run.pack(side=BOTTOM, padx=0, pady=5)
 
             # drawing initial position markers
-            positionData = self.demoKit.getPersonsPositions(False)
-            for i in range(0, len(positionData)):
+            for i in range(0, self.trackedPeople):
                 person = self.canvas.create_oval(0, 0, 20, 20, fill=colors[i % len(colors)])
                 self.persons.append([person, [0, 0]])
-                self.TRACKEDPEOPLE.append(True)
 
             # the following method starts the tracking
             self.trackPersons()
@@ -199,6 +199,8 @@ class DrawByMoving:
 
         frameEntry = Frame(paramenetsFrame)
         frameEntry.pack(padx=20, pady=20)
+        frameRadio = Frame(paramenetsFrame)
+        frameRadio.pack(padx=20, pady=20)
         frameButtons = Frame(paramenetsFrame)
         frameButtons.pack(padx=20, pady=20)
 
@@ -208,7 +210,7 @@ class DrawByMoving:
         self.STABILITYRATE = StringVar(self.master, value=STABLITYRATE)
 
         Label(frameEntry, text="Line width").grid(row=0, sticky=E)
-        Label(frameEntry, text="Maxi X delta").grid(row=1, sticky=E)
+        Label(frameEntry, text="Max line length").grid(row=1, sticky=E)
         Label(frameEntry, text="Framerate").grid(row=2, sticky=E)
         Label(frameEntry, text="Stability rate").grid(row=3, sticky=E)
 
@@ -220,6 +222,11 @@ class DrawByMoving:
         maxmove.grid(row=1, column=1)
         framerate.grid(row=2, column=1)
         stabilityrate.grid(row=3, column=1)
+
+        Label(frameRadio, text="Tracking").grid(row=0, column=0, sticky=E)
+        for i in range(0, self.trackedPeople):
+            self.TRACKEDPEOPLE.append(IntVar(self.master, value=1))
+            Checkbutton(frameRadio, text="person "+str(i), variable=self.TRACKEDPEOPLE[i]).grid(row=i,column=1, sticky=W)
 
         Button(frameButtons, text='Reset', command=self.resetPArameters).grid(row=0, column=1)
 
@@ -262,7 +269,7 @@ class DrawByMoving:
             for i in range(0, len(positionData)):
                 linewidth = self.LINEWIDTH.get()
                 maxmove = self.MAXMOVE.get()
-                if positionData[i] and self.TRACKEDPEOPLE[i] and (linewidth != "") and (maxmove != ""):
+                if positionData[i] and (self.TRACKEDPEOPLE[i].get() == 1) and (linewidth != "") and (maxmove != ""):
                     currentPositionData = self.adjustedCoordinates(positionData[i], self.invertView)
                     if currentPositionData == [10, 10]:
                         currentPositionData = [-50, -50]
