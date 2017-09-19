@@ -22,7 +22,7 @@ __license__ = "MIT"
 __version__ = "0.9.0"
 __maintainer__ = "Francesco Pessolano"
 __email__ = "francesco@xetal.eu"
-__status__ = "in debug"
+__status__ = "pre-release"
 __requiredfirmware__ = "february2017 or later"
 
 # the color array is used to simplify color assignment to the tracking balls

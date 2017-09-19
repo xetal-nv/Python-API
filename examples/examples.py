@@ -15,7 +15,7 @@ import os
 __author__ = "Francesco Pessolano"
 __copyright__ = "Copyright 2017, Xetal nv"
 __license__ = "MIT"
-__version__ = "2.0.0"
+__version__ = "2.1.0"
 __maintainer__ = "Francesco Pessolano"
 __email__ = "francesco@xetal.eu"
 __status__ = "release"
@@ -23,6 +23,7 @@ __status__ = "release"
 absolutePath = os.path.dirname(__file__)
 viewersFolder = 'viewers'
 serverFolder = 'servers'
+interactiveappsFolder = 'interactiveapps'
 
 availableDemos = {
     # shows an example of graphical viewer for tracking
@@ -40,6 +41,9 @@ availableDemos = {
     # shows a an hot spot map based on people position
     "Hotspot map": lambda: subprocess.Popen(
         ["python", os.path.join(absolutePath, viewersFolder, 'hotspotmap.py')]),
+    # shows a an example of drawing by moving
+    "Draw by moving": lambda: subprocess.Popen(
+        ["python", os.path.join(absolutePath, interactiveappsFolder, 'drawByMoving.py')]),
 }
 
 
