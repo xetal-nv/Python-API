@@ -1,5 +1,5 @@
 # Python Kinsei Client, Examples and Applications 
-### Version: 4.1.0 (trunk development)
+### Version: 4.1.3 (trunk - in debug)
 ### Advised Kinsei firmware: July2017
 ### In case of further help please contact us at contact@xetal.eu
 
