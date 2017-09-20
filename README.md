@@ -38,7 +38,7 @@ sample.conf
 Is a standard configuration file to be used as sample and instructions for the command ordering, syntax and usage
 
 ## Kinsei examples
-Several examples are provided in the folder ‘example’ to illustrate how a kinsei system can be used and how to use its API. Most examples can be executed by starting the python script: examples.py.
+Several examples are provided in the folder ‘example’ and 'server' to illustrate how a kinsei system can be used and how to use its API. Most examples can be executed by starting the python script: examples.py.
 Currently the following examples are provided (* is used to indicate if accessible via examples.py):
  
 aggregator.py: server collecting cumulative data from a kinsei device
@@ -57,10 +57,10 @@ trackingFusionViewer.py*: graphically shows the tracking and fusion data in real
 
 trackingViewer.py*: graphically shows the tracking data in real time. Provides also the number of detected people
 
-## Kinsei Applications
-Applications are scripts that can be used to optimize and tune a kinsei device. Furthermore, they show advanced features (such as real time tuning) that can be used to implement open and closed loop control systems for application requiring more precise data or working in unpredictable environments. 
+## Kinsei Tuners
+Tuners are scripts that can be used to optimize and tune a kinsei device. Furthermore, they show advanced features (such as real time tuning) that can be used to implement open and closed loop control systems for application requiring more precise data or working in unpredictable environments. 
 
-These applications also allow operations that were previously only possible by means of a manual SSH connetion to the device.
+These Tuners also allow operations that were previously only possible by means of a manual SSH connetion to the device.
 
 Currently the following applications are provided and can be accessed by running the script deviceconfig.py in folder ‘examples’:
 
@@ -68,6 +68,14 @@ tuner.py: this script can be used to retrieve and set parameters that affect the
 
 configurator.py: this script can be used to perform full device configuration including kinsei firmware upload, changing room topology, sensor topology, storing of measurement of data locally, etc. When run, load the configuration file for an example of all available parameters and an explanation of their use. Please note, that altering the configuration takes effect only after stopping/starting or restarting the device (via the application itself). 
 
+## Interactive Applications
 
+Interactive Applications are examples that are meant to show interactively the functionality of the kit. 
+They can be found in the folder 'interactiveapps' and can be execute via the script examples.py:
+
+drawVyMoving.py: example of detecting a position to draw lines. It is the basic algorithm needed for defining
+entry and exit zones by moving around as well as it has a fun factor to it. Some parameters can be modified via GUI
+in order to alter the behavior: line thickness, maximum line length, sensor frame rate and number of frames for a 
+position to be considered stable if it moved in a given radius
 
 
