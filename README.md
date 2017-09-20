@@ -73,7 +73,7 @@ configurator.py: this script can be used to perform full device configuration in
 Interactive Applications are examples that are meant to show interactively the functionality of the kit. 
 They can be found in the folder 'interactiveapps' and can be execute via the script examples.py:
 
-drawVyMoving.py: example of detecting a position to draw lines. It is the basic algorithm needed for defining
+drawByMoving.py: example of detecting a position to draw lines. It is the basic algorithm needed for defining
 entry and exit zones by moving around as well as it has a fun factor to it. Some parameters can be modified via GUI
 in order to alter the behavior: line thickness, maximum line length, sensor frame rate and number of frames for a 
 position to be considered stable if it moved in a given radius
