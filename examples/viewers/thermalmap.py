@@ -17,7 +17,7 @@ import colormaps
 __author__ = "Francesco Pessolano"
 __copyright__ = "Copyright 2017, Xetal nv"
 __license__ = "MIT"
-__version__ = "1.2.5"
+__version__ = "1.2.6"
 __maintainer__ = "Francesco Pessolano"
 __email__ = "francesco@xetal.eu"
 __status__ = "release"
@@ -39,7 +39,7 @@ showAverageTemp = True
 showColorMapping = False
 
 # Error on average for textColorMapping
-minVariation = 0.1
+minVariation = 0.3
 
 if showAverageTemp:
     from statistics import mean
@@ -61,6 +61,7 @@ class ThermalMap:
         self.averageTemp = 0
         self.thermalMapSettings = None
         self.grid = None
+        self.gridSize = 0
 
     def connect(self, ip, whichMap=whichcoloring):
         try:
@@ -199,26 +200,34 @@ class ThermalMap:
         # draws the map
         cellwidth = w / self.thermalMapSettings[0]
         cellheight = h / self.thermalMapSettings[1]
+
+        loopBreak = False   # used to break all loops in case of partial data from TCP
         for row in range(self.thermalMapSettings[1]):
             for col in range(self.thermalMapSettings[0]):
-                if pixelTemperatures10[row * self.thermalMapSettings[0] + col] == 0:
-                    outlineColor = ""
-                else:
-                    outlineColor = "gray"
-                    if showAverageTemp:
-                        colorText = colormaps.threeWayColor(
-                            pixelTemperatures10[row * self.thermalMapSettings[0] + col] / 10, self.averageTemp, \
-                            minVariation)
+                try:
+                    if pixelTemperatures10[row * self.thermalMapSettings[0] + col] == 0:
+                        outlineColor = ""
                     else:
-                        colorText = "black"
-                    tempLabelPosition = self.canvas.create_text((col + 0.5) * cellwidth + offset,
-                                                                (row + 0.5) * cellheight + offset, anchor="center", \
-                                                                font=('Helvetica', 10), fill=colorText)
-                    tempLabel = str(pixelTemperatures10[row * self.thermalMapSettings[0] + col] / 10)
-                    self.canvas.itemconfig(tempLabelPosition, text=tempLabel)
-                self.canvas.create_rectangle(col * cellwidth + offset, row * cellheight + offset,
-                                             (col + 1) * cellwidth + offset, (row + 1) * cellheight + offset,
-                                             fill="", outline=outlineColor)
+                        outlineColor = "gray"
+                        if showAverageTemp:
+                            colorText = colormaps.threeWayColor(
+                                pixelTemperatures10[row * self.thermalMapSettings[0] + col] / 10, self.averageTemp, \
+                                minVariation)
+                        else:
+                            colorText = "black"
+                        tempLabelPosition = self.canvas.create_text((col + 0.5) * cellwidth + offset,
+                                                                    (row + 0.5) * cellheight + offset, anchor="center", \
+                                                                    font=('Helvetica', 10), fill=colorText)
+                        tempLabel = str(pixelTemperatures10[row * self.thermalMapSettings[0] + col] / 10)
+                        self.canvas.itemconfig(tempLabelPosition, text=tempLabel)
+                    self.canvas.create_rectangle(col * cellwidth + offset, row * cellheight + offset,
+                                                 (col + 1) * cellwidth + offset, (row + 1) * cellheight + offset,
+                                                 fill="", outline=outlineColor)
+                except IndexError:
+                    loopBreak = True
+                    break
+                if loopBreak:
+                    break
 
         self.drawBackground()
         self.canvas.after(10, self.drawMapTemps)  # delay must be larger than 0
