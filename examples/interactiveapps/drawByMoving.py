@@ -19,7 +19,7 @@ import gui
 __author__ = "Francesco Pessolano"
 __copyright__ = "Copyright 2017, Xetal nv"
 __license__ = "MIT"
-__version__ = "1.0.0"
+__version__ = "1.1.0"
 __maintainer__ = "Francesco Pessolano"
 __email__ = "francesco@xetal.eu"
 __status__ = "release"
@@ -35,10 +35,10 @@ SCALEY = 0.7  # scale from maximum X size of screen window
 offset = 10  # padding offset in pixels
 
 # programmatic parameters default values
-LINEWIDTH = 1       # set the tracking line width
-MAXMOVE = 400       # set the maximum line variation (pixels)
-FRAMESRATE = 1      # set the periodicity of reading from the device
-STABLITYRATE = 3    # set the number of captures frames needed for a position to be stable
+LINEWIDTH = 1  # set the tracking line width
+MAXMOVE = 400  # set the maximum line variation (pixels)
+FRAMESRATE = 1  # set the periodicity of reading from the device
+STABLITYRATE = 3  # set the number of captures frames needed for a position to be stable
 
 
 # this class shows how to visualise tracking with tkinter
@@ -62,11 +62,14 @@ class DrawByMoving:
         self.trackedPeople = 0
 
         # programmatic parameters
-        self.LINEWIDTH = None           # set the tracking line width
-        self.MAXMOVE = None             # set the maximum line lenght (pixels)
-        self.FRAMESRATE = None          # set the periodicity of reading from the device
-        self.STABILITYRATE = None       # set the number of captures frames needed for a position to be stable
-        self.TRACKEDPEOPLE = []         # mask for tracker people
+        self.LINEWIDTH = None  # set the tracking line width
+        self.MAXMOVE = None  # set the maximum line lenght (pixels)
+        self.FRAMESRATE = None  # set the periodicity of reading from the device
+        self.STABILITYRATE = None  # set the number of captures frames needed for a position to be stable
+        self.TRACKEDPEOPLE = []  # mask for tracker people
+
+        # stores lines for the clean buttong
+        self.lines = []
 
     def connect(self, ip):
         try:
@@ -194,7 +197,6 @@ class DrawByMoving:
 
     # set-up the parametric menu as well as connect it to the proper class variable
     def setupParameterMenu(self):
-        #TODO needs to add the stability radius
         paramenetsFrame = Frame(self.masterFrame, width=300, height=(self.screenY + 2 * offset))
         paramenetsFrame.pack(expand=1, fill=X, pady=offset, padx=offset, side=RIGHT)
 
@@ -231,9 +233,18 @@ class DrawByMoving:
         Label(frameRadio, text="Tracking").grid(row=0, column=0, sticky=E)
         for i in range(0, self.trackedPeople):
             self.TRACKEDPEOPLE.append(IntVar(self.master, value=1))
-            Checkbutton(frameRadio, text="person "+str(i), variable=self.TRACKEDPEOPLE[i]).grid(row=i,column=1, sticky=W)
+            Checkbutton(frameRadio, text="person " + str(i), variable=self.TRACKEDPEOPLE[i]).grid(row=i, column=1,
+                                                                                                  sticky=W)
 
         Button(frameButtons, text='Reset', command=self.resetPArameters).grid(row=0, column=1)
+        Button(frameButtons, text='Empty', command=self.removeLines).grid(row=0, column=0)
+
+
+    # removes all lines from the canvas
+    def removeLines(self):
+        if self.lines:
+            for line in self.lines:
+                self.canvas.delete(line)
 
     # reset parameters
     def resetPArameters(self):
@@ -282,9 +293,10 @@ class DrawByMoving:
                     deltay = currentPositionData[1] - self.persons[i][1][1]
                     self.canvas.move(self.persons[i][0], deltax, deltay)
                     if (abs(deltax) < int(maxmove)) and (abs(deltay) < int(maxmove)):
-                        self.canvas.create_line(self.persons[i][1][0], self.persons[i][1][1], currentPositionData[0],
-                                                currentPositionData[1], fill=colors[i % len(colors)],
-                                                width=int(linewidth))
+                        self.lines.append(self.canvas.create_line(self.persons[i][1][0], self.persons[i][1][1],
+                                                                  currentPositionData[0],
+                                                                  currentPositionData[1], fill=colors[i % len(colors)],
+                                                                  width=int(linewidth)))
                     self.persons[i][1] = currentPositionData
 
         self.canvas.after(10, self.trackPersons)  # delay must be larger than 0

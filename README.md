@@ -69,7 +69,6 @@ tuner.py: this script can be used to retrieve and set parameters that affect the
 configurator.py: this script can be used to perform full device configuration including kinsei firmware upload, changing room topology, sensor topology, storing of measurement of data locally, etc. When run, load the configuration file for an example of all available parameters and an explanation of their use. Please note, that altering the configuration takes effect only after stopping/starting or restarting the device (via the application itself). 
 
 ## Interactive Applications
-
 Interactive Applications are examples that are meant to show interactively the functionality of the kit. 
 They can be found in the folder 'interactiveapps' and can be execute via the script examples.py:
 
@@ -77,5 +76,8 @@ drawByMoving.py: example of detecting a position to draw lines. It is the basic 
 entry and exit zones by moving around as well as it has a fun factor to it. Some parameters can be modified via GUI
 in order to alter the behavior: line thickness, maximum line length, sensor frame rate and number of frames for a 
 position to be considered stable if it moved in a given radius
+
+## Known issues
+All scripts have a GUI which is not optimal for 4K laptops due to their high DPI count.
 
 
