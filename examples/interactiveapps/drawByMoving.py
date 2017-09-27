@@ -15,11 +15,12 @@ sys.path.insert(0, '../../libs')
 
 import KinseiClient
 import gui
+from tooltip import *
 
 __author__ = "Francesco Pessolano"
 __copyright__ = "Copyright 2017, Xetal nv"
 __license__ = "MIT"
-__version__ = "1.1.0"
+__version__ = "1.2.0"
 __maintainer__ = "Francesco Pessolano"
 __email__ = "francesco@xetal.eu"
 __status__ = "release"
@@ -39,6 +40,14 @@ LINEWIDTH = 1  # set the tracking line width
 MAXMOVE = 400  # set the maximum line variation (pixels)
 FRAMESRATE = 1  # set the periodicity of reading from the device
 STABLITYRATE = 3  # set the number of captures frames needed for a position to be stable
+
+# tips for commands
+
+LW = "Sets the width of the lines being drawn"
+MM = "Sets the maximum lenght of a drawn line in pixels"
+FR = "Sets at what rate the device data is read"
+SR = "Sets the number of frames a position needs to be stable for to be considered valid"
+SRD = "Sets the radius of the circular area in mm to be used in determining if a position is stable"
 
 
 # this class shows how to visualise tracking with tkinter
@@ -67,6 +76,7 @@ class DrawByMoving:
         self.FRAMESRATE = None  # set the periodicity of reading from the device
         self.STABILITYRATE = None  # set the number of captures frames needed for a position to be stable
         self.TRACKEDPEOPLE = []  # mask for tracker people
+        self.STABILITYRADIUS = None
 
         # stores lines for the clean buttong
         self.lines = []
@@ -213,11 +223,24 @@ class DrawByMoving:
         self.STABILITYRATE = StringVar(self.master, value=STABLITYRATE)
         self.STABILITYRADIUS = StringVar(self.master, value=self.demoKit.getStabilityRadius())
 
-        Label(frameEntry, text="Line width").grid(row=0, sticky=E)
-        Label(frameEntry, text="Max line length").grid(row=1, sticky=E)
-        Label(frameEntry, text="Framerate").grid(row=2, sticky=E)
-        Label(frameEntry, text="Stability rate").grid(row=3, sticky=E)
-        Label(frameEntry, text="Stability radius").grid(row=4, sticky=E)
+        linewidth = Label(frameEntry, text="Line width")
+        maxmove = Label(frameEntry, text="Max line length")
+        framerate = Label(frameEntry, text="Framerate")
+        srate = Label(frameEntry, text="Stability rate")
+        srateradius = Label(frameEntry, text="Stability radius")
+
+        linewidth.grid(row=0, sticky=E)
+        maxmove.grid(row=1, sticky=E)
+        framerate.grid(row=2, sticky=E)
+        srate.grid(row=3, sticky=E)
+        srateradius.grid(row=4, sticky=E)
+
+        wraplength = 200
+        Tooltip(linewidth, text=LW, wraplength=wraplength)
+        Tooltip(maxmove, text=MM, wraplength=wraplength)
+        Tooltip(framerate, text=FR, wraplength=wraplength)
+        Tooltip(srate, text=SR, wraplength=wraplength)
+        Tooltip(srateradius, text=SRD, wraplength=wraplength)
 
         linewidth = Entry(frameEntry, textvariable=self.LINEWIDTH)
         maxmove = Entry(frameEntry, textvariable=self.MAXMOVE)
@@ -282,22 +305,23 @@ class DrawByMoving:
                            str(personFix) + "]"
             self.canvas.itemconfig(self.counterLabel, text=labelCounter)
 
-            for i in range(0, len(positionData)):
-                linewidth = self.LINEWIDTH.get()
-                maxmove = self.MAXMOVE.get()
-                if positionData[i] and (self.TRACKEDPEOPLE[i].get() == 1) and (linewidth != "") and (maxmove != ""):
-                    currentPositionData = self.adjustedCoordinates(positionData[i], self.invertView)
-                    if currentPositionData == [10, 10]:
-                        currentPositionData = [-50, -50]
-                    deltax = currentPositionData[0] - self.persons[i][1][0]
-                    deltay = currentPositionData[1] - self.persons[i][1][1]
-                    self.canvas.move(self.persons[i][0], deltax, deltay)
-                    if (abs(deltax) < int(maxmove)) and (abs(deltay) < int(maxmove)):
-                        self.lines.append(self.canvas.create_line(self.persons[i][1][0], self.persons[i][1][1],
-                                                                  currentPositionData[0],
-                                                                  currentPositionData[1], fill=colors[i % len(colors)],
-                                                                  width=int(linewidth)))
-                    self.persons[i][1] = currentPositionData
+            if positionData:
+                for i in range(0, len(positionData)):
+                    linewidth = self.LINEWIDTH.get()
+                    maxmove = self.MAXMOVE.get()
+                    if positionData[i] and (self.TRACKEDPEOPLE[i].get() == 1) and (linewidth != "") and (maxmove != ""):
+                        currentPositionData = self.adjustedCoordinates(positionData[i], self.invertView)
+                        if currentPositionData == [10, 10]:
+                            currentPositionData = [-50, -50]
+                        deltax = currentPositionData[0] - self.persons[i][1][0]
+                        deltay = currentPositionData[1] - self.persons[i][1][1]
+                        self.canvas.move(self.persons[i][0], deltax, deltay)
+                        if (abs(deltax) < int(maxmove)) and (abs(deltay) < int(maxmove)):
+                            self.lines.append(self.canvas.create_line(self.persons[i][1][0], self.persons[i][1][1],
+                                                                      currentPositionData[0],
+                                                                      currentPositionData[1], fill=colors[i % len(colors)],
+                                                                      width=int(linewidth)))
+                        self.persons[i][1] = currentPositionData
 
         self.canvas.after(10, self.trackPersons)  # delay must be larger than 0
 
