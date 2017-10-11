@@ -174,17 +174,21 @@ class MainWindow:
 
     # draws persons on the canvas
     def drawPersons(self):
-        # need to remove circles if not present around (0,0)
         if self.positionData:
             newPersons = []
             for i in range(0, len(self.positionData)):
                 if self.persons:
                     self.canvas.delete(self.persons[i])
                 currentPositionData = self.adjustedCoordinates(self.positionData[i])
+                if currentPositionData[0] <= 20 and currentPositionData[1] <= 20:
+                    state = HIDDEN
+                else:
+                    state = NORMAL
                 person = self.canvas.create_oval(currentPositionData[0],
                                                  currentPositionData[1],
                                                  currentPositionData[0] + diameter,
-                                                 currentPositionData[1] + diameter, fill=colors[i % len(colors)])
+                                                 currentPositionData[1] + diameter, fill=colors[i % len(colors)],
+                                                 state=state)
                 newPersons.append(person)
             self.persons = newPersons
 
