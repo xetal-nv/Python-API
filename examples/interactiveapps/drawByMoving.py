@@ -50,7 +50,7 @@ SR = "Sets the number of frames a position needs to be stable for to be consider
 SRD = "Sets the radius of the circular area in mm to be used in determining if a position is stable"
 
 
-# this class shows how to visualise tracking with tkinter
+# this class shows how to visualise tracking with tkinter and trajectories
 class DrawByMoving:
     def __init__(self):
         self.demoKit = None
