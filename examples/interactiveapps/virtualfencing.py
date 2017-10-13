@@ -18,7 +18,7 @@ import gui
 __author__ = "Francesco Pessolano"
 __copyright__ = "Copyright 2017, Xetal nv"
 __license__ = "MIT"
-__version__ = "0.1.0"
+__version__ = "0.2.0"
 __maintainer__ = "Francesco Pessolano"
 __email__ = "francesco@xetal.eu"
 __status__ = "in development"
@@ -35,12 +35,23 @@ offset = 10  # padding offset in pixels
 # set diameter person in pixels
 diameter = 20
 
+# programmatic parameters default values
+LINEWIDTH = 1  # set the tracking line width
+MAXMOVE = 400  # set the maximum line variation (pixels)
+FRAMESRATE = 1  # set the periodicity of reading from the device
+STABLITYRATE = 3  # set the number of captures frames needed for a position to be stable
+
 
 # this is the main windows whosing tracking, zones, events and control buttons
 class MainWindow:
     def __init__(self, maximumSize):
+
+        # device
         self.demoKit = None
         self.connected = False
+        self.ip = None
+
+        # main canvas
         self.canvas = None
         self.spaceEnvelop = None
         self.master = None
@@ -51,14 +62,37 @@ class MainWindow:
         self.screenX = maximumSize[0]
         self.screenY = maximumSize[1]
         self.counterLabel = None
-        self.run = None
-        self.ip = None
         self.offset = [offset, offset]
         self.boundary = None
         self.geometry = None
         self.leftLabel = None
         # this lock is betweeb resize and tracking, and it is redundant but left for future changes in the ref module
         self.lock = Lock()
+
+        # MENU CONTROL
+        self.extraWindows = []
+
+        # RUNNING
+        self.run = None
+
+        # TRACING
+        self.tracing = None
+        self.traceWin = None
+        self.LINEWIDTH = None  # set the tracking line width
+        self.MAXMOVE = None  # set the maximum line lenght (pixels)
+        self.FRAMESRATE = None  # set the periodicity of reading from the device
+        self.STABILITYRATE = None  # set the number of captures frames needed for a position to be stable
+        self.TRACKEDPEOPLE = []  # mask for tracker people
+        self.STABILITYRADIUS = None
+        self.traceLines = []  # drawn lines
+        self.traceLinesCoords = []  # drawn lines
+        self.lineParameters = [] # store the line width and maxmove
+
+        # ZONE definition
+        self.zones = None
+
+        # EVENT monitor
+        self.monitor = None
 
     def connect(self, ip):
         try:
@@ -67,8 +101,8 @@ class MainWindow:
             self.ip = ip
         except:
             self.connected = False
-        # self.ip = "0"
-        # self.connected = True
+            # self.ip = "0"
+            # self.connected = True
 
     def isConnected(self):
         return self.connected
@@ -170,7 +204,33 @@ class MainWindow:
         self.drawRoomSpace()
         self.drawLabels()
         self.drawPersons()
+        self.scaleTracingLines()
         self.lock.release()
+
+    # scale tracing lines is present HERE
+    def scaleTracingLines(self):
+        if self.traceLines:
+            for line in self.traceLines:
+                self.canvas.delete(line)
+            for i in range(1, len(self.traceLinesCoords)):
+                linewidth = self.lineParameters[i][0]
+                maxmove = self.lineParameters[i][1]
+                currentVector = self.traceLinesCoords[i]
+                previousVector = self.traceLinesCoords[i-1]
+                for j in range(0, len(currentVector)):
+
+                    if previousVector[j][0] > 0 and previousVector[j][1] > 0 and currentVector[j][0] > 0 \
+                            and currentVector[j][1] > 0:
+                        previousPositionData = self.adjustedCoordinates(previousVector[j])
+                        currentPositionData = self.adjustedCoordinates(currentVector[j])
+                        deltax = currentPositionData[0] - previousPositionData[0]
+                        deltay = currentPositionData[1] - previousPositionData[1]
+                        if (abs(deltax) < int(maxmove)) and (abs(deltay) < int(maxmove)):
+                            line = self.canvas.create_line(previousPositionData[0], previousPositionData[1],
+                                                           currentPositionData[0], currentPositionData[1],
+                                                           fill=colors[j % len(colors)], width=int(linewidth))
+                            self.traceLines.append(line)
+
 
     # draws persons on the canvas
     def drawPersons(self):
@@ -180,7 +240,7 @@ class MainWindow:
                 if self.persons:
                     self.canvas.delete(self.persons[i])
                 currentPositionData = self.adjustedCoordinates(self.positionData[i])
-                if currentPositionData[0] <= 20 and currentPositionData[1] <= 20:
+                if self.positionData[i][0] <= 20 and self.positionData[i][1] <= 20:
                     state = HIDDEN
                 else:
                     state = NORMAL
@@ -191,6 +251,32 @@ class MainWindow:
                                                  state=state)
                 newPersons.append(person)
             self.persons = newPersons
+
+    # draws tracing lines
+    def drawTracingLines(self):
+        if 1 in map(IntVar.get, self.TRACKEDPEOPLE):
+            newPositionVector = []
+            linewidth = self.LINEWIDTH.get()
+            maxmove = self.MAXMOVE.get()
+            self.lineParameters.append([linewidth, maxmove])
+            for i in range(0, len(self.positionData)):
+                if self.TRACKEDPEOPLE[i].get():
+                    newPositionVector.append(self.positionData[i])
+                    if len(self.traceLinesCoords) > 0:
+                        if self.traceLinesCoords[-1][i][0] > 0 and self.traceLinesCoords[-1][i][1] > 0 \
+                                and self.positionData[i][0] > 0 and self.positionData[i][1] > 0:
+                            previousPositionData = self.adjustedCoordinates(self.traceLinesCoords[-1][i])
+                            currentPositionData = self.adjustedCoordinates(self.positionData[i])
+                            deltax = currentPositionData[0] - previousPositionData[0]
+                            deltay = currentPositionData[1] - previousPositionData[1]
+                            if (abs(deltax) < int(maxmove)) and (abs(deltay) < int(maxmove)):
+                                line = self.canvas.create_line(previousPositionData[0], previousPositionData[1],
+                                                               currentPositionData[0], currentPositionData[1],
+                                                               fill=colors[i % len(colors)], width=int(linewidth))
+                                self.traceLines.append(line)
+                else:
+                    newPositionVector.append([0, 0])
+            self.traceLinesCoords.append(newPositionVector)
 
     # draws room walls and envelop on canvas
     def drawRoomSpace(self):
@@ -241,6 +327,7 @@ class MainWindow:
                                str(personFix) + "]"
                 self.canvas.itemconfig(self.counterLabel, text=labelCounter)
                 self.drawPersons()
+                self.drawTracingLines()
 
         self.canvas.after(10, self.trackPersons)  # delay must be larger than 0
 
@@ -248,14 +335,18 @@ class MainWindow:
     def create_buttons(self):
         frame = Frame(self.master, bg='grey', width=400, height=40)
         frame.pack(fill='x')
-        # button1 = Button(frame, text='test1')
-        # button1.pack(side='left')
-        # button2 = Button(frame, text='test2')
-        # button2.pack(side='left')
         self.run = Button(frame, text="RUNNING", command=self.togglePause)
         self.run.pack(side='left')
+        self.tracing = Button(frame, text="TRACING", command=self.traceTracking)
+        self.tracing.pack(side='left')
+        self.zones = Button(frame, text="ZONES")
+        self.zones.pack(side='left')
+        self.monitor = Button(frame, text="MONITOR")
+        self.monitor.pack(side='left')
 
-    # toggle pause butting
+    # RUNNING menu
+
+    ## execute the start and pause fanction
     def togglePause(self):
         if self.run['text'] == "RUNNING":
             if not self.demoKit.disconnect():
@@ -265,6 +356,94 @@ class MainWindow:
             if self.demoKit.reconnect():
                 self.run['text'] = "RUNNING"
                 self.run.config(relief=RAISED)
+
+    # TRACING menu
+
+    ## open the menu for tracing the movements
+    def traceTracking(self):
+        if "traceTracking" not in self.extraWindows:
+            self.extraWindows.append("traceTracking")
+            self.traceWin = Toplevel()
+            self.tracingwindow()
+        else:
+            try:
+                self.traceWin.state()
+            except:
+                self.traceWin = Toplevel()
+                self.tracingwindow()
+                pass
+
+    ## set up the tracing window
+    def tracingwindow(self):
+        # follows old code to be adapted
+        master = self.traceWin
+        master.title("Tracing menu")
+
+        # bind escape to terminate
+        master.bind('<Escape>', quit)
+
+        canvas = Canvas(master)
+        canvas.pack(fill=BOTH, expand=1)
+
+        frameEntry = Frame(canvas)
+        frameEntry.pack(padx=20, pady=20)
+        frameRadio = Frame(canvas)
+        frameRadio.pack(padx=20, pady=20)
+        frameButtons = Frame(canvas)
+        frameButtons.pack(padx=20, pady=20)
+
+        self.LINEWIDTH = StringVar(self.master, value=LINEWIDTH)
+        self.MAXMOVE = StringVar(self.master, value=MAXMOVE)
+        self.FRAMESRATE = StringVar(self.master, value=FRAMESRATE)
+        self.STABILITYRATE = StringVar(self.master, value=STABLITYRATE)
+        self.STABILITYRADIUS = StringVar(self.master, value=self.demoKit.getStabilityRadius())
+
+        linewidth = Label(frameEntry, text="Line width")
+        maxmove = Label(frameEntry, text="Max line length")
+        framerate = Label(frameEntry, text="Framerate")
+        srate = Label(frameEntry, text="Stability rate")
+        srateradius = Label(frameEntry, text="Stability radius")
+
+        linewidth.grid(row=0, sticky=E)
+        maxmove.grid(row=1, sticky=E)
+        framerate.grid(row=2, sticky=E)
+        srate.grid(row=3, sticky=E)
+        srateradius.grid(row=4, sticky=E)
+
+        linewidth = Entry(frameEntry, textvariable=self.LINEWIDTH)
+        maxmove = Entry(frameEntry, textvariable=self.MAXMOVE)
+        framerate = Entry(frameEntry, textvariable=self.FRAMESRATE)
+        stabilityrate = Entry(frameEntry, textvariable=self.STABILITYRATE)
+        stabilityradius = Entry(frameEntry, textvariable=self.STABILITYRADIUS)
+        linewidth.grid(row=0, column=1)
+        maxmove.grid(row=1, column=1)
+        framerate.grid(row=2, column=1)
+        stabilityrate.grid(row=3, column=1)
+        stabilityradius.grid(row=4, column=1)
+
+        Label(frameRadio, text="Tracing").grid(row=0, column=0, sticky=E)
+        for i in range(0, len(self.persons)):
+            self.TRACKEDPEOPLE.append(IntVar(self.master, value=0))
+            Checkbutton(frameRadio, text="person " + str(i), variable=self.TRACKEDPEOPLE[i]).grid(row=i, column=1,
+                                                                                                  sticky=W)
+
+        Button(frameButtons, text='Reset', command=self.resetParameters).grid(row=0, column=1)
+        Button(frameButtons, text='Empty', command=self.removeLines).grid(row=0, column=0)
+
+    ## removes all lines from the canvas
+    def removeLines(self):
+        if self.traceLines:
+            self.traceLinesCoords = []
+            self.linewidth = []
+            for line in self.traceLines:
+                self.canvas.delete(line)
+
+    ## reset parameters
+    def resetParameters(self):
+        self.LINEWIDTH.set(LINEWIDTH)
+        self.MAXMOVE.set(MAXMOVE)
+        self.FRAMESRATE.set(FRAMESRATE)
+        self.STABILITYRATE.set(STABLITYRATE)
 
 
 def start():
