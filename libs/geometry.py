@@ -2,6 +2,8 @@
 
 """geometry.py: collection of geometrical functons """
 
+from math import *
+
 __author__ = "Francesco Pessolano"
 __copyright__ = "Copyright 2017, Xetal nv"
 __license__ = "MIT"
@@ -52,3 +54,68 @@ def find_intersection( lineA, lineB):
     intersection_point = [ p0[0] + (t * s10_x), p0[1] + (t * s10_y)]
 
     return intersection_point
+
+
+def distancePoint(pointA, pointB):
+    return hypot(pointB[0] - pointA[0], pointB[1] - pointA[1])
+
+
+def distanceFromCircle(centre, radius, point):
+    return abs(hypot(point[0] - centre[0], point[1] - centre[1]) - radius)
+
+
+def distanceFromDiamond(centre, radius, point):
+    cornerA = [centre[0]-radius,centre[1]]
+    cornerC = [centre[0]+radius,centre[1]]
+    cornerD = [centre[0],centre[1]-radius]
+    cornerB = [centre[0],centre[1]+radius]
+    return distanceFromPoly([cornerA,cornerB,cornerC,cornerD, cornerA],point)
+
+
+def distanceFromLine(line, point):
+
+    x1 = line[0][0]
+    y1 = line[0][1]
+    x2 = line[1][0]
+    y2 = line[1][1]
+    x3 = point[0]
+    y3 = point[1]
+
+    px = x2-x1
+    py = y2-y1
+
+    crossP = px*px + py*py
+
+    u = ((x3 - x1) * px + (y3 - y1) * py) / float(crossP)
+
+    if u > 1:
+        u = 1
+    elif u < 0:
+        u = 0
+
+    x = x1 + u * px
+    y = y1 + u * py
+
+    dx = x - x3
+    dy = y - y3
+
+    dist = hypot(dx, dy)
+
+    return dist
+
+
+def distanceFromPoly(poly,point):
+
+    minDistance = 99999999999
+
+    for i in range(1,len(poly)):
+        newDistance = distanceFromLine([poly[i-1],poly[i]],point)
+        if newDistance < minDistance: minDistance = newDistance
+
+    return minDistance
+
+
+def distanceFromRect(rect,point):
+
+    rect2poly = [rect[0], [rect[1][0],rect[0][1]], rect[1], [rect[0][0],rect[1][1]], rect[0]]
+    return distanceFromPoly(rect2poly, point)

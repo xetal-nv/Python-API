@@ -36,6 +36,9 @@ offset = 10  # padding offset in pixels
 # set diameter person in pixels
 diameter = 20
 
+# set selection distance in pixels
+nearbyDistance = 5
+
 # programmatic parameters default values
 LINEWIDTH = 1  # set the tracking line width
 MAXMOVE = 400  # set the maximum line variation (pixels)
@@ -67,6 +70,7 @@ class MainWindow:
         self.boundary = None
         self.geometry = None
         self.leftLabel = None
+        self.multiplierMmPx = 1
         # this lock is betweeb resize and tracking, and it is redundant but left for future changes in the ref module
         self.lock = Lock()
 
@@ -93,6 +97,7 @@ class MainWindow:
         self.zones = None
         self.canvasZones = []
         self.pointerLine = None
+        self.canvasItems = []
 
         # EVENT monitor
         self.monitor = None
@@ -162,6 +167,7 @@ class MainWindow:
         screenY = yMax - yMin
         self.offset[0] = (maxWidthOrig - screenX) / 2
         self.offset[1] = (maxHeightOrig - screenY) / 2
+        self.multiplierMmPx = self.spaceEnvelop[0] / screenX
         return [screenX, screenY]
 
     # this function set-up the canvas and let the tracking start
@@ -480,25 +486,25 @@ class MainWindow:
         frameButtons = Frame(canvas)
         frameEntry = Frame(canvas)
         frameRadio = Frame(canvas)
-        frameButtons2 = Frame(canvas)
-
+        frameData = Frame(canvas)
 
         def defineActionMenuCross():
             defineActionMenu('cross', ['From Left', 'From Right'])
 
         def defineActionMenuRect():
-            defineActionMenu('rect', ['From Left', 'From Right', 'Disappear Inside', 'In out'])
+            defineActionMenu('rect', ['From Inside', 'From Outside', 'Disappear Inside', 'In out'])
 
         def defineActionMenuOval():
-            defineActionMenu('oval', ['From Left', 'From Right', 'Disappear Inside', 'In out'])
+            defineActionMenu('oval', ['From Inside', 'From Outside', 'Disappear Inside', 'In out'])
 
         def defineActionMenuPoly():
-            defineActionMenu('poly', ['From Left', 'From Right', 'Disappear Inside', 'In out'])
+            defineActionMenu('poly', ['From Inside', 'From Outside', 'Disappear Inside', 'Crossing', 'In out'])
 
         def defineActionMenu(typeAction, labelDir):
 
             drawingPoints = []
             directionRadio = []
+            actionLabel.config(text=typeAction)
             stabilityTimeVar = StringVar(self.master, value=LINEWIDTH)
             stabilityTimeLabel = Label(frameEntry, text="Stability time ms")
             stabilityTimeLabel.grid(row=0, sticky=E)
@@ -517,14 +523,17 @@ class MainWindow:
                     drawingPoints.append([event.x, event.y])
                 if len(drawingPoints) == 2 and typeAction != 'poly':
                     if typeAction == 'cross':
-                        self.canvas.create_line(drawingPoints[0][0], drawingPoints[0][1],
-                                                drawingPoints[1][0], drawingPoints[1][1])
+                        self.canvasItems = self.canvas.create_line(drawingPoints[0][0], drawingPoints[0][1],
+                                                                   drawingPoints[1][0], drawingPoints[1][1],
+                                                                   dash=(3, 5), width=1)
                     elif typeAction == 'rect':
-                        self.canvas.create_rectangle(drawingPoints[0][0], drawingPoints[0][1],
-                                                     drawingPoints[1][0], drawingPoints[1][1])
+                        self.canvasItems = self.canvas.create_rectangle(drawingPoints[0][0], drawingPoints[0][1],
+                                                                        drawingPoints[1][0], drawingPoints[1][1],
+                                                                        dash=(3, 5), width=1)
                     elif typeAction == 'oval':
-                        self.canvas.create_oval(drawingPoints[0][0], drawingPoints[0][1],
-                                                drawingPoints[1][0], drawingPoints[1][1])
+                        self.canvasItems = self.canvas.create_oval(drawingPoints[0][0], drawingPoints[0][1],
+                                                                   drawingPoints[1][0], drawingPoints[1][1],
+                                                                   dash=(3, 5), width=1)
                     self.canvas.unbind("<Motion>", bindIDmove)
                     self.canvas.unbind("<Button-2>", bindIDclick)
                     actionEvent(drawingPoints)
@@ -532,35 +541,51 @@ class MainWindow:
                         self.canvas.delete(self.pointerLine)
                     activeAction.release()
                 elif len(drawingPoints) > 1 and typeAction == 'poly':
-                    self.canvas.create_line(drawingPoints[-2][0], drawingPoints[-2][1],
-                                            drawingPoints[-1][0], drawingPoints[-1][1])
+                    self.canvasItems.append(self.canvas.create_line(drawingPoints[-2][0], drawingPoints[-2][1],
+                                                                    drawingPoints[-1][0], drawingPoints[-1][1],
+                                                                    dash=(3, 5), width=1))
                     if self.pointerLine:
                         self.canvas.delete(self.pointerLine)
 
             def traceAction(event):
+                cmDistance = 0
                 if len(drawingPoints) >= 1:
                     if self.pointerLine:
                         self.canvas.delete(self.pointerLine)
                     if typeAction == 'cross':
+                        cmDistance = int(
+                            self.multiplierMmPx * distancePoint(drawingPoints[-1], [event.x, event.y]) / 10)
                         self.pointerLine = self.canvas.create_line(drawingPoints[0][0], drawingPoints[0][1],
                                                                    event.x, event.y, dash=(3, 5), width=1)
                     elif typeAction == 'rect':
+                        cmDistance = [int(abs(self.multiplierMmPx * (drawingPoints[-1][0] - event.x) / 10)),
+                                      int(abs(self.multiplierMmPx * (drawingPoints[-1][1] - event.y) / 10))]
                         self.pointerLine = self.canvas.create_rectangle(drawingPoints[0][0], drawingPoints[0][1],
                                                                         event.x, event.y, dash=(3, 5), width=1)
                     elif typeAction == 'oval':
+                        cmDistance = int(abs(self.multiplierMmPx * (drawingPoints[-1][0] - event.x) / 20))
                         self.pointerLine = self.canvas.create_oval(drawingPoints[0][0], drawingPoints[0][1],
                                                                    event.x, event.y, dash=(3, 5), width=1)
                     elif typeAction == 'poly':
+                        cmDistance = int(
+                            self.multiplierMmPx * distancePoint(drawingPoints[-1], [event.x, event.y]) / 10)
                         self.pointerLine = self.canvas.create_line(drawingPoints[-1][0], drawingPoints[-1][1],
                                                                    event.x, event.y, dash=(3, 5), width=1)
+                    distanceLabel.config(text=str(cmDistance))
+
+                mouseDistance = [int(self.multiplierMmPx * event.x / 10), int(self.multiplierMmPx * event.y / 10)]
+                mouseLabel.config(text=str(mouseDistance))
 
             def actionEvent(line):
-                self.canvasZones.append([typeAction, line, stabilityTimeVar.get(), direction.get()])
+                self.canvasZones.append([typeAction, line, self.canvasItems, stabilityTimeVar.get(), direction.get()])
+                self.canvasItems = []
                 stabilityTimeLabel.destroy()
                 stabilityTime.destroy()
                 for i in range(0, len(directionRadio)):
                     directionRadio[i].destroy()
-                print(self.canvasZones)
+                actionLabel.config(text='inactive')
+                mouseLabel.config(text='inactive')
+                distanceLabel.config(text='inactive')
 
             def endPolyTerminate(event):
                 if len(drawingPoints) > 2:
@@ -575,8 +600,8 @@ class MainWindow:
 
             def endPolyClose(event):
                 drawingPoints.append(drawingPoints[0])
-                self.canvas.create_line(drawingPoints[-2][0], drawingPoints[-2][1],
-                                        drawingPoints[-1][0], drawingPoints[-1][1])
+                self.canvasItems.append(self.canvas.create_line(drawingPoints[-2][0], drawingPoints[-2][1],
+                                        drawingPoints[-1][0], drawingPoints[-1][1], dash=(3, 5), width=1))
                 endPolyTerminate(event)
 
             if activeAction.acquire(False):
@@ -586,6 +611,50 @@ class MainWindow:
                     bindClosure = self.master.bind('<c>', endPolyClose)
                     bindClosureOpen = self.master.bind('<space>', endPolyTerminate)
 
+        def deleteZone():
+
+            def zoneFound(event):
+
+                for zone in self.canvasZones:
+                    if zone[0] == 'oval':
+                        centre = [(zone[1][0][0] + zone[1][1][0]) / 2, (zone[1][0][1] + zone[1][1][1]) / 2]
+                        radiusX = (zone[1][0][0] - zone[1][1][0]) / 2 + 2 * nearbyDistance
+                        radiusY = (zone[1][0][1] - zone[1][1][1]) / 2 + 2 * nearbyDistance
+                        cornerA = [centre[0] - radiusX, centre[1]]
+                        cornerC = [centre[0] + radiusX, centre[1]]
+                        cornerD = [centre[0], centre[1] - radiusY]
+                        cornerB = [centre[0], centre[1] + radiusY]
+                        distance = distanceFromPoly([cornerA,cornerB,cornerC,cornerD], [event.x, event.y])
+                    elif zone[0] == 'rect':
+                        distance = distanceFromRect(zone[1], [event.x, event.y])
+                    else:
+                        distance = distanceFromPoly(zone[1], [event.x, event.y])
+                    if distance < nearbyDistance:
+                        self.canvas.delete(self.pointerLine)
+                        self.canvasItems = zone
+                        self.pointerLine = self.canvas.create_oval(event.x - nearbyDistance, event.y - nearbyDistance,
+                                                                   event.x + nearbyDistance, event.y + nearbyDistance,
+                                                                   fill="blue", outline="#DDD", width=1)
+                        break
+                    else:
+                        self.canvas.delete(self.pointerLine)
+                        self.canvasItems = []
+
+            def deleteZone(event):
+                print(self.canvasItems)
+                pass
+
+            def closeAction():
+                if self.pointerLine:
+                    self.canvas.delete(self.pointerLine)
+                self.canvas.unbind("<Motion>", bindIDmove)
+                self.canvas.unbind("<Button-2>", bindIDclick)
+                activeAction.release()
+
+            if activeAction.acquire(False):
+                bindIDclick = self.canvas.bind("<Button-2>", deleteZone)
+                bindIDmove = self.canvas.bind("<Motion>", zoneFound)
+
         # bind escape to terminate
         master.bind('<Escape>', quit)
 
@@ -593,13 +662,23 @@ class MainWindow:
         frameButtons.pack(padx=20, pady=20)
         frameEntry.pack(padx=20, pady=20)
         frameRadio.pack(padx=20, pady=20)
-        frameButtons2.pack(padx=20, pady=20)
+        frameData.pack(padx=20, pady=20)
+        frameData.grid_columnconfigure(1, minsize=100)
 
         # action butting defined
         Button(frameButtons, text='CROSS', command=defineActionMenuCross).grid(row=0, column=0)
         Button(frameButtons, text='RECT', command=defineActionMenuRect).grid(row=0, column=1)
         Button(frameButtons, text='POLY', command=defineActionMenuPoly).grid(row=0, column=2)
         Button(frameButtons, text='OVAL', command=defineActionMenuOval).grid(row=0, column=3)
+        Button(frameButtons, text='DELETE', command=deleteZone).grid(row=0, column=4)
+
+        # set data on pointer
+        actionLabel = Label(frameData, text="inactive")
+        actionLabel.grid(row=0, column=0)
+        mouseLabel = Label(frameData, text="inactive")
+        mouseLabel.grid(row=0, column=1)
+        distanceLabel = Label(frameData, text="inactive")
+        distanceLabel.grid(row=0, column=2)
 
 
 def start():
