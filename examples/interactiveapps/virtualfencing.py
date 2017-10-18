@@ -523,17 +523,17 @@ class MainWindow:
                     drawingPoints.append([event.x, event.y])
                 if len(drawingPoints) == 2 and typeAction != 'poly':
                     if typeAction == 'cross':
-                        self.canvasItems = self.canvas.create_line(drawingPoints[0][0], drawingPoints[0][1],
+                        self.canvasItems.append(self.canvas.create_line(drawingPoints[0][0], drawingPoints[0][1],
                                                                    drawingPoints[1][0], drawingPoints[1][1],
-                                                                   dash=(3, 5), width=1)
+                                                                   dash=(3, 5), width=1))
                     elif typeAction == 'rect':
-                        self.canvasItems = self.canvas.create_rectangle(drawingPoints[0][0], drawingPoints[0][1],
+                        self.canvasItems.append(self.canvas.create_rectangle(drawingPoints[0][0], drawingPoints[0][1],
                                                                         drawingPoints[1][0], drawingPoints[1][1],
-                                                                        dash=(3, 5), width=1)
+                                                                        dash=(3, 5), width=1))
                     elif typeAction == 'oval':
-                        self.canvasItems = self.canvas.create_oval(drawingPoints[0][0], drawingPoints[0][1],
+                        self.canvasItems.append(self.canvas.create_oval(drawingPoints[0][0], drawingPoints[0][1],
                                                                    drawingPoints[1][0], drawingPoints[1][1],
-                                                                   dash=(3, 5), width=1)
+                                                                   dash=(3, 5), width=1))
                     self.canvas.unbind("<Motion>", bindIDmove)
                     self.canvas.unbind("<Button-2>", bindIDclick)
                     actionEvent(drawingPoints)
@@ -631,7 +631,7 @@ class MainWindow:
                         distance = distanceFromPoly(zone[1], [event.x, event.y])
                     if distance < nearbyDistance:
                         self.canvas.delete(self.pointerLine)
-                        self.canvasItems = zone
+                        self.canvasItems = zone[2]
                         self.pointerLine = self.canvas.create_oval(event.x - nearbyDistance, event.y - nearbyDistance,
                                                                    event.x + nearbyDistance, event.y + nearbyDistance,
                                                                    fill="blue", outline="#DDD", width=1)
@@ -641,19 +641,22 @@ class MainWindow:
                         self.canvasItems = []
 
             def deleteZone(event):
-                print(self.canvasItems)
-                pass
+                for item in self.canvasItems:
+                    self.canvas.delete(item)
+                closeAction()
 
             def closeAction():
                 if self.pointerLine:
                     self.canvas.delete(self.pointerLine)
                 self.canvas.unbind("<Motion>", bindIDmove)
                 self.canvas.unbind("<Button-2>", bindIDclick)
+                actionLabel.config(text='inactive')
                 activeAction.release()
 
             if activeAction.acquire(False):
                 bindIDclick = self.canvas.bind("<Button-2>", deleteZone)
                 bindIDmove = self.canvas.bind("<Motion>", zoneFound)
+                actionLabel.config(text='delete')
 
         # bind escape to terminate
         master.bind('<Escape>', quit)
