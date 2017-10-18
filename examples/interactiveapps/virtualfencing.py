@@ -588,11 +588,13 @@ class MainWindow:
 
         # bind escape to terminate
         master.bind('<Escape>', quit)
+
         # gui canvas defined
         frameButtons.pack(padx=20, pady=20)
         frameEntry.pack(padx=20, pady=20)
         frameRadio.pack(padx=20, pady=20)
         frameButtons2.pack(padx=20, pady=20)
+
         # action butting defined
         Button(frameButtons, text='CROSS', command=defineActionMenuCross).grid(row=0, column=0)
         Button(frameButtons, text='RECT', command=defineActionMenuRect).grid(row=0, column=1)
