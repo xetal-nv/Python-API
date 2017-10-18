@@ -14,11 +14,12 @@ sys.path.insert(0, '../../libs')
 
 import KinseiClient
 import gui
+from geometry import *
 
 __author__ = "Francesco Pessolano"
 __copyright__ = "Copyright 2017, Xetal nv"
 __license__ = "MIT"
-__version__ = "0.2.0"
+__version__ = "0.3.0"
 __maintainer__ = "Francesco Pessolano"
 __email__ = "francesco@xetal.eu"
 __status__ = "in development"
@@ -86,10 +87,12 @@ class MainWindow:
         self.STABILITYRADIUS = None
         self.traceLines = []  # drawn lines
         self.traceLinesCoords = []  # drawn lines
-        self.lineParameters = [] # store the line width and maxmove
+        self.lineParameters = []  # store the line width and maxmove
 
         # ZONE definition
         self.zones = None
+        self.canvasZones = []
+        self.pointerLine = None
 
         # EVENT monitor
         self.monitor = None
@@ -167,7 +170,7 @@ class MainWindow:
         if self.connected:
             # the canvas is created and all elements initialisated
             self.spaceEnvelop = self.demoKit.getRoomSize()
-            [self.screenX, self.screenY] = self.defineDynamicCanvas(self.screenX, self.screenY)  # test HERE
+            [self.screenX, self.screenY] = self.defineDynamicCanvas(self.screenX, self.screenY)
             self.offset = [offset, offset]
             self.master = Tk()
             self.master.title("Virtual Fencing Demo: " + self.ip)
@@ -209,6 +212,22 @@ class MainWindow:
 
     # scale tracing lines is present HERE
     def scaleTracingLines(self):
+
+        def drawVector(currentVector, previousVector):
+            for j in range(0, len(currentVector)):
+
+                if previousVector[j][0] > 0 and previousVector[j][1] > 0 and currentVector[j][0] > 0 \
+                        and currentVector[j][1] > 0:
+                    previousPositionData = self.adjustedCoordinates(previousVector[j])
+                    currentPositionData = self.adjustedCoordinates(currentVector[j])
+                    deltax = currentPositionData[0] - previousPositionData[0]
+                    deltay = currentPositionData[1] - previousPositionData[1]
+                    if (abs(deltax) < int(maxmove)) and (abs(deltay) < int(maxmove)):
+                        line = self.canvas.create_line(previousPositionData[0], previousPositionData[1],
+                                                       currentPositionData[0], currentPositionData[1],
+                                                       fill=colors[j % len(colors)], width=int(linewidth))
+                        self.traceLines.append(line)
+
         if self.traceLines:
             for line in self.traceLines:
                 self.canvas.delete(line)
@@ -216,21 +235,9 @@ class MainWindow:
                 linewidth = self.lineParameters[i][0]
                 maxmove = self.lineParameters[i][1]
                 currentVector = self.traceLinesCoords[i]
-                previousVector = self.traceLinesCoords[i-1]
-                for j in range(0, len(currentVector)):
-
-                    if previousVector[j][0] > 0 and previousVector[j][1] > 0 and currentVector[j][0] > 0 \
-                            and currentVector[j][1] > 0:
-                        previousPositionData = self.adjustedCoordinates(previousVector[j])
-                        currentPositionData = self.adjustedCoordinates(currentVector[j])
-                        deltax = currentPositionData[0] - previousPositionData[0]
-                        deltay = currentPositionData[1] - previousPositionData[1]
-                        if (abs(deltax) < int(maxmove)) and (abs(deltay) < int(maxmove)):
-                            line = self.canvas.create_line(previousPositionData[0], previousPositionData[1],
-                                                           currentPositionData[0], currentPositionData[1],
-                                                           fill=colors[j % len(colors)], width=int(linewidth))
-                            self.traceLines.append(line)
-
+                previousVector = self.traceLinesCoords[i - 1]
+                drawVector(currentVector, previousVector)
+            drawVector(self.traceLinesCoords[0], self.traceLinesCoords[-1])
 
     # draws persons on the canvas
     def drawPersons(self):
@@ -257,7 +264,11 @@ class MainWindow:
         if 1 in map(IntVar.get, self.TRACKEDPEOPLE):
             newPositionVector = []
             linewidth = self.LINEWIDTH.get()
+            if not linewidth:
+                linewidth = LINEWIDTH
             maxmove = self.MAXMOVE.get()
+            if not maxmove:
+                maxmove = MAXMOVE
             self.lineParameters.append([linewidth, maxmove])
             for i in range(0, len(self.positionData)):
                 if self.TRACKEDPEOPLE[i].get():
@@ -337,9 +348,9 @@ class MainWindow:
         frame.pack(fill='x')
         self.run = Button(frame, text="RUNNING", command=self.togglePause)
         self.run.pack(side='left')
-        self.tracing = Button(frame, text="TRACING", command=self.traceTracking)
+        self.tracing = Button(frame, text="TRACING", command=self.traceTrackingLauncher)
         self.tracing.pack(side='left')
-        self.zones = Button(frame, text="ZONES")
+        self.zones = Button(frame, text="ZONES", command=self.zoneWindowLancher)
         self.zones.pack(side='left')
         self.monitor = Button(frame, text="MONITOR")
         self.monitor.pack(side='left')
@@ -358,77 +369,74 @@ class MainWindow:
                 self.run.config(relief=RAISED)
 
     # TRACING menu
+    def traceTrackingLauncher(self):
 
-    ## open the menu for tracing the movements
-    def traceTracking(self):
+        ## set up the tracing window
+        def tracingwindow():
+            master = self.traceWin
+            master.title("Tracing menu")
+
+            # bind escape to terminate
+            master.bind('<Escape>', quit)
+
+            canvas = Canvas(master)
+            canvas.pack(fill=BOTH, expand=1)
+
+            frameEntry = Frame(canvas)
+            frameEntry.pack(padx=20, pady=20)
+            frameRadio = Frame(canvas)
+            frameRadio.pack(padx=20, pady=20)
+            frameButtons = Frame(canvas)
+            frameButtons.pack(padx=20, pady=20)
+
+            self.LINEWIDTH = StringVar(self.master, value=LINEWIDTH)
+            self.MAXMOVE = StringVar(self.master, value=MAXMOVE)
+            self.FRAMESRATE = StringVar(self.master, value=FRAMESRATE)
+            self.STABILITYRATE = StringVar(self.master, value=STABLITYRATE)
+            self.STABILITYRADIUS = StringVar(self.master, value=self.demoKit.getStabilityRadius())
+
+            linewidth = Label(frameEntry, text="Line width")
+            maxmove = Label(frameEntry, text="Max line length")
+            framerate = Label(frameEntry, text="Framerate")
+            srate = Label(frameEntry, text="Stability rate")
+            srateradius = Label(frameEntry, text="Stability radius")
+
+            linewidth.grid(row=0, sticky=E)
+            maxmove.grid(row=1, sticky=E)
+            framerate.grid(row=2, sticky=E)
+            srate.grid(row=3, sticky=E)
+            srateradius.grid(row=4, sticky=E)
+
+            linewidth = Entry(frameEntry, textvariable=self.LINEWIDTH)
+            maxmove = Entry(frameEntry, textvariable=self.MAXMOVE)
+            framerate = Entry(frameEntry, textvariable=self.FRAMESRATE)
+            stabilityrate = Entry(frameEntry, textvariable=self.STABILITYRATE)
+            stabilityradius = Entry(frameEntry, textvariable=self.STABILITYRADIUS)
+            linewidth.grid(row=0, column=1)
+            maxmove.grid(row=1, column=1)
+            framerate.grid(row=2, column=1)
+            stabilityrate.grid(row=3, column=1)
+            stabilityradius.grid(row=4, column=1)
+
+            Label(frameRadio, text="Tracing").grid(row=0, column=0, sticky=E)
+            for i in range(0, len(self.persons)):
+                self.TRACKEDPEOPLE.append(IntVar(self.master, value=0))
+                Checkbutton(frameRadio, text="person " + str(i), variable=self.TRACKEDPEOPLE[i]).grid(row=i, column=1,
+                                                                                                      sticky=W)
+
+            Button(frameButtons, text='Reset', command=self.resetParameters).grid(row=0, column=1)
+            Button(frameButtons, text='Empty', command=self.removeLines).grid(row=0, column=0)
+
         if "traceTracking" not in self.extraWindows:
             self.extraWindows.append("traceTracking")
             self.traceWin = Toplevel()
-            self.tracingwindow()
+            tracingwindow()
         else:
             try:
                 self.traceWin.state()
             except:
                 self.traceWin = Toplevel()
-                self.tracingwindow()
-                pass
-
-    ## set up the tracing window
-    def tracingwindow(self):
-        # follows old code to be adapted
-        master = self.traceWin
-        master.title("Tracing menu")
-
-        # bind escape to terminate
-        master.bind('<Escape>', quit)
-
-        canvas = Canvas(master)
-        canvas.pack(fill=BOTH, expand=1)
-
-        frameEntry = Frame(canvas)
-        frameEntry.pack(padx=20, pady=20)
-        frameRadio = Frame(canvas)
-        frameRadio.pack(padx=20, pady=20)
-        frameButtons = Frame(canvas)
-        frameButtons.pack(padx=20, pady=20)
-
-        self.LINEWIDTH = StringVar(self.master, value=LINEWIDTH)
-        self.MAXMOVE = StringVar(self.master, value=MAXMOVE)
-        self.FRAMESRATE = StringVar(self.master, value=FRAMESRATE)
-        self.STABILITYRATE = StringVar(self.master, value=STABLITYRATE)
-        self.STABILITYRADIUS = StringVar(self.master, value=self.demoKit.getStabilityRadius())
-
-        linewidth = Label(frameEntry, text="Line width")
-        maxmove = Label(frameEntry, text="Max line length")
-        framerate = Label(frameEntry, text="Framerate")
-        srate = Label(frameEntry, text="Stability rate")
-        srateradius = Label(frameEntry, text="Stability radius")
-
-        linewidth.grid(row=0, sticky=E)
-        maxmove.grid(row=1, sticky=E)
-        framerate.grid(row=2, sticky=E)
-        srate.grid(row=3, sticky=E)
-        srateradius.grid(row=4, sticky=E)
-
-        linewidth = Entry(frameEntry, textvariable=self.LINEWIDTH)
-        maxmove = Entry(frameEntry, textvariable=self.MAXMOVE)
-        framerate = Entry(frameEntry, textvariable=self.FRAMESRATE)
-        stabilityrate = Entry(frameEntry, textvariable=self.STABILITYRATE)
-        stabilityradius = Entry(frameEntry, textvariable=self.STABILITYRADIUS)
-        linewidth.grid(row=0, column=1)
-        maxmove.grid(row=1, column=1)
-        framerate.grid(row=2, column=1)
-        stabilityrate.grid(row=3, column=1)
-        stabilityradius.grid(row=4, column=1)
-
-        Label(frameRadio, text="Tracing").grid(row=0, column=0, sticky=E)
-        for i in range(0, len(self.persons)):
-            self.TRACKEDPEOPLE.append(IntVar(self.master, value=0))
-            Checkbutton(frameRadio, text="person " + str(i), variable=self.TRACKEDPEOPLE[i]).grid(row=i, column=1,
-                                                                                                  sticky=W)
-
-        Button(frameButtons, text='Reset', command=self.resetParameters).grid(row=0, column=1)
-        Button(frameButtons, text='Empty', command=self.removeLines).grid(row=0, column=0)
+                tracingwindow()
 
     ## removes all lines from the canvas
     def removeLines(self):
@@ -444,6 +452,152 @@ class MainWindow:
         self.MAXMOVE.set(MAXMOVE)
         self.FRAMESRATE.set(FRAMESRATE)
         self.STABILITYRATE.set(STABLITYRATE)
+
+    # ZONES menu
+    ## zone window menu launcher
+    def zoneWindowLancher(self):
+        if "zones" not in self.extraWindows:
+            self.extraWindows.append("zones")
+            self.traceWin = Toplevel()
+            self.zonewindow()
+        else:
+            try:
+                self.traceWin.state()
+            except:
+                self.traceWin = Toplevel()
+                self.zonewindow()
+
+    ## set up the zone menu and actions
+    def zonewindow(self):
+
+        # action lock
+        activeAction = Lock()
+        # gui canvas
+        master = self.traceWin
+        master.title("Zone menu")
+        canvas = Canvas(master)
+        canvas.pack(fill=BOTH, expand=1)
+        frameButtons = Frame(canvas)
+        frameEntry = Frame(canvas)
+        frameRadio = Frame(canvas)
+        frameButtons2 = Frame(canvas)
+
+
+        def defineActionMenuCross():
+            defineActionMenu('cross', ['From Left', 'From Right'])
+
+        def defineActionMenuRect():
+            defineActionMenu('rect', ['From Left', 'From Right', 'Disappear Inside', 'In out'])
+
+        def defineActionMenuOval():
+            defineActionMenu('oval', ['From Left', 'From Right', 'Disappear Inside', 'In out'])
+
+        def defineActionMenuPoly():
+            defineActionMenu('poly', ['From Left', 'From Right', 'Disappear Inside', 'In out'])
+
+        def defineActionMenu(typeAction, labelDir):
+
+            drawingPoints = []
+            directionRadio = []
+            stabilityTimeVar = StringVar(self.master, value=LINEWIDTH)
+            stabilityTimeLabel = Label(frameEntry, text="Stability time ms")
+            stabilityTimeLabel.grid(row=0, sticky=E)
+            stabilityTime = Entry(frameEntry, textvariable=stabilityTimeVar)
+            stabilityTime.grid(row=0, column=1)
+            direction = StringVar()
+
+            for i in range(0, len(labelDir)):
+                directionRadio.append(Radiobutton(frameRadio, text=labelDir[i], variable=direction, value=labelDir[i]))
+                directionRadio[i].grid(row=0, column=i)
+
+            direction.set(labelDir[0])
+
+            def defineAction(event):
+                if isPointInPoly([event.x, event.y], self.realVertex):
+                    drawingPoints.append([event.x, event.y])
+                if len(drawingPoints) == 2 and typeAction != 'poly':
+                    if typeAction == 'cross':
+                        self.canvas.create_line(drawingPoints[0][0], drawingPoints[0][1],
+                                                drawingPoints[1][0], drawingPoints[1][1])
+                    elif typeAction == 'rect':
+                        self.canvas.create_rectangle(drawingPoints[0][0], drawingPoints[0][1],
+                                                     drawingPoints[1][0], drawingPoints[1][1])
+                    elif typeAction == 'oval':
+                        self.canvas.create_oval(drawingPoints[0][0], drawingPoints[0][1],
+                                                drawingPoints[1][0], drawingPoints[1][1])
+                    self.canvas.unbind("<Motion>", bindIDmove)
+                    self.canvas.unbind("<Button-2>", bindIDclick)
+                    actionEvent(drawingPoints)
+                    if self.pointerLine:
+                        self.canvas.delete(self.pointerLine)
+                    activeAction.release()
+                elif len(drawingPoints) > 1 and typeAction == 'poly':
+                    self.canvas.create_line(drawingPoints[-2][0], drawingPoints[-2][1],
+                                            drawingPoints[-1][0], drawingPoints[-1][1])
+                    if self.pointerLine:
+                        self.canvas.delete(self.pointerLine)
+
+            def traceAction(event):
+                if len(drawingPoints) >= 1:
+                    if self.pointerLine:
+                        self.canvas.delete(self.pointerLine)
+                    if typeAction == 'cross':
+                        self.pointerLine = self.canvas.create_line(drawingPoints[0][0], drawingPoints[0][1],
+                                                                   event.x, event.y, dash=(3, 5), width=1)
+                    elif typeAction == 'rect':
+                        self.pointerLine = self.canvas.create_rectangle(drawingPoints[0][0], drawingPoints[0][1],
+                                                                        event.x, event.y, dash=(3, 5), width=1)
+                    elif typeAction == 'oval':
+                        self.pointerLine = self.canvas.create_oval(drawingPoints[0][0], drawingPoints[0][1],
+                                                                   event.x, event.y, dash=(3, 5), width=1)
+                    elif typeAction == 'poly':
+                        self.pointerLine = self.canvas.create_line(drawingPoints[-1][0], drawingPoints[-1][1],
+                                                                   event.x, event.y, dash=(3, 5), width=1)
+
+            def actionEvent(line):
+                self.canvasZones.append([typeAction, line, stabilityTimeVar.get(), direction.get()])
+                stabilityTimeLabel.destroy()
+                stabilityTime.destroy()
+                for i in range(0, len(directionRadio)):
+                    directionRadio[i].destroy()
+                print(self.canvasZones)
+
+            def endPolyTerminate(event):
+                if len(drawingPoints) > 2:
+                    self.canvas.unbind("<Motion>", bindIDmove)
+                    self.canvas.unbind("<Button-2>", bindIDclick)
+                    self.master.unbind("<c>", bindClosure)
+                    self.master.unbind("<space>", bindClosureOpen)
+                    actionEvent(drawingPoints)
+                    if self.pointerLine:
+                        self.canvas.delete(self.pointerLine)
+                    activeAction.release()
+
+            def endPolyClose(event):
+                drawingPoints.append(drawingPoints[0])
+                self.canvas.create_line(drawingPoints[-2][0], drawingPoints[-2][1],
+                                        drawingPoints[-1][0], drawingPoints[-1][1])
+                endPolyTerminate(event)
+
+            if activeAction.acquire(False):
+                bindIDclick = self.canvas.bind("<Button-2>", defineAction)
+                bindIDmove = self.canvas.bind("<Motion>", traceAction)
+                if typeAction == 'poly':
+                    bindClosure = self.master.bind('<c>', endPolyClose)
+                    bindClosureOpen = self.master.bind('<space>', endPolyTerminate)
+
+        # bind escape to terminate
+        master.bind('<Escape>', quit)
+        # gui canvas defined
+        frameButtons.pack(padx=20, pady=20)
+        frameEntry.pack(padx=20, pady=20)
+        frameRadio.pack(padx=20, pady=20)
+        frameButtons2.pack(padx=20, pady=20)
+        # action butting defined
+        Button(frameButtons, text='CROSS', command=defineActionMenuCross).grid(row=0, column=0)
+        Button(frameButtons, text='RECT', command=defineActionMenuRect).grid(row=0, column=1)
+        Button(frameButtons, text='POLY', command=defineActionMenuPoly).grid(row=0, column=2)
+        Button(frameButtons, text='OVAL', command=defineActionMenuOval).grid(row=0, column=3)
 
 
 def start():

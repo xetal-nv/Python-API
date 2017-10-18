@@ -135,7 +135,7 @@ class KinseiTuner(object):
             return self.internalCommands["error"]
 
     """ resetBackground:
-    Returns True if the tracking and fusion server has been sucesfully resetted
+    Returns True if the tracking and fusion server has been sucessfully resetted
     False otherwise
     """
 
@@ -148,7 +148,7 @@ class KinseiTuner(object):
         return False
 
     """ resetOffset:
-    Returns True if the tracking and fusion server has been sucesfully resetted
+    Returns True if the tracking and fusion server has been sucessfully resetted
     False otherwise
     """
 
