@@ -45,11 +45,30 @@ MAXMOVE = 400  # set the maximum line variation (pixels)
 FRAMESRATE = 1  # set the periodicity of reading from the device
 STABLITYRATE = 3  # set the number of captures frames needed for a position to be stable
 
-# definition of events
+# definition of events labels
 crossEvents = ['From Left', 'From Right']
-rectEvents = ['From Inside', 'From Outside', 'Disappear Inside', 'In out']
-ovalEvents = ['From Inside', 'From Outside', 'Disappear Inside', 'In out']
-polyEvents = ['From Inside', 'From Outside', 'Disappear Inside', 'Crossing', 'In out']
+rectEvents = ['Is Inside', 'Is Outside', 'Disappear Inside', 'Entering', 'Exiting']
+ovalEvents = ['Is Inside', 'Is Outside', 'Disappear Inside', 'Entering', 'Exiting']
+polyEvents = ['Is Inside', 'Is Outside', 'Disappear Inside', 'Entering', 'Exiting', 'Crossing']
+
+# definition of basic event flags
+# format of flags is 1 checked, 0 not checked. Order of flags is
+# [n0t used, is left, is right, is inside, is outside, disappeared, entering, exiting]
+
+fromLeft = 0xb01000000
+fromRight = 0xb00100000
+isInside = 0xb00010000
+isOutside = 0xb00001000
+disappearing = 0xb00000100
+entering = 0xb00000010
+exiting = 0xb00000001
+
+# definition of event flags per type of zones
+
+crossEventsFlags = [fromLeft, fromRight]
+rectEventsFlags = [isInside, isOutside, isInside & disappearing, entering, exiting]
+ovalEventsFlags = [isInside, isOutside, isInside & disappearing, entering, exiting]
+polyEventsFlags = [isInside, isOutside, isInside & disappearing, entering, exiting, entering & exiting]
 
 
 # this is the main windows whosing tracking, zones, events and control buttons
