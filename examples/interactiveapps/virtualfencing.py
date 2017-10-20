@@ -116,7 +116,6 @@ class MainWindow:
         return self.connected
 
     # the KinseiClient class provides coordinates in mm and absolute
-    # here we scale to cm and made them relative to our 800x800 canvas
     def adjustedCoordinates(self, coordinates):
 
         coordX = int((coordinates[0] / 10) * ((self.screenX * 10) / self.spaceEnvelop[0])) + self.offset[0]
@@ -216,7 +215,7 @@ class MainWindow:
         self.scaleTracingLines()
         self.lock.release()
 
-    # scale tracing lines is present HERE
+    # scale tracing lines
     def scaleTracingLines(self):
 
         def drawVector(currentVector, previousVector):
@@ -634,10 +633,20 @@ class MainWindow:
                         self.canvasItems = zone[2]
                         self.pointerLine = self.canvas.create_oval(event.x - nearbyDistance, event.y - nearbyDistance,
                                                                    event.x + nearbyDistance, event.y + nearbyDistance,
-                                                                   fill="blue", outline="#DDD", width=1)
+                                                                   fill="red", outline="red", width=1)
+                        for item in self.canvasItems:
+                            try:
+                                self.canvas.itemconfig(item, outline="red")
+                            except:
+                                self.canvas.itemconfig(item, fill="red")
                         break
                     else:
                         self.canvas.delete(self.pointerLine)
+                        for item in self.canvasItems:
+                            try:
+                                self.canvas.itemconfig(item, outline="black")
+                            except:
+                                self.canvas.itemconfig(item, fill="black")
                         self.canvasItems = []
 
             def deleteZone(event):
