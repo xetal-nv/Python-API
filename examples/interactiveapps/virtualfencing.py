@@ -45,6 +45,12 @@ MAXMOVE = 400  # set the maximum line variation (pixels)
 FRAMESRATE = 1  # set the periodicity of reading from the device
 STABLITYRATE = 3  # set the number of captures frames needed for a position to be stable
 
+# definition of events
+crossEvents = ['From Left', 'From Right']
+rectEvents = ['From Inside', 'From Outside', 'Disappear Inside', 'In out']
+ovalEvents = ['From Inside', 'From Outside', 'Disappear Inside', 'In out']
+polyEvents = ['From Inside', 'From Outside', 'Disappear Inside', 'Crossing', 'In out']
+
 
 # this is the main windows whosing tracking, zones, events and control buttons
 class MainWindow:
@@ -488,16 +494,16 @@ class MainWindow:
         frameData = Frame(canvas)
 
         def defineActionMenuCross():
-            defineActionMenu('cross', ['From Left', 'From Right'])
+            defineActionMenu('cross', crossEvents)
 
         def defineActionMenuRect():
-            defineActionMenu('rect', ['From Inside', 'From Outside', 'Disappear Inside', 'In out'])
+            defineActionMenu('rect', rectEvents)
 
         def defineActionMenuOval():
-            defineActionMenu('oval', ['From Inside', 'From Outside', 'Disappear Inside', 'In out'])
+            defineActionMenu('oval', ovalEvents)
 
         def defineActionMenuPoly():
-            defineActionMenu('poly', ['From Inside', 'From Outside', 'Disappear Inside', 'Crossing', 'In out'])
+            defineActionMenu('poly',polyEvents)
 
         def defineActionMenu(typeAction, labelDir):
 
