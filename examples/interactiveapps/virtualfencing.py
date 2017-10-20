@@ -105,6 +105,7 @@ class MainWindow:
         self.pointerLine = None
         self.canvasItems = []
 
+
         # EVENT monitor
         self.monitor = None
 
@@ -121,11 +122,19 @@ class MainWindow:
     def isConnected(self):
         return self.connected
 
-    # the KinseiClient class provides coordinates in mm and absolute
+    # adjusts the coordinates in mm to screen values
     def adjustedCoordinates(self, coordinates):
 
         coordX = int((coordinates[0] / 10) * ((self.screenX * 10) / self.spaceEnvelop[0])) + self.offset[0]
         coordY = int((coordinates[1] / 10) * ((self.screenY * 10) / self.spaceEnvelop[1])) + self.offset[1]
+        return [coordX, coordY]
+
+
+    # extracts the coordinates in mm from screen values
+    def extractCoordinates(self, coordinates):
+
+        coordX = (coordinates[0] - self.offset[0]) * (self.spaceEnvelop[0] / (self.screenX * 10)) * 10
+        coordY = (coordinates[1] - self.offset[1]) * (self.spaceEnvelop[1] / (self.screenY * 10)) * 10
         return [coordX, coordY]
 
     # adjust the canvas dynamically depending on the windows soze
@@ -219,6 +228,7 @@ class MainWindow:
         self.drawLabels()
         self.drawPersons()
         self.scaleTracingLines()
+        self.scaleZoneDrawing()
         self.lock.release()
 
     # scale tracing lines
@@ -310,8 +320,6 @@ class MainWindow:
                                                      dash=(5, 5), outline="red", width='2')
         if self.geometry:
             self.canvas.delete(self.geometry)
-        # testData = [[0, 0], [0, 4000], [4000, 4000], [4000, 0]]
-        # self.realVertex = list(map(self.adjustedCoordinates, testData))
         if self.run['text'] == "RUNNING":
             self.realVertex = list(map(self.adjustedCoordinates, self.demoKit.getRoomCorners()))
         else:
@@ -363,7 +371,7 @@ class MainWindow:
         self.tracing.pack(side='left')
         self.zones = Button(frame, text="ZONES", command=self.zoneWindowLancher)
         self.zones.pack(side='left')
-        self.monitor = Button(frame, text="MONITOR")
+        self.monitor = Button(frame, text="MONITOR", command=self.monitorWindowLancher)
         self.monitor.pack(side='left')
 
     # RUNNING menu
@@ -481,8 +489,6 @@ class MainWindow:
     ## set up the zone menu and actions
     def zonewindow(self):
 
-        # action lock
-        activeAction = Lock()
         # gui canvas
         master = self.traceWin
         master.title("Zone menu")
@@ -509,6 +515,7 @@ class MainWindow:
 
             drawingPoints = []
             directionRadio = []
+            activeAction = Lock()
             actionLabel.config(text=typeAction)
             stabilityTimeVar = StringVar(self.master, value=LINEWIDTH)
             stabilityTimeLabel = Label(frameEntry, text="Stability time ms")
@@ -524,33 +531,34 @@ class MainWindow:
             direction.set(labelDir[0])
 
             def defineAction(event):
-                if isPointInPoly([event.x, event.y], self.realVertex):
-                    drawingPoints.append([event.x, event.y])
-                if len(drawingPoints) == 2 and typeAction != 'poly':
-                    if typeAction == 'cross':
-                        self.canvasItems.append(self.canvas.create_line(drawingPoints[0][0], drawingPoints[0][1],
-                                                                   drawingPoints[1][0], drawingPoints[1][1],
-                                                                   dash=(3, 5), width=1))
-                    elif typeAction == 'rect':
-                        self.canvasItems.append(self.canvas.create_rectangle(drawingPoints[0][0], drawingPoints[0][1],
-                                                                        drawingPoints[1][0], drawingPoints[1][1],
+                if not self.lock.locked():
+                    if isPointInPoly([event.x, event.y], self.realVertex):
+                        drawingPoints.append([event.x, event.y])
+                    if len(drawingPoints) == 2 and typeAction != 'poly':
+                        if typeAction == 'cross':
+                            self.canvasItems.append(self.canvas.create_line(drawingPoints[0][0], drawingPoints[0][1],
+                                                                       drawingPoints[1][0], drawingPoints[1][1],
+                                                                       dash=(3, 5), width=1))
+                        elif typeAction == 'rect':
+                            self.canvasItems.append(self.canvas.create_rectangle(drawingPoints[0][0], drawingPoints[0][1],
+                                                                            drawingPoints[1][0], drawingPoints[1][1],
+                                                                            dash=(3, 5), width=1))
+                        elif typeAction == 'oval':
+                            self.canvasItems.append(self.canvas.create_oval(drawingPoints[0][0], drawingPoints[0][1],
+                                                                       drawingPoints[1][0], drawingPoints[1][1],
+                                                                       dash=(3, 5), width=1))
+                        self.canvas.unbind("<Motion>", bindIDmove)
+                        self.canvas.unbind("<Button-2>", bindIDclick)
+                        actionEvent(drawingPoints)
+                        if self.pointerLine:
+                            self.canvas.delete(self.pointerLine)
+                        activeAction.release()
+                    elif len(drawingPoints) > 1 and typeAction == 'poly':
+                        self.canvasItems.append(self.canvas.create_line(drawingPoints[-2][0], drawingPoints[-2][1],
+                                                                        drawingPoints[-1][0], drawingPoints[-1][1],
                                                                         dash=(3, 5), width=1))
-                    elif typeAction == 'oval':
-                        self.canvasItems.append(self.canvas.create_oval(drawingPoints[0][0], drawingPoints[0][1],
-                                                                   drawingPoints[1][0], drawingPoints[1][1],
-                                                                   dash=(3, 5), width=1))
-                    self.canvas.unbind("<Motion>", bindIDmove)
-                    self.canvas.unbind("<Button-2>", bindIDclick)
-                    actionEvent(drawingPoints)
-                    if self.pointerLine:
-                        self.canvas.delete(self.pointerLine)
-                    activeAction.release()
-                elif len(drawingPoints) > 1 and typeAction == 'poly':
-                    self.canvasItems.append(self.canvas.create_line(drawingPoints[-2][0], drawingPoints[-2][1],
-                                                                    drawingPoints[-1][0], drawingPoints[-1][1],
-                                                                    dash=(3, 5), width=1))
-                    if self.pointerLine:
-                        self.canvas.delete(self.pointerLine)
+                        if self.pointerLine:
+                            self.canvas.delete(self.pointerLine)
 
             def traceAction(event):
                 cmDistance = 0
@@ -582,7 +590,10 @@ class MainWindow:
                 mouseLabel.config(text=str(mouseDistance))
 
             def actionEvent(line):
-                self.canvasZones.append([typeAction, line, self.canvasItems, stabilityTimeVar.get(), direction.get()])
+                absCoords = []
+                for coordinates in line:
+                    absCoords.append(self.extractCoordinates(coordinates))
+                self.canvasZones.append([typeAction, line, self.canvasItems, absCoords, stabilityTimeVar.get(), direction.get()])
                 self.canvasItems = []
                 stabilityTimeLabel.destroy()
                 stabilityTime.destroy()
@@ -698,6 +709,42 @@ class MainWindow:
         distanceLabel = Label(frameData, text="inactive")
         distanceLabel.grid(row=0, column=2)
 
+    ## scale the zones and the temporary mouse pointer HERE
+    ## it needs to have the true coordinates also!!!
+
+    def scaleZoneDrawing(self):
+        for i in range(0,len(self.canvasZones)):
+            scaledCoord = []
+            for coord in self.canvasZones[i][3]:
+                scaledCoord.append(self.adjustedCoordinates(coord))
+            if self.canvasZones[i][0] == 'cross':
+                self.canvas.delete(self.canvasZones[i][2])
+                self.canvasZones[i][2] = self.canvas.create_line(scaledCoord[0][0], scaledCoord[0][1],
+                                                                 scaledCoord[1][0], scaledCoord[1][1],
+                                                                 dash=(3, 5), width=1)
+            elif self.canvasZones[i][0] == 'rect':
+                self.canvas.delete(self.canvasZones[i][2])
+                self.canvasZones[i][2] = self.canvas.create_rectangle(scaledCoord[0][0], scaledCoord[0][1],
+                                                                 scaledCoord[1][0], scaledCoord[1][1],
+                                                                 dash=(3, 5), width=1)
+            elif self.canvasZones[i][0] == 'oval':
+                self.canvas.delete(self.canvasZones[i][2])
+                self.canvasZones[i][2] = self.canvas.create_oval(scaledCoord[0][0], scaledCoord[0][1],
+                                                                 scaledCoord[1][0], scaledCoord[1][1],
+                                                                 dash=(3, 5), width=1)
+            elif self.canvasZones[i][0] == 'poly':
+                for item in self.canvasZones[i][2]:
+                    self.canvas.delete(item)
+                self.canvasZones[i][2] = []
+                for j in range(1,len(scaledCoord)):
+                    self.canvasZones[i][2].append(self.canvas.create_line(scaledCoord[j-1][0], scaledCoord[j-1][1],
+                                                                     scaledCoord[j][0], scaledCoord[j][1],
+                                                                     dash=(3, 5), width=1))
+    # MONITOR menu
+
+    ## launcher HERE
+    def monitorWindowLancher(self):
+        pass
 
 def start():
     root = Tk()
