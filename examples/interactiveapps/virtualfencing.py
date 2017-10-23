@@ -123,10 +123,11 @@ class MainWindow:
         self.canvasZones = []
         self.pointerLine = None
         self.canvasItems = []
-
+        self.activeAction = Lock()
 
         # EVENT monitor
         self.monitor = None
+        self.monitorActive = Lock()
 
     def connect(self, ip):
         try:
@@ -147,7 +148,6 @@ class MainWindow:
         coordX = int((coordinates[0] / 10) * ((self.screenX * 10) / self.spaceEnvelop[0])) + self.offset[0]
         coordY = int((coordinates[1] / 10) * ((self.screenY * 10) / self.spaceEnvelop[1])) + self.offset[1]
         return [coordX, coordY]
-
 
     # extracts the coordinates in mm from screen values
     def extractCoordinates(self, coordinates):
@@ -390,7 +390,7 @@ class MainWindow:
         self.tracing.pack(side='left')
         self.zones = Button(frame, text="ZONES", command=self.zoneWindowLancher)
         self.zones.pack(side='left')
-        self.monitor = Button(frame, text="MONITOR", command=self.monitorWindowLancher)
+        self.monitor = Button(frame, text="MONITOR OFF", command=self.monitorWindowLancher)
         self.monitor.pack(side='left')
 
     # RUNNING menu
@@ -534,7 +534,6 @@ class MainWindow:
 
             drawingPoints = []
             directionRadio = []
-            activeAction = Lock()
             actionLabel.config(text=typeAction)
             stabilityTimeVar = StringVar(self.master, value=LINEWIDTH)
             stabilityTimeLabel = Label(frameEntry, text="Stability time ms")
@@ -571,7 +570,7 @@ class MainWindow:
                         actionEvent(drawingPoints)
                         if self.pointerLine:
                             self.canvas.delete(self.pointerLine)
-                        activeAction.release()
+                        self.activeAction.release()
                     elif len(drawingPoints) > 1 and typeAction == 'poly':
                         self.canvasItems.append(self.canvas.create_line(drawingPoints[-2][0], drawingPoints[-2][1],
                                                                         drawingPoints[-1][0], drawingPoints[-1][1],
@@ -631,7 +630,7 @@ class MainWindow:
                     actionEvent(drawingPoints)
                     if self.pointerLine:
                         self.canvas.delete(self.pointerLine)
-                    activeAction.release()
+                    self.activeAction.release()
 
             def endPolyClose(event):
                 drawingPoints.append(drawingPoints[0])
@@ -639,7 +638,7 @@ class MainWindow:
                                         drawingPoints[-1][0], drawingPoints[-1][1], dash=(3, 5), width=1))
                 endPolyTerminate(event)
 
-            if activeAction.acquire(False):
+            if self.activeAction.acquire(False):
                 bindIDclick = self.canvas.bind("<Button-2>", defineAction)
                 bindIDmove = self.canvas.bind("<Motion>", traceAction)
                 if typeAction == 'poly':
@@ -696,9 +695,9 @@ class MainWindow:
                 self.canvas.unbind("<Motion>", bindIDmove)
                 self.canvas.unbind("<Button-2>", bindIDclick)
                 actionLabel.config(text='inactive')
-                activeAction.release()
+                self.activeAction.release()
 
-            if activeAction.acquire(False):
+            if self.activeAction.acquire(False):
                 bindIDclick = self.canvas.bind("<Button-2>", deleteZone)
                 bindIDmove = self.canvas.bind("<Motion>", zoneFound)
                 actionLabel.config(text='delete')
@@ -759,11 +758,25 @@ class MainWindow:
                     self.canvasZones[i][2].append(self.canvas.create_line(scaledCoord[j-1][0], scaledCoord[j-1][1],
                                                                      scaledCoord[j][0], scaledCoord[j][1],
                                                                      dash=(3, 5), width=1))
+
     # MONITOR menu
 
     ## launcher HERE
     def monitorWindowLancher(self):
-        pass
+        # will need to use the event flag and the stability time to determe if all flags are met
+        # this needs a call on the tracking since it needs to be executed every frame
+        # actually this is best done like the running/pause with a lock that enables the monitor or not
+
+        if self.monitorActive.acquire(False):
+            if self.demoKit.serverConnected:
+                if self.monitor['text'] == "MONITOR OFF":
+                    self.monitor['text'] = "MONITOR ON"
+                    # start monitoring
+                else:
+                    self.monitor['text'] = "MONITOR OFF"
+                    # stop monitoring
+            else:
+                self.monitor['text'] = "MONITOR OFF"
 
 def start():
     root = Tk()
