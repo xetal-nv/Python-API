@@ -119,3 +119,5 @@ def distanceFromRect(rect,point):
 
     rect2poly = [rect[0], [rect[1][0],rect[0][1]], rect[1], [rect[0][0],rect[1][1]], rect[0]]
     return distanceFromPoly(rect2poly, point)
+
+

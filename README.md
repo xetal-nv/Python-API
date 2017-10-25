@@ -8,6 +8,8 @@ NOTE => PLEASE INSTALL ALL DEPENDENCIES WITH PIP INSTALL -R REQUIREMENTS.TXT
 
 NOTE => PLEASE NOTE THAT TRUNK DEVELOPMENT MIGHT CONTAIN ADDITIONAL BUGS OR UNFINISHED CODE
 
+NOTE => TRUNK DEVELOPMENT IS ON APPLICATION VIRTUALFENCING.PY, WHICH IS NEITHER BUG FREE NOR COMPLETED
+
 
 ## Introduction
 This module provides the Python3 libraries/API for the standard use of a Kinsei system, examples illustrating their usage and applications that can be used either to optimize the device or as examples for more complex application requiring open/closed loop control.
@@ -77,6 +79,8 @@ drawByMoving.py: example of detecting a position to draw lines. It is the basic 
 entry and exit zones by moving around as well as it has a fun factor to it. Some parameters can be modified via GUI
 in order to alter the behavior: line thickness, maximum line length, sensor frame rate and number of frames for a 
 position to be considered stable if it moved in a given radius
+
+virtualfencing.py: (in development) it allows to define and monitor events using a combination of back and front end elements. It also incliudes the tracking and draw by movement examples, and it supports resizing of the application window.
 
 ## Known issues
 All scripts have a GUI which is not optimal for 4K laptops due to their high DPI count.
