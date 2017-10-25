@@ -2,6 +2,8 @@
 
 """virtualfencing.py: allows to track people, define interest zones, events and monitor them """
 
+""" placeholder for final version which is in debug"""
+
 from tkinter import *
 from math import *
 import os
@@ -62,6 +64,7 @@ isOutside = 0xb00001000
 disappearing = 0xb00000100
 entering = 0xb00000010
 exiting = 0xb00000001
+empty = 0xb00000000
 
 # definition of event flags per type of zones
 
@@ -128,6 +131,7 @@ class MainWindow:
         # EVENT monitor
         self.monitor = None
         self.monitorActive = Lock()
+        self.eventStatus = []
 
     def connect(self, ip):
         try:
@@ -365,7 +369,7 @@ class MainWindow:
         labelCounter = "Number of people: [{0}, {1}]".format("{0:.2f}".format(personFloat), str(personFix))
         self.canvas.itemconfig(self.counterLabel, text=labelCounter)
 
-    # track persons and draw on canvas
+    # track persons and draw on canvas HERE
     def trackPersons(self):
         if not self.lock.locked():
             if self.run['text'] == "RUNNING":
@@ -377,6 +381,11 @@ class MainWindow:
                 self.canvas.itemconfig(self.counterLabel, text=labelCounter)
                 self.drawPersons()
                 self.drawTracingLines()
+                if self.monitorActive.locked():
+                    self.monitorForEvents()
+                else:
+                    # TODO: does it need to clean up?
+                    pass
 
         self.canvas.after(10, self.trackPersons)  # delay must be larger than 0
 
@@ -390,7 +399,7 @@ class MainWindow:
         self.tracing.pack(side='left')
         self.zones = Button(frame, text="ZONES", command=self.zoneWindowLancher)
         self.zones.pack(side='left')
-        self.monitor = Button(frame, text="MONITOR OFF", command=self.monitorWindowLancher)
+        self.monitor = Button(frame, text="MONITOR OFF", command=self.monitorWindowToggle)
         self.monitor.pack(side='left')
 
     # RUNNING menu
@@ -528,7 +537,7 @@ class MainWindow:
             defineActionMenu('oval', ovalEvents)
 
         def defineActionMenuPoly():
-            defineActionMenu('poly',polyEvents)
+            defineActionMenu('poly', polyEvents)
 
         def defineActionMenu(typeAction, labelDir):
 
@@ -555,16 +564,17 @@ class MainWindow:
                     if len(drawingPoints) == 2 and typeAction != 'poly':
                         if typeAction == 'cross':
                             self.canvasItems.append(self.canvas.create_line(drawingPoints[0][0], drawingPoints[0][1],
-                                                                       drawingPoints[1][0], drawingPoints[1][1],
-                                                                       dash=(3, 5), width=1))
-                        elif typeAction == 'rect':
-                            self.canvasItems.append(self.canvas.create_rectangle(drawingPoints[0][0], drawingPoints[0][1],
                                                                             drawingPoints[1][0], drawingPoints[1][1],
                                                                             dash=(3, 5), width=1))
+                        elif typeAction == 'rect':
+                            self.canvasItems.append(
+                                self.canvas.create_rectangle(drawingPoints[0][0], drawingPoints[0][1],
+                                                             drawingPoints[1][0], drawingPoints[1][1],
+                                                             dash=(3, 5), width=1))
                         elif typeAction == 'oval':
                             self.canvasItems.append(self.canvas.create_oval(drawingPoints[0][0], drawingPoints[0][1],
-                                                                       drawingPoints[1][0], drawingPoints[1][1],
-                                                                       dash=(3, 5), width=1))
+                                                                            drawingPoints[1][0], drawingPoints[1][1],
+                                                                            dash=(3, 5), width=1))
                         self.canvas.unbind("<Motion>", bindIDmove)
                         self.canvas.unbind("<Button-2>", bindIDclick)
                         actionEvent(drawingPoints)
@@ -611,7 +621,8 @@ class MainWindow:
                 absCoords = []
                 for coordinates in line:
                     absCoords.append(self.extractCoordinates(coordinates))
-                self.canvasZones.append([typeAction, line, self.canvasItems, absCoords, stabilityTimeVar.get(), direction.get()])
+                self.canvasZones.append(
+                    [typeAction, line, self.canvasItems, absCoords, stabilityTimeVar.get(), direction.get()])
                 self.canvasItems = []
                 stabilityTimeLabel.destroy()
                 stabilityTime.destroy()
@@ -635,7 +646,8 @@ class MainWindow:
             def endPolyClose(event):
                 drawingPoints.append(drawingPoints[0])
                 self.canvasItems.append(self.canvas.create_line(drawingPoints[-2][0], drawingPoints[-2][1],
-                                        drawingPoints[-1][0], drawingPoints[-1][1], dash=(3, 5), width=1))
+                                                                drawingPoints[-1][0], drawingPoints[-1][1], dash=(3, 5),
+                                                                width=1))
                 endPolyTerminate(event)
 
             if self.activeAction.acquire(False):
@@ -658,7 +670,7 @@ class MainWindow:
                         cornerC = [centre[0] + radiusX, centre[1]]
                         cornerD = [centre[0], centre[1] - radiusY]
                         cornerB = [centre[0], centre[1] + radiusY]
-                        distance = distanceFromPoly([cornerA,cornerB,cornerC,cornerD], [event.x, event.y])
+                        distance = distanceFromPoly([cornerA, cornerB, cornerC, cornerD], [event.x, event.y])
                     elif zone[0] == 'rect':
                         distance = distanceFromRect(zone[1], [event.x, event.y])
                     else:
@@ -731,7 +743,7 @@ class MainWindow:
     ## it needs to have the true coordinates also!!!
 
     def scaleZoneDrawing(self):
-        for i in range(0,len(self.canvasZones)):
+        for i in range(0, len(self.canvasZones)):
             scaledCoord = []
             for coord in self.canvasZones[i][3]:
                 scaledCoord.append(self.adjustedCoordinates(coord))
@@ -743,8 +755,8 @@ class MainWindow:
             elif self.canvasZones[i][0] == 'rect':
                 self.canvas.delete(self.canvasZones[i][2])
                 self.canvasZones[i][2] = self.canvas.create_rectangle(scaledCoord[0][0], scaledCoord[0][1],
-                                                                 scaledCoord[1][0], scaledCoord[1][1],
-                                                                 dash=(3, 5), width=1)
+                                                                      scaledCoord[1][0], scaledCoord[1][1],
+                                                                      dash=(3, 5), width=1)
             elif self.canvasZones[i][0] == 'oval':
                 self.canvas.delete(self.canvasZones[i][2])
                 self.canvasZones[i][2] = self.canvas.create_oval(scaledCoord[0][0], scaledCoord[0][1],
@@ -754,29 +766,64 @@ class MainWindow:
                 for item in self.canvasZones[i][2]:
                     self.canvas.delete(item)
                 self.canvasZones[i][2] = []
-                for j in range(1,len(scaledCoord)):
-                    self.canvasZones[i][2].append(self.canvas.create_line(scaledCoord[j-1][0], scaledCoord[j-1][1],
-                                                                     scaledCoord[j][0], scaledCoord[j][1],
-                                                                     dash=(3, 5), width=1))
+                for j in range(1, len(scaledCoord)):
+                    self.canvasZones[i][2].append(self.canvas.create_line(scaledCoord[j - 1][0], scaledCoord[j - 1][1],
+                                                                          scaledCoord[j][0], scaledCoord[j][1],
+                                                                          dash=(3, 5), width=1))
 
     # MONITOR menu
 
-    ## launcher HERE
-    def monitorWindowLancher(self):
-        # will need to use the event flag and the stability time to determe if all flags are met
-        # this needs a call on the tracking since it needs to be executed every frame
-        # actually this is best done like the running/pause with a lock that enables the monitor or not
+    ## toggles on/off the monitoring
+    def monitorWindowToggle(self):
 
-        if self.monitorActive.acquire(False):
+        if not self.monitorActive.locked():
             if self.demoKit.serverConnected:
-                if self.monitor['text'] == "MONITOR OFF":
-                    self.monitor['text'] = "MONITOR ON"
-                    # start monitoring
-                else:
-                    self.monitor['text'] = "MONITOR OFF"
-                    # stop monitoring
+                self.monitorActive.acquire()
+                self.monitor['text'] = "MONITOR ON"
             else:
                 self.monitor['text'] = "MONITOR OFF"
+        else:
+            self.monitorActive.release()
+            self.monitor['text'] = "MONITOR OFF"
+
+    ## execute the monitoring
+    ## HERE
+    def monitorForEvents(self):
+        ### Data used in self.canvasZones follows this format
+        ### [type , canvas coordinates, ID canvas items, absolute coordinates, number frame stability, event flags]
+        ### it tracks each person differently, so the results depends also on the tracking consistency
+
+        if len(self.canvasZones) != len(self.eventStatus):
+            self.eventStatus = []
+            for zoneDef in self.canvasZones:
+                statusEntry = [].append(zoneDef)
+                for i in range(0, len(self.positionData)):
+                    statusEntry.append(empty)
+                self.eventStatus.append(statusEntry)
+
+        for event in self.eventStatus:
+            for personPosition in self.positionData:
+                # check for new flag, then all flags, then show alarm bu changing fill of the item
+                pass
+
+    ## check what is the positional relationshio between the point and the shape
+    def pointPositionVSshape(self, point, shape, shapeType, cumulativeFlags):
+        """ temp ref to be deleted
+            fromLeft = 0xb01000000
+            fromRight = 0xb00100000
+            isInside = 0xb00010000
+            isOutside = 0xb00001000
+            disappearing = 0xb00000100
+            entering = 0xb00000010
+            exiting = 0xb00000001
+            empty = 0xb00000000
+
+            cross, rect, oval, poly
+
+        """
+        # HERE
+        pass
+
 
 def start():
     root = Tk()
