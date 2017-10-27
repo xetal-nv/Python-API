@@ -821,9 +821,13 @@ class MainWindow:
                 if i == 0: # this is just for development
                     event[i + 1] = self.pointPositionVSshape(self.positionData[i], event[0][3], event[0][0],
                                                              event[i + 1])
+                    # HERE -  stylig not working
                     if event[i + 1] == event[0][5]:
-                        # HERE
                         print("alarm")
+                        self.canvas.itemconfig(event[2], fill='red', stipple='gray50')
+                    else:
+                        self.canvas.itemconfig(event[2], fill='', stipple='')
+
 
     ## check what is the positional relationshio between the point and the shape
     @staticmethod
