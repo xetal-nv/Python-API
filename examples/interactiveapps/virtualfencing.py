@@ -2,7 +2,6 @@
 
 """virtualfencing.py: allows to track people, define interest zones, events and monitor them """
 
-""" placeholder for final version which is in debug"""
 
 from tkinter import *
 from math import *
@@ -54,19 +53,19 @@ ovalEvents = ['Is Inside', 'Is Outside', 'Disappear Inside', 'Entering', 'Exitin
 polyEvents = ['Is Inside', 'Is Outside', 'Disappear Inside', 'Entering', 'Exiting', 'Crossing']
 
 # definition of basic event flags
-# format of flags is 1 checked, 0 not checked. Order of flags is
-# [n0t used, is left, is right, is inside, is outside, disappeared, entering, exiting]
 
 fromLeft = 0xb01000000
 fromRight = 0xb00100000
+isLeft = 0xb10000000 | fromRight
+isRight = 0xb10000000 | fromLeft
 isInside = 0xb00010000
 isOutside = 0xb00001000
 disappearing = 0xb00000100
-entering = 0xb00000010
-exiting = 0xb00000001
+entering = 0xb00000010 | isInside
+exiting = 0xb00000001 | isOutside
 empty = 0xb00000000
 
-# definition of event flags per type of zones
+# definition of event flags per type of alarms
 
 crossEventsFlags = [fromLeft, fromRight]
 rectEventsFlags = [isInside, isOutside, isInside & disappearing, entering, exiting]
@@ -74,7 +73,7 @@ ovalEventsFlags = [isInside, isOutside, isInside & disappearing, entering, exiti
 polyEventsFlags = [isInside, isOutside, isInside & disappearing, entering, exiting, entering & exiting]
 
 
-# this is the main windows whosing tracking, zones, events and control buttons
+# this is the main windows whosing tracking, zones, alarms, events and control buttons
 class MainWindow:
     def __init__(self, maximumSize):
 
@@ -121,9 +120,11 @@ class MainWindow:
         self.traceLinesCoords = []  # drawn lines
         self.lineParameters = []  # store the line width and maxmove
 
-        # ZONE definition
-        self.zones = None
-        self.canvasZones = []
+        # ZONES menus
+
+        # ALARMS definition
+        self.alarms = None
+        self.canvasAlarm = []
         self.pointerLine = None
         self.canvasItems = []
         self.activeAction = Lock()
@@ -251,7 +252,7 @@ class MainWindow:
         self.drawLabels()
         self.drawPersons()
         self.scaleTracingLines()
-        self.scaleZoneDrawing()
+        self.scaleAlarmDrawing()
         self.lock.release()
 
     # scale tracing lines
@@ -397,8 +398,10 @@ class MainWindow:
         self.run.pack(side='left')
         self.tracing = Button(frame, text="TRACING", command=self.traceTrackingLauncher)
         self.tracing.pack(side='left')
-        self.zones = Button(frame, text="ZONES", command=self.zoneWindowLancher)
-        self.zones.pack(side='left')
+        self.monitor = Button(frame, text="ZONES")
+        self.monitor.pack(side='left')
+        self.alarms = Button(frame, text="ALARMS", command=self.alarmWindowLancher)
+        self.alarms.pack(side='left')
         self.monitor = Button(frame, text="MONITOR OFF", command=self.monitorWindowToggle)
         self.monitor.pack(side='left')
 
@@ -500,26 +503,26 @@ class MainWindow:
         self.FRAMESRATE.set(FRAMESRATE)
         self.STABILITYRATE.set(STABLITYRATE)
 
-    # ZONES menu
-    ## zone window menu launcher
-    def zoneWindowLancher(self):
-        if "zones" not in self.extraWindows:
-            self.extraWindows.append("zones")
+    # ALARMS menu
+    ## alarm window menu launcher
+    def alarmWindowLancher(self):
+        if "alarms" not in self.extraWindows:
+            self.extraWindows.append("alarms")
             self.traceWin = Toplevel()
-            self.zonewindow()
+            self.alarmWindow()
         else:
             try:
                 self.traceWin.state()
             except:
                 self.traceWin = Toplevel()
-                self.zonewindow()
+                self.alarmWindow()
 
-    ## set up the zone menu and actions
-    def zonewindow(self):
+    ## set up the alarm menu and actions
+    def alarmWindow(self):
 
         # gui canvas
         master = self.traceWin
-        master.title("Zone menu")
+        master.title("Alarm menu")
         canvas = Canvas(master)
         canvas.pack(fill=BOTH, expand=1)
         frameButtons = Frame(canvas)
@@ -621,7 +624,7 @@ class MainWindow:
                 absCoords = []
                 for coordinates in line:
                     absCoords.append(self.extractCoordinates(coordinates))
-                self.canvasZones.append(
+                self.canvasAlarm.append(
                     [typeAction, line, self.canvasItems, absCoords, stabilityTimeVar.get(), direction.get()])
                 self.canvasItems = []
                 stabilityTimeLabel.destroy()
@@ -657,11 +660,11 @@ class MainWindow:
                     bindClosure = self.master.bind('<c>', endPolyClose)
                     bindClosureOpen = self.master.bind('<space>', endPolyTerminate)
 
-        def deleteZone():
+        def deleteAlarm():
 
-            def zoneFound(event):
+            def alarmFound(event):
 
-                for zone in self.canvasZones:
+                for zone in self.canvasAlarm:
                     if zone[0] == 'oval':
                         centre = [(zone[1][0][0] + zone[1][1][0]) / 2, (zone[1][0][1] + zone[1][1][1]) / 2]
                         radiusX = (zone[1][0][0] - zone[1][1][0]) / 2 + 2 * nearbyDistance
@@ -696,7 +699,7 @@ class MainWindow:
                                 self.canvas.itemconfig(item, fill="black")
                         self.canvasItems = []
 
-            def deleteZone(event):
+            def deleteSpecificAlarm(event):
                 for item in self.canvasItems:
                     self.canvas.delete(item)
                 closeAction()
@@ -710,8 +713,8 @@ class MainWindow:
                 self.activeAction.release()
 
             if self.activeAction.acquire(False):
-                bindIDclick = self.canvas.bind("<Button-2>", deleteZone)
-                bindIDmove = self.canvas.bind("<Motion>", zoneFound)
+                bindIDclick = self.canvas.bind("<Button-2>", deleteSpecificAlarm)
+                bindIDmove = self.canvas.bind("<Motion>", alarmFound)
                 actionLabel.config(text='delete')
 
         # bind escape to terminate
@@ -729,7 +732,7 @@ class MainWindow:
         Button(frameButtons, text='RECT', command=defineActionMenuRect).grid(row=0, column=1)
         Button(frameButtons, text='POLY', command=defineActionMenuPoly).grid(row=0, column=2)
         Button(frameButtons, text='OVAL', command=defineActionMenuOval).grid(row=0, column=3)
-        Button(frameButtons, text='DELETE', command=deleteZone).grid(row=0, column=4)
+        Button(frameButtons, text='DELETE', command=deleteAlarm).grid(row=0, column=4)
 
         # set data on pointer
         actionLabel = Label(frameData, text="inactive")
@@ -739,35 +742,34 @@ class MainWindow:
         distanceLabel = Label(frameData, text="inactive")
         distanceLabel.grid(row=0, column=2)
 
-    ## scale the zones and the temporary mouse pointer HERE
-    ## it needs to have the true coordinates also!!!
+    ## scale the alarm and the temporary mouse pointer
 
-    def scaleZoneDrawing(self):
-        for i in range(0, len(self.canvasZones)):
+    def scaleAlarmDrawing(self):
+        for i in range(0, len(self.canvasAlarm)):
             scaledCoord = []
-            for coord in self.canvasZones[i][3]:
+            for coord in self.canvasAlarm[i][3]:
                 scaledCoord.append(self.adjustedCoordinates(coord))
-            if self.canvasZones[i][0] == 'cross':
-                self.canvas.delete(self.canvasZones[i][2])
-                self.canvasZones[i][2] = self.canvas.create_line(scaledCoord[0][0], scaledCoord[0][1],
+            if self.canvasAlarm[i][0] == 'cross':
+                self.canvas.delete(self.canvasAlarm[i][2])
+                self.canvasAlarm[i][2] = self.canvas.create_line(scaledCoord[0][0], scaledCoord[0][1],
                                                                  scaledCoord[1][0], scaledCoord[1][1],
                                                                  dash=(3, 5), width=1)
-            elif self.canvasZones[i][0] == 'rect':
-                self.canvas.delete(self.canvasZones[i][2])
-                self.canvasZones[i][2] = self.canvas.create_rectangle(scaledCoord[0][0], scaledCoord[0][1],
+            elif self.canvasAlarm[i][0] == 'rect':
+                self.canvas.delete(self.canvasAlarm[i][2])
+                self.canvasAlarm[i][2] = self.canvas.create_rectangle(scaledCoord[0][0], scaledCoord[0][1],
                                                                       scaledCoord[1][0], scaledCoord[1][1],
                                                                       dash=(3, 5), width=1)
-            elif self.canvasZones[i][0] == 'oval':
-                self.canvas.delete(self.canvasZones[i][2])
-                self.canvasZones[i][2] = self.canvas.create_oval(scaledCoord[0][0], scaledCoord[0][1],
+            elif self.canvasAlarm[i][0] == 'oval':
+                self.canvas.delete(self.canvasAlarm[i][2])
+                self.canvasAlarm[i][2] = self.canvas.create_oval(scaledCoord[0][0], scaledCoord[0][1],
                                                                  scaledCoord[1][0], scaledCoord[1][1],
                                                                  dash=(3, 5), width=1)
-            elif self.canvasZones[i][0] == 'poly':
-                for item in self.canvasZones[i][2]:
+            elif self.canvasAlarm[i][0] == 'poly':
+                for item in self.canvasAlarm[i][2]:
                     self.canvas.delete(item)
-                self.canvasZones[i][2] = []
+                self.canvasAlarm[i][2] = []
                 for j in range(1, len(scaledCoord)):
-                    self.canvasZones[i][2].append(self.canvas.create_line(scaledCoord[j - 1][0], scaledCoord[j - 1][1],
+                    self.canvasAlarm[i][2].append(self.canvas.create_line(scaledCoord[j - 1][0], scaledCoord[j - 1][1],
                                                                           scaledCoord[j][0], scaledCoord[j][1],
                                                                           dash=(3, 5), width=1))
 
@@ -789,40 +791,66 @@ class MainWindow:
     ## execute the monitoring
     ## HERE
     def monitorForEvents(self):
-        ### Data used in self.canvasZones follows this format
+        ### Data used in self.canvasAlarm follows this format
         ### [type , canvas coordinates, ID canvas items, absolute coordinates, number frame stability, event flags]
         ### it tracks each person differently, so the results depends also on the tracking consistency
 
-        if len(self.canvasZones) != len(self.eventStatus):
+        if len(self.canvasAlarm) != len(self.eventStatus):
+            ### we create the array of the zone data plus N cumulative flags, one per person
             self.eventStatus = []
-            for zoneDef in self.canvasZones:
-                statusEntry = [].append(zoneDef)
+            for zoneDef in self.canvasAlarm:
+                statusEntry = [zoneDef]
                 for i in range(0, len(self.positionData)):
                     statusEntry.append(empty)
                 self.eventStatus.append(statusEntry)
 
         for event in self.eventStatus:
-            for personPosition in self.positionData:
+            for i in range(0,len(self.positionData)):
                 # check for new flag, then all flags, then show alarm bu changing fill of the item
-                pass
+                # HERE - test only one 1 person
+                # error is that the flag is passes as TEXT, needs to be translated into the binary flag
+                if i==0:
+                    print(event[i+1], event[0][5])
+                    event[i + 1] = self.pointPositionVSshape(self.positionData[i],event[0][3], event[0][0],event[i+1])
+                    if event[i+1] == event[0][5]:
+                        print("alarm")
 
     ## check what is the positional relationshio between the point and the shape
     def pointPositionVSshape(self, point, shape, shapeType, cumulativeFlags):
-        """ temp ref to be deleted
-            fromLeft = 0xb01000000
-            fromRight = 0xb00100000
-            isInside = 0xb00010000
-            isOutside = 0xb00001000
-            disappearing = 0xb00000100
-            entering = 0xb00000010
-            exiting = 0xb00000001
-            empty = 0xb00000000
 
-            cross, rect, oval, poly
+        pointInside = False
+        sideLine = 0
 
-        """
-        # HERE
-        pass
+        if point != [0,0]:
+            isPresent = True
+            if shapeType == 'oval':
+                centre = [(shape[0][0] + shape[1][0]) / 2, (shape[0][1] + shape[1][1]) / 2]
+                radiusX = (shape[0][0] - shape[1][0]) / 2 + 2 * nearbyDistance
+                radiusY = (shape[0][1] - shape[1][1]) / 2 + 2 * nearbyDistance
+                pointInside = pointInEllipse(point,centre,radiusX,radiusY)
+            elif shapeType == 'cross':
+                sideLine = whichSideIsPoint(point, shape)
+            else:
+                if shapeType == 'rect':
+                    polygon = [shape[0], [shape[1][0], shape[0][1]], shape[1],
+                               [shape[0][0], shape[1][1]], shape[0]]
+                else:
+                    polygon = shape[0]
+                pointInside = isPointInPoly(point,polygon)
+
+            if (cumulativeFlags == empty) and not isPresent: return empty
+            if (cumulativeFlags == isInside) and (not pointInside) and isPresent: return exiting
+            if (cumulativeFlags == isOutside) and pointInside: return entering
+            if (cumulativeFlags == isInside) and (not isPresent): return disappearing
+            if (cumulativeFlags == isLeft) and (sideLine < 0): return fromLeft
+            if (cumulativeFlags == isRight) and (sideLine > 0): return fromRight
+            if pointInside: return isInside
+            if sideLine > 0: return isLeft
+            if sideLine < 0: return isRight
+            return isOutside
+
+
+
 
 
 def start():

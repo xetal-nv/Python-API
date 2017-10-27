@@ -9,7 +9,7 @@ import math
 __author__ = "Francesco Pessolano"
 __copyright__ = "Copyright 2017, Xetal nv"
 __license__ = "MIT"
-__version__ = "2.3.6"
+__version__ = "2.3.7"
 __maintainer__ = "Francesco Pessolano"
 __email__ = "francesco@xetal.eu"
 __status__ = "release"
@@ -185,13 +185,16 @@ class KinseiSocket(object):
         if data == self.kinseiCommand["error"]:
             return False
         allPositions = []
-        for i in range(data[1]):
-            currentPosition = []
-            x = [data[4 + 6 * i], data[5 + 6 * i]]
-            y = [data[6 + 6 * i], data[7 + 6 * i]]
-            currentPosition.append(self.bytes_to_int(x))
-            currentPosition.append(self.bytes_to_int(y))
-            allPositions.append(currentPosition)
+        try:
+            for i in range(data[1]):
+                currentPosition = []
+                x = [data[4 + 6 * i], data[5 + 6 * i]]
+                y = [data[6 + 6 * i], data[7 + 6 * i]]
+                currentPosition.append(self.bytes_to_int(x))
+                currentPosition.append(self.bytes_to_int(y))
+                allPositions.append(currentPosition)
+        except:
+            allPositions = []
         return allPositions
 
     """ getNumberPersonsFixed:
