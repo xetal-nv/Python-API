@@ -2,7 +2,6 @@
 
 """virtualfencing.py: allows to track people, define interest zones, events and monitor them """
 
-
 from tkinter import *
 from math import *
 import os
@@ -622,10 +621,21 @@ class MainWindow:
 
             def actionEvent(line):
                 absCoords = []
+                actionFlag = empty
                 for coordinates in line:
                     absCoords.append(self.extractCoordinates(coordinates))
+
+                if typeAction == 'cross':
+                    actionFlag = crossEventsFlags[crossEvents.index(direction.get())]
+                elif typeAction == 'rect':
+                    actionFlag = rectEventsFlags[rectEvents.index(direction.get())]
+                elif typeAction == 'oval':
+                    actionFlag = ovalEventsFlags[ovalEvents.index(direction.get())]
+                elif typeAction == 'poly':
+                    actionFlag = polyEventsFlags[polyEvents.index(direction.get())]
+
                 self.canvasAlarm.append(
-                    [typeAction, line, self.canvasItems, absCoords, stabilityTimeVar.get(), direction.get()])
+                    [typeAction, line, self.canvasItems, absCoords, stabilityTimeVar.get(), actionFlag])
                 self.canvasItems = []
                 stabilityTimeLabel.destroy()
                 stabilityTime.destroy()
@@ -805,29 +815,30 @@ class MainWindow:
                 self.eventStatus.append(statusEntry)
 
         for event in self.eventStatus:
-            for i in range(0,len(self.positionData)):
+            for i in range(0, len(self.positionData)):
                 # check for new flag, then all flags, then show alarm bu changing fill of the item
-                # HERE - test only one 1 person
-                # error is that the flag is passes as TEXT, needs to be translated into the binary flag
-                if i==0:
-                    print(event[i+1], event[0][5])
-                    event[i + 1] = self.pointPositionVSshape(self.positionData[i],event[0][3], event[0][0],event[i+1])
-                    if event[i+1] == event[0][5]:
+                # HERE - testing only one 1 person
+                if i == 0: # this is just for development
+                    event[i + 1] = self.pointPositionVSshape(self.positionData[i], event[0][3], event[0][0],
+                                                             event[i + 1])
+                    if event[i + 1] == event[0][5]:
+                        # HERE
                         print("alarm")
 
     ## check what is the positional relationshio between the point and the shape
-    def pointPositionVSshape(self, point, shape, shapeType, cumulativeFlags):
+    @staticmethod
+    def pointPositionVSshape(point, shape, shapeType, cumulativeFlags):
 
         pointInside = False
         sideLine = 0
 
-        if point != [0,0]:
+        if point != [0, 0]:
             isPresent = True
             if shapeType == 'oval':
                 centre = [(shape[0][0] + shape[1][0]) / 2, (shape[0][1] + shape[1][1]) / 2]
                 radiusX = (shape[0][0] - shape[1][0]) / 2 + 2 * nearbyDistance
                 radiusY = (shape[0][1] - shape[1][1]) / 2 + 2 * nearbyDistance
-                pointInside = pointInEllipse(point,centre,radiusX,radiusY)
+                pointInside = pointInEllipse(point, centre, radiusX, radiusY)
             elif shapeType == 'cross':
                 sideLine = whichSideIsPoint(point, shape)
             else:
@@ -836,7 +847,7 @@ class MainWindow:
                                [shape[0][0], shape[1][1]], shape[0]]
                 else:
                     polygon = shape[0]
-                pointInside = isPointInPoly(point,polygon)
+                pointInside = isPointInPoly(point, polygon)
 
             if (cumulativeFlags == empty) and not isPresent: return empty
             if (cumulativeFlags == isInside) and (not pointInside) and isPresent: return exiting
@@ -848,9 +859,6 @@ class MainWindow:
             if sideLine > 0: return isLeft
             if sideLine < 0: return isRight
             return isOutside
-
-
-
 
 
 def start():
