@@ -804,29 +804,31 @@ class MainWindow:
         ### Data used in self.canvasAlarm follows this format
         ### [type , canvas coordinates, ID canvas items, absolute coordinates, number frame stability, event flags]
         ### it tracks each person differently, so the results depends also on the tracking consistency
+        try:
+            if len(self.canvasAlarm) != len(self.eventStatus):
+                ### we create the array of the zone data plus N cumulative flags, one per person
+                self.eventStatus = []
+                for zoneDef in self.canvasAlarm:
+                    statusEntry = [zoneDef]
+                    for i in range(0, len(self.positionData)):
+                        statusEntry.append(empty)
+                    self.eventStatus.append(statusEntry)
 
-        if len(self.canvasAlarm) != len(self.eventStatus):
-            ### we create the array of the zone data plus N cumulative flags, one per person
-            self.eventStatus = []
-            for zoneDef in self.canvasAlarm:
-                statusEntry = [zoneDef]
+            for event in self.eventStatus:
                 for i in range(0, len(self.positionData)):
-                    statusEntry.append(empty)
-                self.eventStatus.append(statusEntry)
-
-        for event in self.eventStatus:
-            for i in range(0, len(self.positionData)):
-                # check for new flag, then all flags, then show alarm bu changing fill of the item
-                # HERE - testing only one 1 person
-                if i == 0: # this is just for development
-                    event[i + 1] = self.pointPositionVSshape(self.positionData[i], event[0][3], event[0][0],
-                                                             event[i + 1])
-                    # HERE -  stylig not working
-                    if event[i + 1] == event[0][5]:
-                        print("alarm")
-                        self.canvas.itemconfig(event[2], fill='red', stipple='gray50')
-                    else:
-                        self.canvas.itemconfig(event[2], fill='', stipple='')
+                    # check for new flag, then all flags, then show alarm bu changing fill of the item
+                    # HERE - testing only one 1 person
+                    if i == 0: # this is just for development
+                        event[i + 1] = self.pointPositionVSshape(self.positionData[i], event[0][3], event[0][0],
+                                                                 event[i + 1])
+                        # HERE -  stylig not working
+                        if event[i + 1] == event[0][5]:
+                            self.canvas.itemconfig(event[0][2], fill='red', stipple='gray50')
+                        else:
+                            self.canvas.itemconfig(event[0][2], fill='white')
+        except:
+            # captures possible corrupted data form the device and skips it
+            pass
 
 
     ## check what is the positional relationshio between the point and the shape
