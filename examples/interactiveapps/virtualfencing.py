@@ -45,6 +45,9 @@ MAXMOVE = 400  # set the maximum line variation (pixels)
 FRAMESRATE = 1  # set the periodicity of reading from the device
 STABLITYRATE = 3  # set the number of captures frames needed for a position to be stable
 
+# alarm presets
+PERSISTANCE = 3 # number of frames
+
 # definition of events labels
 crossEvents = ['From Left', 'From Right']
 rectEvents = ['Is Inside', 'Is Outside', 'Disappear Inside', 'Entering', 'Exiting']
@@ -672,6 +675,8 @@ class MainWindow:
 
         def deleteAlarm():
 
+            ## BUG deleted zone appear when scaling up/doens the window !!!
+
             def alarmFound(event):
 
                 for zone in self.canvasAlarm:
@@ -818,6 +823,7 @@ class MainWindow:
                 for i in range(0, len(self.positionData)):
                     # check for new flag, then all flags, then show alarm bu changing fill of the item
                     # HERE - testing only one 1 person
+                    # needs to add persistance and stability check
                     if i == 0: # this is just for development
                         event[i + 1] = self.pointPositionVSshape(self.positionData[i], event[0][3], event[0][0],
                                                                  event[i + 1])
