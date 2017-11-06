@@ -7,6 +7,8 @@
 import socket
 import struct
 from tkinter import *
+import sys
+
 
 import matplotlib.animation as animation
 import matplotlib.pyplot as plt

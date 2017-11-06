@@ -26,10 +26,10 @@ tuneFolder = 'tuners'
 availableApps = {
     # starts the device tuner
     "Runtime Tuner": lambda: subprocess.Popen(
-        ["python", os.path.join(absolutePath, tuneFolder, 'tuner.py')]),
+        ["python3", os.path.join(absolutePath, tuneFolder, 'tuner.py')]),
     # starts the device configurator
     "Configurator": lambda: subprocess.Popen(
-        ["python", os.path.join(absolutePath, tuneFolder, 'configurator.py')]),
+        ["python3", os.path.join(absolutePath, tuneFolder, 'configurator.py')]),
 }
 
 

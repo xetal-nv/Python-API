@@ -8,6 +8,8 @@ from tkinter.scrolledtext import *
 from tkinter import filedialog
 from tkinter import messagebox
 import os
+import sys
+
 
 absolutePath = os.path.abspath(__file__)
 processRoot = os.path.dirname(absolutePath)

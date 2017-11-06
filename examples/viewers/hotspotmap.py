@@ -9,6 +9,8 @@ import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 from tkinter import *
 import os
+import sys
+
 
 absolutePath = os.path.abspath(__file__)
 processRoot = os.path.dirname(absolutePath)

@@ -4,7 +4,6 @@
 
 import collections
 import subprocess
-import sys
 import tkinter as tk
 import os
 
@@ -28,22 +27,22 @@ interactiveappsFolder = 'interactiveapps'
 availableDemos = {
     # shows an example of graphical viewer for tracking
     "Tracking viewer": lambda: subprocess.Popen(
-        ["python", os.path.join(absolutePath, viewersFolder, 'trackingViewer.py')]),
+        ["python3", os.path.join(absolutePath, viewersFolder, 'trackingViewer.py')]),
     # shows an example of graphical viewer for tracking and raw data (fusion)
     "Tracking & fusion viewer": lambda: subprocess.Popen(
-        ["python", os.path.join(absolutePath, viewersFolder, 'trackingFusionViewer.py')]),
+        ["python3", os.path.join(absolutePath, viewersFolder, 'trackingFusionViewer.py')]),
     # shows an example of http server reporting number of people
     "Presence http server ": lambda: subprocess.Popen(
-        ["python", os.path.join(absolutePath, serverFolder, 'presencehttp.py')]),
+        ["python3", os.path.join(absolutePath, serverFolder, 'presencehttp.py')]),
     # shows a thermal map based on the settings in the source files
     "Thermal map": lambda: subprocess.Popen(
-        ["python", os.path.join(absolutePath, viewersFolder, 'thermalmap.py')]),
+        ["python3", os.path.join(absolutePath, viewersFolder, 'thermalmap.py')]),
     # shows a an hot spot map based on people position
     "Hotspot map": lambda: subprocess.Popen(
-        ["python", os.path.join(absolutePath, viewersFolder, 'hotspotmap.py')]),
+        ["python3", os.path.join(absolutePath, viewersFolder, 'hotspotmap.py')]),
     # shows a an example of drawing by moving
     "Draw by moving": lambda: subprocess.Popen(
-        ["python", os.path.join(absolutePath, interactiveappsFolder, 'drawByMoving.py')]),
+        ["python3", os.path.join(absolutePath, interactiveappsFolder, 'drawByMoving.py')]),
 }
 
 
