@@ -7,6 +7,8 @@ from math import *
 import os
 from threading import Lock
 import sys
+from tkinter import filedialog
+from tkinter import messagebox
 
 
 absolutePath = os.path.abspath(__file__)
@@ -224,6 +226,9 @@ class MainWindow:
             self.master = Tk()
             self.master.title("Virtual Fencing Demo: " + self.ip)
 
+            # cerate menus
+            self.create_menu()
+
             # create the function buttons
             self.create_buttons()
 
@@ -394,6 +399,88 @@ class MainWindow:
                     pass
 
         self.canvas.after(10, self.trackPersons)  # delay must be larger than 0
+
+    # define the menu and associated elements
+    def create_menu(self):
+        menubar = Menu(self.master)
+        filemenu = Menu(menubar, tearoff=0)
+        filemenu.add_command(label="Load Alarms", command=self.loadAlarms)
+        filemenu.add_command(label="Save Alarms", command=self.saveAlarms)
+        filemenu.add_separator()
+        filemenu.add_command(label="Exit", command=self.master.quit)
+        menubar.add_cascade(label="File", menu=filemenu)
+        self.master.config(menu=menubar)
+
+    def saveAlarms(self):
+        self.master.filename = filedialog.asksaveasfilename(initialdir="./", title="Select file",
+                                                            filetypes=(("alarm files", "*.alm"), ("all files", "*.*")))
+        with (open(self.master.filename, 'w')) as saveFile:
+            for event in self.canvasAlarm:
+                saveFile.write(event[0] + ";")
+                for coords in event[1]:
+                    saveFile.write(" ")
+                    saveFile.write(str(coords[0]) + " ")
+                    saveFile.write(str(coords[1]))
+                saveFile.write(";")
+                try:
+                    for el in event[2]:
+                        saveFile.write(" ")
+                        saveFile.write(str(el))
+                except:
+                    saveFile.write(" ")
+                    saveFile.write(str(event[2]))
+                saveFile.write(";")
+                for coords in event[3]:
+                    saveFile.write(" ")
+                    saveFile.write(str(coords[0]) + " ")
+                    saveFile.write(str(coords[1]))
+                saveFile.write("; ")
+                saveFile.write(event[4] + "; ")
+                saveFile.write(str(event[5]) + "; ")
+                saveFile.write(event[6] + ";")
+                saveFile.write("\n")
+
+    def loadAlarms(self):
+        self.master.filename = filedialog.askopenfilename(initialdir="./", title="Select file",
+                                                          filetypes=(("alarm files", "*.alm"), ("all files", "*")))
+        # try:
+        if self.master.filename:
+            for alarm in self.canvasAlarm:
+                self.canvas.delete(alarm[2])
+            self.canvasAlarm= []
+            with (open(self.master.filename, 'r')) as loadFile:
+                for line in loadFile:
+                    linedata = line.split(';')[0:-1]
+                    print(linedata)
+                    alarm = [linedata[0]]
+                    coord = list(map(int, linedata[1].strip().split(' ')))
+                    coordList = []
+                    for i in range(0,len(coord)//2):
+                        point = [coord[2*i],coord[1+2*i]]
+                        coordList.append(point)
+                    alarm.append(coordList)
+                    elements = list(map(int, linedata[2].strip().split(' ')))
+                    if len(elements) == 1:
+                        alarm.append(elements[0])
+                    else:
+                        alarm.append(elements)
+                    coord = list(map(float, linedata[3].strip().split(' ')))
+                    coordList = []
+                    for i in range(0, len(coord) // 2):
+                        point = [coord[2 * i], coord[1 + 2 * i]]
+                        coordList.append(point)
+                    alarm.append(coordList)
+                    alarm.append(int(linedata[4].strip()))
+                    alarm.append(int(linedata[4].strip()))
+                    alarm.append(linedata[4].strip())
+                    self.canvasAlarm.append(alarm)
+                    print(alarm)
+                    ## alarm monitoring not working!!!
+
+            self.scaleAlarmDrawing()
+        # except:
+        #     messagebox.showerror("Answer", "Invalid file")
+
 
     # create all buttons on main window
     def create_buttons(self):
@@ -822,8 +909,6 @@ class MainWindow:
     ## execute the monitoring
     ## HERE
     def monitorForEvents(self):
-
-        ### NEED TO USE DEFINED COLOR
 
         ### Data used in self.canvasAlarm follows this format
         ### [type, canvas coords, ID canvas items, absolute coordinates, number frame stability, event flags, color]

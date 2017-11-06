@@ -20,7 +20,7 @@ from tkinter import *
 __author__ = "Francesco Pessolano"
 __copyright__ = "Copyright 2017, Xetal nv"
 __license__ = "MIT"
-__version__ = "1.1.1"
+__version__ = "1.1.2"
 __maintainer__ = "Francesco Pessolano"
 __email__ = "francesco@xetal.eu"
 __status__ = "release"
@@ -236,14 +236,14 @@ class TunerGui:
             popUpNotOk()
 
     def saveConfig(self):
-        self.master.filename = filedialog.asksaveasfilename(initialdir="/", title="Select file",
+        self.master.filename = filedialog.asksaveasfilename(initialdir="./", title="Select file",
                                                             filetypes=(("config files", "*.cfg"), ("all files", "*.*")))
         with (open(self.master.filename, 'w')) as saveFile:
             for i in range(0, len(self.scales)):
                 saveFile.write(str(self.scales[i].get()) + "\n")
 
     def loadConfig(self):
-        self.master.filename = filedialog.askopenfilename(initialdir="/", title="Select file",
+        self.master.filename = filedialog.askopenfilename(initialdir="./", title="Select file",
                                                           filetypes=(("config files", "*.cfg"), ("all files", "*.*")))
         with (open(self.master.filename, 'r')) as loadFile:
             for i in range(0, len(self.scales)):
