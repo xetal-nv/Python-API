@@ -688,11 +688,11 @@ class MainWindow:
 
         def deleteAlarm():
 
-            ## BUG deleted zone appear when scaling up/doens the window !!!
-
             def alarmFound(event):
 
-                for zone in self.canvasAlarm:
+                # for zone in self.canvasAlarm:
+                for i in range(0,len(self.canvasAlarm)):
+                    zone = self.canvasAlarm[i]
                     if zone[0] == 'oval':
                         centre = [(zone[1][0][0] + zone[1][1][0]) / 2, (zone[1][0][1] + zone[1][1][1]) / 2]
                         radiusX = (zone[1][0][0] - zone[1][1][0]) / 2 + 2 * nearbyDistance
@@ -708,11 +708,11 @@ class MainWindow:
                         distance = distanceFromPoly(zone[1], [event.x, event.y])
                     if distance < nearbyDistance:
                         self.canvas.delete(self.pointerLine)
-                        self.canvasItems = zone[2]
+                        self.canvasItems = [zone[2],i]
                         self.pointerLine = self.canvas.create_oval(event.x - nearbyDistance, event.y - nearbyDistance,
                                                                    event.x + nearbyDistance, event.y + nearbyDistance,
                                                                    fill="red", outline="red", width=1)
-                        for item in self.canvasItems:
+                        for item in self.canvasItems[0]:
                             try:
                                 self.canvas.itemconfig(item, outline="red")
                             except:
@@ -720,17 +720,18 @@ class MainWindow:
                         break
                     else:
                         self.canvas.delete(self.pointerLine)
-                        for item in self.canvasItems:
-                            try:
-                                self.canvas.itemconfig(item, outline="black")
-                            except:
-                                self.canvas.itemconfig(item, fill="black")
+                        if self.canvasItems:
+                            for item in self.canvasItems[0]:
+                                try:
+                                    self.canvas.itemconfig(item, outline="black")
+                                except:
+                                    self.canvas.itemconfig(item, fill="black")
                         self.canvasItems = []
 
             def deleteSpecificAlarm(event):
-                for item in self.canvasItems:
+                for item in self.canvasItems[0]:
                     self.canvas.delete(item)
-                    ## need to remove them from self.canvasAlarm
+                    del self.canvasAlarm[self.canvasItems[1]]
                 closeAction()
 
             def closeAction():
