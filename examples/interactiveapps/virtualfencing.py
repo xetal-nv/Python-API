@@ -826,7 +826,7 @@ class MainWindow:
         ### NEED TO USE DEFINED COLOR
 
         ### Data used in self.canvasAlarm follows this format
-        ### [type , canvas coordinates, ID canvas items, absolute coordinates, number frame stability, event flags]
+        ### [type, canvas coords, ID canvas items, absolute coordinates, number frame stability, event flags, color]
         ### it tracks each person differently, so the results depends also on the tracking consistency
         try:
             if len(self.canvasAlarm) != len(self.eventStatus):
@@ -849,7 +849,7 @@ class MainWindow:
                                                                  event[i + 1])
                         # HERE -  stylig not working
                         if event[i + 1] == event[0][5]:
-                            self.canvas.itemconfig(event[0][2], fill='red', stipple='gray50')
+                            self.canvas.itemconfig(event[0][2], fill=event[0][6], stipple='gray50')
                         else:
                             self.canvas.itemconfig(event[0][2], fill='white')
         except:
