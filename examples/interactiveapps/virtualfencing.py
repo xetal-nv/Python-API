@@ -10,7 +10,6 @@ import sys
 from tkinter import filedialog
 from tkinter import messagebox
 
-
 absolutePath = os.path.abspath(__file__)
 processRoot = os.path.dirname(absolutePath)
 os.chdir(processRoot)
@@ -280,7 +279,8 @@ class MainWindow:
                     if (abs(deltax) < int(maxmove)) and (abs(deltay) < int(maxmove)):
                         line = self.canvas.create_line(previousPositionData[0], previousPositionData[1],
                                                        currentPositionData[0], currentPositionData[1],
-                                                       fill=colorsTracking[j % len(colorsTracking)], width=int(linewidth))
+                                                       fill=colorsTracking[j % len(colorsTracking)],
+                                                       width=int(linewidth))
                         self.traceLines.append(line)
 
         if self.traceLines:
@@ -309,7 +309,8 @@ class MainWindow:
                 person = self.canvas.create_oval(currentPositionData[0],
                                                  currentPositionData[1],
                                                  currentPositionData[0] + diameter,
-                                                 currentPositionData[1] + diameter, fill=colorsTracking[i % len(colorsTracking)],
+                                                 currentPositionData[1] + diameter,
+                                                 fill=colorsTracking[i % len(colorsTracking)],
                                                  state=state)
                 newPersons.append(person)
             self.persons = newPersons
@@ -338,7 +339,8 @@ class MainWindow:
                             if (abs(deltax) < int(maxmove)) and (abs(deltay) < int(maxmove)):
                                 line = self.canvas.create_line(previousPositionData[0], previousPositionData[1],
                                                                currentPositionData[0], currentPositionData[1],
-                                                               fill=colorsTracking[i % len(colorsTracking)], width=int(linewidth))
+                                                               fill=colorsTracking[i % len(colorsTracking)],
+                                                               width=int(linewidth))
                                 self.traceLines.append(line)
                 else:
                     newPositionVector.append([0, 0])
@@ -380,7 +382,7 @@ class MainWindow:
         labelCounter = "Number of people: [{0}, {1}]".format("{0:.2f}".format(personFloat), str(personFix))
         self.canvas.itemconfig(self.counterLabel, text=labelCounter)
 
-    # track persons and draw on canvas HERE
+    # track persons and draw on canvas
     def trackPersons(self):
         if not self.lock.locked():
             if self.run['text'] == "RUNNING":
@@ -395,7 +397,7 @@ class MainWindow:
                 if self.monitorActive.locked():
                     self.monitorForEvents()
                 else:
-                    # TODO: does it need to clean up?
+                    # TODO: add full cleanup
                     pass
 
         self.canvas.after(10, self.trackPersons)  # delay must be larger than 0
@@ -416,6 +418,7 @@ class MainWindow:
                                                             filetypes=(("alarm files", "*.alm"), ("all files", "*.*")))
         with (open(self.master.filename, 'w')) as saveFile:
             for event in self.canvasAlarm:
+                print(event)
                 saveFile.write(event[0] + ";")
                 for coords in event[1]:
                     saveFile.write(" ")
@@ -443,44 +446,42 @@ class MainWindow:
     def loadAlarms(self):
         self.master.filename = filedialog.askopenfilename(initialdir="./", title="Select file",
                                                           filetypes=(("alarm files", "*.alm"), ("all files", "*")))
-        # try:
-        if self.master.filename:
-            for alarm in self.canvasAlarm:
-                self.canvas.delete(alarm[2])
-            self.canvasAlarm= []
-            with (open(self.master.filename, 'r')) as loadFile:
-                for line in loadFile:
-                    linedata = line.split(';')[0:-1]
-                    print(linedata)
-                    alarm = [linedata[0]]
-                    coord = list(map(int, linedata[1].strip().split(' ')))
-                    coordList = []
-                    for i in range(0,len(coord)//2):
-                        point = [coord[2*i],coord[1+2*i]]
-                        coordList.append(point)
-                    alarm.append(coordList)
-                    elements = list(map(int, linedata[2].strip().split(' ')))
-                    if len(elements) == 1:
-                        alarm.append(elements[0])
-                    else:
-                        alarm.append(elements)
-                    coord = list(map(float, linedata[3].strip().split(' ')))
-                    coordList = []
-                    for i in range(0, len(coord) // 2):
-                        point = [coord[2 * i], coord[1 + 2 * i]]
-                        coordList.append(point)
-                    alarm.append(coordList)
-                    alarm.append(int(linedata[4].strip()))
-                    alarm.append(int(linedata[4].strip()))
-                    alarm.append(linedata[4].strip())
-                    self.canvasAlarm.append(alarm)
-                    print(alarm)
-                    ## alarm monitoring not working!!!
+        try:
+            if self.master.filename:
+                for alarm in self.canvasAlarm:
+                    self.canvas.delete(alarm[2])
+                self.canvasAlarm = []
+                with (open(self.master.filename, 'r')) as loadFile:
+                    for line in loadFile:
+                        linedata = line.split(';')[0:-1]
+                        alarm = [linedata[0]]
+                        coord = list(map(int, linedata[1].strip().split(' ')))
+                        coordList = []
+                        for i in range(0, len(coord) // 2):
+                            point = [coord[2 * i], coord[1 + 2 * i]]
+                            coordList.append(point)
+                        alarm.append(coordList)
+                        elements = list(map(int, linedata[2].strip().split(' ')))
+                        if len(elements) == 1:
+                            alarm.append(elements[0])
+                        else:
+                            alarm.append(elements)
+                        coord = list(map(float, linedata[3].strip().split(' ')))
+                        coordList = []
+                        for i in range(0, len(coord) // 2):
+                            point = [coord[2 * i], coord[1 + 2 * i]]
+                            coordList.append(point)
+                        alarm.append(coordList)
+                        alarm.append(linedata[4].strip())
+                        alarm.append(int(linedata[5].strip()))
+                        alarm.append(linedata[6].strip())
+                        self.canvasAlarm.append(alarm)
 
-            self.scaleAlarmDrawing()
-        # except:
-        #     messagebox.showerror("Answer", "Invalid file")
-
+                self.monitorWindowToggle(True)
+                self.scaleAlarmDrawing()
+                self.eventStatus = []
+        except:
+            messagebox.showerror("Answer", "Invalid file")
 
     # create all buttons on main window
     def create_buttons(self):
@@ -657,7 +658,8 @@ class MainWindow:
                 eventRadio[i].grid(row=0, column=i)
 
             for i in range(0, len(colorsAlarm)):
-                colorRadio.append(Radiobutton(frameColors, text=colorsAlarm[i], variable=alarmColor, value=colorsAlarm[i]))
+                colorRadio.append(
+                    Radiobutton(frameColors, text=colorsAlarm[i], variable=alarmColor, value=colorsAlarm[i]))
                 colorRadio[i].grid(row=0, column=i)
 
             def defineAction(event):
@@ -736,7 +738,8 @@ class MainWindow:
                     actionFlag = polyEventsFlags[polyEvents.index(alarmType.get())]
 
                 self.canvasAlarm.append(
-                    [typeAction, line, self.canvasItems, absCoords, stabilityTimeVar.get(), actionFlag, alarmColor.get()])
+                    [typeAction, line, self.canvasItems, absCoords, stabilityTimeVar.get(), actionFlag,
+                     alarmColor.get()])
                 self.canvasItems = []
                 stabilityTimeLabel.destroy()
                 stabilityTime.destroy()
@@ -778,7 +781,7 @@ class MainWindow:
             def alarmFound(event):
 
                 # for zone in self.canvasAlarm:
-                for i in range(0,len(self.canvasAlarm)):
+                for i in range(0, len(self.canvasAlarm)):
                     zone = self.canvasAlarm[i]
                     if zone[0] == 'oval':
                         centre = [(zone[1][0][0] + zone[1][1][0]) / 2, (zone[1][0][1] + zone[1][1][1]) / 2]
@@ -795,7 +798,7 @@ class MainWindow:
                         distance = distanceFromPoly(zone[1], [event.x, event.y])
                     if distance < nearbyDistance:
                         self.canvas.delete(self.pointerLine)
-                        self.canvasItems = [zone[2],i]
+                        self.canvasItems = [zone[2], i]
                         self.pointerLine = self.canvas.create_oval(event.x - nearbyDistance, event.y - nearbyDistance,
                                                                    event.x + nearbyDistance, event.y + nearbyDistance,
                                                                    fill="red", outline="red", width=1)
@@ -894,17 +897,22 @@ class MainWindow:
     # MONITOR menu
 
     ## toggles on/off the monitoring
-    def monitorWindowToggle(self):
+    def monitorWindowToggle(self, forceOff=False):
 
-        if not self.monitorActive.locked():
-            if self.demoKit.serverConnected:
-                self.monitorActive.acquire()
-                self.monitor['text'] = "MONITOR ON"
-            else:
-                self.monitor['text'] = "MONITOR OFF"
-        else:
-            self.monitorActive.release()
+        if forceOff:
+            if self.monitorActive.locked():
+                self.monitorActive.release()
             self.monitor['text'] = "MONITOR OFF"
+        else:
+            if not self.monitorActive.locked():
+                if self.demoKit.serverConnected:
+                    self.monitorActive.acquire()
+                    self.monitor['text'] = "MONITOR ON"
+                else:
+                    self.monitor['text'] = "MONITOR OFF"
+            else:
+                self.monitorActive.release()
+                self.monitor['text'] = "MONITOR OFF"
 
     ## execute the monitoring
     ## HERE
