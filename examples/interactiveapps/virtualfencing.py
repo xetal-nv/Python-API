@@ -416,7 +416,7 @@ class MainWindow:
     def saveAlarms(self):
         self.master.filename = filedialog.asksaveasfilename(initialdir="./", title="Select file",
                                                             filetypes=(("alarm files", "*.alm"), ("all files", "*.*")))
-        with (open(self.master.filename, 'w')) as saveFile:
+        with (open(self.master.filename + ".alm", 'w')) as saveFile:
             for event in self.canvasAlarm:
                 print(event)
                 saveFile.write(event[0] + ";")
