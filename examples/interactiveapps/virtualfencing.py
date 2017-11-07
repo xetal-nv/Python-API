@@ -839,7 +839,12 @@ class MainWindow:
                 self.activeAction.release()
 
             if self.activeAction.acquire(False):
-                bindIDclick = self.canvas.bind("<Button-2>", deleteSpecificAlarm)
+                if platform.system() == 'Linux':
+                    bindIDclick = self.canvas.bind("<Button-3>", deleteSpecificAlarm)
+                elif platform.system() == 'Windows':
+                    bindIDclick = self.canvas.bind("<Button-3>", deleteSpecificAlarm)
+                else:
+                    bindIDclick = self.canvas.bind("<Button-2>", deleteSpecificAlarm)
                 bindIDmove = self.canvas.bind("<Motion>", alarmFound)
                 actionLabel.config(text='delete')
 
