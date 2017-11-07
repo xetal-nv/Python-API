@@ -770,7 +770,7 @@ class MainWindow:
                 endPolyTerminate(event)
 
             if self.activeAction.acquire(False):
-                bindIDclick = self.canvas.bind("<Button-2>", defineAction)
+                bindIDclick = self.canvas.bind("<Button-3>", defineAction)
                 bindIDmove = self.canvas.bind("<Motion>", traceAction)
                 if typeAction == 'poly':
                     bindClosure = self.master.bind('<c>', endPolyClose)
