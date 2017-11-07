@@ -238,7 +238,9 @@ class TunerGui:
     def saveConfig(self):
         self.master.filename = filedialog.asksaveasfilename(initialdir="./", title="Select file",
                                                             filetypes=(("config files", "*.cfg"), ("all files", "*.*")))
-        with (open(self.master.filename + ".cfg", 'w')) as saveFile:
+        if platform.system() != 'Linux' or platform.system() == 'Windows':
+            self.master.filename += ".cfg"
+        with (open(self.master.filename, 'w')) as saveFile:
             for i in range(0, len(self.scales)):
                 saveFile.write(str(self.scales[i].get()) + "\n")
 
