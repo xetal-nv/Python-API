@@ -9,6 +9,7 @@ from threading import Lock
 import sys
 from tkinter import filedialog
 from tkinter import messagebox
+import platform
 
 absolutePath = os.path.abspath(__file__)
 processRoot = os.path.dirname(absolutePath)
@@ -770,7 +771,12 @@ class MainWindow:
                 endPolyTerminate(event)
 
             if self.activeAction.acquire(False):
-                bindIDclick = self.canvas.bind("<Button-3>", defineAction)
+                if platform.system() == 'Linux':
+                    bindIDclick = self.canvas.bind("<Button-3>", defineAction)
+                elif platform.system() == 'Windows':
+                    bindIDclick = self.canvas.bind("<Button-3>", defineAction)
+                else:
+                    bindIDclick = self.canvas.bind("<Button-2>", defineAction)
                 bindIDmove = self.canvas.bind("<Motion>", traceAction)
                 if typeAction == 'poly':
                     bindClosure = self.master.bind('<c>', endPolyClose)
