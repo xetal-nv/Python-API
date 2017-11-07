@@ -417,7 +417,9 @@ class MainWindow:
     def saveAlarms(self):
         self.master.filename = filedialog.asksaveasfilename(initialdir="./", title="Select file",
                                                             filetypes=(("alarm files", "*.alm"), ("all files", "*.*")))
-        with (open(self.master.filename + ".alm", 'w')) as saveFile:
+        if platform.system() != 'Linux' or platform.system() == 'Windows':
+            self.master.filename += ".alm"
+        with (open(self.master.filename, 'w')) as saveFile:
             for event in self.canvasAlarm:
                 print(event)
                 saveFile.write(event[0] + ";")
@@ -771,9 +773,7 @@ class MainWindow:
                 endPolyTerminate(event)
 
             if self.activeAction.acquire(False):
-                if platform.system() == 'Linux':
-                    bindIDclick = self.canvas.bind("<Button-3>", defineAction)
-                elif platform.system() == 'Windows':
+                if platform.system() == 'Linux' or platform.system() == 'Windows':
                     bindIDclick = self.canvas.bind("<Button-3>", defineAction)
                 else:
                     bindIDclick = self.canvas.bind("<Button-2>", defineAction)
@@ -839,9 +839,7 @@ class MainWindow:
                 self.activeAction.release()
 
             if self.activeAction.acquire(False):
-                if platform.system() == 'Linux':
-                    bindIDclick = self.canvas.bind("<Button-3>", deleteSpecificAlarm)
-                elif platform.system() == 'Windows':
+                if platform.system() == 'Linux' or platform.system() == 'Windows':
                     bindIDclick = self.canvas.bind("<Button-3>", deleteSpecificAlarm)
                 else:
                     bindIDclick = self.canvas.bind("<Button-2>", deleteSpecificAlarm)
