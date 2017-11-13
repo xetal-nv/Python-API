@@ -946,7 +946,6 @@ class MainWindow:
                 eventHappened = False
                 for i in range(0, len(self.positionData)):
                     # check for new flag, then all flags, then show alarm by changing fill of the item
-
                     event[i + 1] = self.pointPositionVSshape(self.positionData[i], event[0][3], event[0][0],
                                                              event[i + 1])
                     if event[i + 1] == event[0][5]:
