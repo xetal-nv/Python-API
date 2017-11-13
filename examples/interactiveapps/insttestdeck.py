@@ -236,6 +236,8 @@ class MainWindow:
             self.canvas = Canvas(self.master, width=(self.screenX + 2 * offset), height=(self.screenY + 2 * offset),
                                  highlightthickness=0)
             self.canvas.pack(fill=BOTH, expand=YES)
+            self.canvas.configure(background='white')
+
 
             # define starting values and inizial canvas state
             self.deviceVertex = self.demoKit.getRoomCorners()
