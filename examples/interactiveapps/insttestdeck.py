@@ -238,7 +238,6 @@ class MainWindow:
             self.canvas.pack(fill=BOTH, expand=YES)
             self.canvas.configure(background='white')
 
-
             # define starting values and inizial canvas state
             self.deviceVertex = self.demoKit.getRoomCorners()
             self.positionData = self.demoKit.getPersonsPositions()
@@ -496,8 +495,8 @@ class MainWindow:
         self.run.pack(side='left')
         self.tracing = Button(frame, text="TRACING", command=self.traceTrackingLauncher)
         self.tracing.pack(side='left')
-        self.monitor = Button(frame, text="ZONES")
-        self.monitor.pack(side='left')
+        # self.monitor = Button(frame, text="ZONES")
+        # self.monitor.pack(side='left')
         self.alarms = Button(frame, text="ALARMS", command=self.alarmWindowLancher)
         self.alarms.pack(side='left')
         self.monitor = Button(frame, text="MONITOR OFF", command=self.monitorWindowToggle)
@@ -602,6 +601,10 @@ class MainWindow:
         self.STABILITYRATE.set(STABLITYRATE)
 
     # ALARMS menu
+
+    # TODO: the application crashes when an alarm is started but the control windows is closed without the alarm
+    # operation being completed
+
     ## alarm window menu launcher
     def alarmWindowLancher(self):
         if "alarms" not in self.extraWindows:
@@ -655,17 +658,20 @@ class MainWindow:
             alarmType = StringVar()
             alarmColor = StringVar()
 
-            alarmType.set(labelDir[0])
-            alarmColor.set(colorsAlarm[0])
-
             for i in range(0, len(labelDir)):
-                eventRadio.append(Radiobutton(frameRadio, text=labelDir[i], variable=alarmType, value=labelDir[i]))
+                eventRadio.append(
+                    Radiobutton(frameRadio, text=labelDir[i], variable=alarmType, value=labelDir[i], indicatoron=0,
+                                selectcolor='gray'))
                 eventRadio[i].grid(row=0, column=i)
 
             for i in range(0, len(colorsAlarm)):
                 colorRadio.append(
-                    Radiobutton(frameColors, text=colorsAlarm[i], variable=alarmColor, value=colorsAlarm[i]))
+                    Radiobutton(frameColors, text=colorsAlarm[i], variable=alarmColor, value=colorsAlarm[i],
+                                indicatoron=0, selectcolor='gray'))
                 colorRadio[i].grid(row=0, column=i)
+
+            alarmType.set(labelDir[0])
+            alarmColor.set(colorsAlarm[0])
 
             def defineAction(event):
                 if not self.lock.locked():
@@ -926,7 +932,6 @@ class MainWindow:
                 self.monitor['text'] = "MONITOR OFF"
 
     ## execute the monitoring
-    ## HERE
     def monitorForEvents(self):
 
         ### Data used in self.canvasAlarm follows this format
@@ -949,12 +954,10 @@ class MainWindow:
                     event[i + 1] = self.pointPositionVSshape(self.positionData[i], event[0][3], event[0][0],
                                                              event[i + 1])
                     if event[i + 1] == event[0][5]:
-                        print('alarm on ', i)
                         self.canvas.itemconfig(event[0][2], fill=event[0][6], stipple='gray50')
                         eventHappened = True
                     elif not eventHappened:
-                        print('no alarm on ', i, self.canvas.itemcget(event[0][2], "fill"))
-                        self.canvas.itemconfig(event[0][2], fill='white')
+                        self.canvas.itemconfig(event[0][2], fill='')
         except:
             # captures possible corrupted data form the device and skips it
             pass
