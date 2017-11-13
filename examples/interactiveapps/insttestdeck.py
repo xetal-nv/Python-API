@@ -946,7 +946,7 @@ class MainWindow:
                     # HERE - testing only one 1 person
                     # needs to add persistance and stability check
                     # if i == 0:  # this is just for development
-                    # if self.canvas_1.itemcget(event[0][2], "fill") != event[0][6]: # not good
+                    # if self.canvas_1.itemcget(event[0][2], "fill") != event[0][6]: # not working
                     ## BUG does not work if i remove the i==0 check
                     event[i + 1] = self.pointPositionVSshape(self.positionData[i], event[0][3], event[0][0],
                                                              event[i + 1])
