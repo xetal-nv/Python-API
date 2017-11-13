@@ -944,18 +944,20 @@ class MainWindow:
 
             for event in self.eventStatus:
                 for i in range(0, len(self.positionData)):
-                    # check for new flag, then all flags, then show alarm bu changing fill of the item
-                    # HERE - testing only one 1 person
+                    # check for new flag, then all flags, then show alarm by changing fill of the item
+                    # HERE
                     # needs to add persistance and stability check
                     # if i == 0:  # this is just for development
                     # if self.canvas_1.itemcget(event[0][2], "fill") != event[0][6]: # not working
-                    ## BUG does not work if i remove the i==0 check
+                    ## BUG styling fails due to anding of events with more people tracked!!!
                     event[i + 1] = self.pointPositionVSshape(self.positionData[i], event[0][3], event[0][0],
                                                              event[i + 1])
                     # HERE -  stylig not working
                     if event[i + 1] == event[0][5]:
+                        print('alarm on ',i)
                         self.canvas.itemconfig(event[0][2], fill=event[0][6], stipple='gray50')
                     else:
+                        print('no alarm on ',i)
                         self.canvas.itemconfig(event[0][2], fill='white')
         except:
             # captures possible corrupted data form the device and skips it
