@@ -23,11 +23,14 @@ from geometry import *
 __author__ = "Francesco Pessolano"
 __copyright__ = "Copyright 2017, Xetal nv"
 __license__ = "MIT"
-__version__ = "0.3.0"
+__version__ = "0.8.0"
 __maintainer__ = "Francesco Pessolano"
 __email__ = "francesco@xetal.eu"
-__status__ = "in development"
+__status__ = "alpha release"
 __requiredfirmware__ = "february2017 or later"
+
+# Application name
+APPNAME = "Installation and Test Deck: "
 
 # theses color arrays are used to simplify color assignments
 colorsTracking = ["green", "blue", "magenta", "white", "cyan", "black", "yellow", "red"]
@@ -224,7 +227,7 @@ class MainWindow:
             [self.screenX, self.screenY] = self.defineDynamicCanvas(self.screenX, self.screenY)
             self.offset = [offset, offset]
             self.master = Tk()
-            self.master.title("Installation and Test Deck: " + self.ip)
+            self.master.title(APPNAME + self.ip)
 
             # cerate menus
             self.create_menu()
@@ -602,7 +605,6 @@ class MainWindow:
 
     # ALARMS menu
 
-    # TODO: the application crashes when an alarm is started but the control windows is closed without the alarm
     # operation being completed
 
     ## alarm window menu launcher
@@ -757,16 +759,8 @@ class MainWindow:
                 self.canvasAlarm.append(
                     [typeAction, line, self.canvasItems, absCoords, stabilityTimeVar.get(), actionFlag,
                      alarmColor.get()])
-                self.canvasItems = []
-                stabilityTimeLabel.destroy()
-                stabilityTime.destroy()
-                for i in range(0, len(eventRadio)):
-                    eventRadio[i].destroy()
-                for i in range(0, len(colorRadio)):
-                    colorRadio[i].destroy()
-                actionLabel.config(text='inactive')
-                mouseLabel.config(text='inactive')
-                distanceLabel.config(text='inactive')
+                forceUnlock()
+
 
             def endPolyTerminate(event):
                 if len(drawingPoints) > 2:
@@ -784,13 +778,30 @@ class MainWindow:
                 except:
                     forceUnlock()
 
-            def forceUnlock():
-                self.canvas.unbind("<Motion>", bindIDmove)
-                self.canvas.unbind("<Button-2>", bindIDclick)
+            def forceUnlock(event=None):
+                self.canvasItems = []
+                if stabilityTimeLabel:
+                    stabilityTimeLabel.destroy()
+                    stabilityTime.destroy()
+                if eventRadio:
+                    for i in range(0, len(eventRadio)):
+                        eventRadio[i].destroy()
+                if colorRadio:
+                    for i in range(0, len(colorRadio)):
+                        colorRadio[i].destroy()
+                actionLabel.config(text='inactive')
+                mouseLabel.config(text='inactive')
+                distanceLabel.config(text='inactive')
+                self.canvas.unbind("<Motion>")
+                self.canvas.unbind("<Button-2>")
+                self.master.unbind("<s>")
                 self.master.unbind("<c>")
                 self.master.unbind("<space>")
                 if self.pointerLine:
                     self.canvas.delete(self.pointerLine)
+                if self.canvasItems: # should delete partial poly but it does not work
+                    for item in self.canvasItems:
+                        self.canvas.delete(item)
                 if self.activeAction.locked():
                     self.activeAction.release()
 
@@ -800,6 +811,7 @@ class MainWindow:
                 else:
                     bindIDclick = self.canvas.bind("<Button-2>", defineAction)
                 bindIDmove = self.canvas.bind("<Motion>", traceAction)
+                self.master.bind("<s>", forceUnlock)
                 if typeAction == 'poly':
                     # bindClosure = self.master.bind('<c>', endPolyClose)
                     # bindClosureOpen = self.master.bind('<space>', endPolyTerminate)
@@ -815,13 +827,12 @@ class MainWindow:
                     zone = self.canvasAlarm[i]
                     if zone[0] == 'oval':
                         centre = [(zone[1][0][0] + zone[1][1][0]) / 2, (zone[1][0][1] + zone[1][1][1]) / 2]
-                        radiusX = (zone[1][0][0] - zone[1][1][0]) / 2 + 2 * nearbyDistance
-                        radiusY = (zone[1][0][1] - zone[1][1][1]) / 2 + 2 * nearbyDistance
-                        cornerA = [centre[0] - radiusX, centre[1]]
-                        cornerC = [centre[0] + radiusX, centre[1]]
-                        cornerD = [centre[0], centre[1] - radiusY]
-                        cornerB = [centre[0], centre[1] + radiusY]
-                        distance = distanceFromPoly([cornerA, cornerB, cornerC, cornerD], [event.x, event.y])
+                        radiusX = (zone[1][0][0] - zone[1][1][0]) / 2
+                        radiusY = (zone[1][0][1] - zone[1][1][1]) / 2
+                        if pointOnEllipse([event.x, event.y], centre, radiusX, radiusY):
+                            distance = 0
+                        else:
+                            distance = nearbyDistance
                     elif zone[0] == 'rect':
                         distance = distanceFromRect(zone[1], [event.x, event.y])
                     else:

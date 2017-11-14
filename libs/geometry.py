@@ -125,5 +125,11 @@ def pointInEllipse(point, center, width, height):
     return (dx * dx) / (width * width) + (dy * dy) / (height * height) <= 1
 
 
+def pointOnEllipse(point, center, width, height, border=0.05):
+    dx = point[0] - center[0]
+    dy = point[1] - center[1]
+    return (1 + border) >= (dx * dx) / (width * width) + (dy * dy) / (height * height) >= (1 - border)
+
+
 def whichSideIsPoint(point, line):
     return (line[1][0] - line[0][0]) * (point[1] - line[0][1]) - (point[0] - line[0][0]) * (line[1][1] - line[0][1])
