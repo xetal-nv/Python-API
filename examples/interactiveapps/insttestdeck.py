@@ -650,7 +650,7 @@ class MainWindow:
             eventRadio = []
             colorRadio = []
             actionLabel.config(text=typeAction)
-            stabilityTimeVar = StringVar(self.master, value=LINEWIDTH)
+            stabilityTimeVar = StringVar(master, value=LINEWIDTH)
             stabilityTimeLabel = Label(frameEntry, text="Stability time ms")
             stabilityTimeLabel.grid(row=0, sticky=E)
             stabilityTime = Entry(frameEntry, textvariable=stabilityTimeVar)
@@ -674,64 +674,70 @@ class MainWindow:
             alarmColor.set(colorsAlarm[0])
 
             def defineAction(event):
-                if not self.lock.locked():
-                    if isPointInPoly([event.x, event.y], self.realVertex):
-                        drawingPoints.append([event.x, event.y])
-                    if len(drawingPoints) == 2 and typeAction != 'poly':
-                        if typeAction == 'cross':
-                            self.canvasItems.append(self.canvas.create_line(drawingPoints[0][0], drawingPoints[0][1],
-                                                                            drawingPoints[1][0], drawingPoints[1][1],
+                try:
+                    if not self.lock.locked():
+                        if isPointInPoly([event.x, event.y], self.realVertex):
+                            drawingPoints.append([event.x, event.y])
+                        if len(drawingPoints) == 2 and typeAction != 'poly':
+                            if typeAction == 'cross':
+                                self.canvasItems.append(self.canvas.create_line(drawingPoints[0][0], drawingPoints[0][1],
+                                                                                drawingPoints[1][0], drawingPoints[1][1],
+                                                                                dash=(3, 5), width=1))
+                            elif typeAction == 'rect':
+                                self.canvasItems.append(
+                                    self.canvas.create_rectangle(drawingPoints[0][0], drawingPoints[0][1],
+                                                                 drawingPoints[1][0], drawingPoints[1][1],
+                                                                 dash=(3, 5), width=1))
+                            elif typeAction == 'oval':
+                                self.canvasItems.append(self.canvas.create_oval(drawingPoints[0][0], drawingPoints[0][1],
+                                                                                drawingPoints[1][0], drawingPoints[1][1],
+                                                                                dash=(3, 5), width=1))
+                            self.canvas.unbind("<Motion>", bindIDmove)
+                            self.canvas.unbind("<Button-2>", bindIDclick)
+                            actionEvent(drawingPoints)
+                            if self.pointerLine:
+                                self.canvas.delete(self.pointerLine)
+                            self.activeAction.release()
+                        elif len(drawingPoints) > 1 and typeAction == 'poly':
+                            self.canvasItems.append(self.canvas.create_line(drawingPoints[-2][0], drawingPoints[-2][1],
+                                                                            drawingPoints[-1][0], drawingPoints[-1][1],
                                                                             dash=(3, 5), width=1))
-                        elif typeAction == 'rect':
-                            self.canvasItems.append(
-                                self.canvas.create_rectangle(drawingPoints[0][0], drawingPoints[0][1],
-                                                             drawingPoints[1][0], drawingPoints[1][1],
-                                                             dash=(3, 5), width=1))
-                        elif typeAction == 'oval':
-                            self.canvasItems.append(self.canvas.create_oval(drawingPoints[0][0], drawingPoints[0][1],
-                                                                            drawingPoints[1][0], drawingPoints[1][1],
-                                                                            dash=(3, 5), width=1))
-                        self.canvas.unbind("<Motion>", bindIDmove)
-                        self.canvas.unbind("<Button-2>", bindIDclick)
-                        actionEvent(drawingPoints)
-                        if self.pointerLine:
-                            self.canvas.delete(self.pointerLine)
-                        self.activeAction.release()
-                    elif len(drawingPoints) > 1 and typeAction == 'poly':
-                        self.canvasItems.append(self.canvas.create_line(drawingPoints[-2][0], drawingPoints[-2][1],
-                                                                        drawingPoints[-1][0], drawingPoints[-1][1],
-                                                                        dash=(3, 5), width=1))
-                        if self.pointerLine:
-                            self.canvas.delete(self.pointerLine)
+                            if self.pointerLine:
+                                self.canvas.delete(self.pointerLine)
+                except:
+                    forceUnlock()
 
             def traceAction(event):
-                cmDistance = 0
-                if len(drawingPoints) >= 1:
-                    if self.pointerLine:
-                        self.canvas.delete(self.pointerLine)
-                    if typeAction == 'cross':
-                        cmDistance = int(
-                            self.multiplierMmPx * distancePoint(drawingPoints[-1], [event.x, event.y]) / 10)
-                        self.pointerLine = self.canvas.create_line(drawingPoints[0][0], drawingPoints[0][1],
-                                                                   event.x, event.y, dash=(3, 5), width=1)
-                    elif typeAction == 'rect':
-                        cmDistance = [int(abs(self.multiplierMmPx * (drawingPoints[-1][0] - event.x) / 10)),
-                                      int(abs(self.multiplierMmPx * (drawingPoints[-1][1] - event.y) / 10))]
-                        self.pointerLine = self.canvas.create_rectangle(drawingPoints[0][0], drawingPoints[0][1],
-                                                                        event.x, event.y, dash=(3, 5), width=1)
-                    elif typeAction == 'oval':
-                        cmDistance = int(abs(self.multiplierMmPx * (drawingPoints[-1][0] - event.x) / 20))
-                        self.pointerLine = self.canvas.create_oval(drawingPoints[0][0], drawingPoints[0][1],
-                                                                   event.x, event.y, dash=(3, 5), width=1)
-                    elif typeAction == 'poly':
-                        cmDistance = int(
-                            self.multiplierMmPx * distancePoint(drawingPoints[-1], [event.x, event.y]) / 10)
-                        self.pointerLine = self.canvas.create_line(drawingPoints[-1][0], drawingPoints[-1][1],
-                                                                   event.x, event.y, dash=(3, 5), width=1)
-                    distanceLabel.config(text=str(cmDistance))
+                try:
+                    cmDistance = 0
+                    if len(drawingPoints) >= 1:
+                        if self.pointerLine:
+                            self.canvas.delete(self.pointerLine)
+                        if typeAction == 'cross':
+                            cmDistance = int(
+                                self.multiplierMmPx * distancePoint(drawingPoints[-1], [event.x, event.y]) / 10)
+                            self.pointerLine = self.canvas.create_line(drawingPoints[0][0], drawingPoints[0][1],
+                                                                       event.x, event.y, dash=(3, 5), width=1)
+                        elif typeAction == 'rect':
+                            cmDistance = [int(abs(self.multiplierMmPx * (drawingPoints[-1][0] - event.x) / 10)),
+                                          int(abs(self.multiplierMmPx * (drawingPoints[-1][1] - event.y) / 10))]
+                            self.pointerLine = self.canvas.create_rectangle(drawingPoints[0][0], drawingPoints[0][1],
+                                                                            event.x, event.y, dash=(3, 5), width=1)
+                        elif typeAction == 'oval':
+                            cmDistance = int(abs(self.multiplierMmPx * (drawingPoints[-1][0] - event.x) / 20))
+                            self.pointerLine = self.canvas.create_oval(drawingPoints[0][0], drawingPoints[0][1],
+                                                                       event.x, event.y, dash=(3, 5), width=1)
+                        elif typeAction == 'poly':
+                            cmDistance = int(
+                                self.multiplierMmPx * distancePoint(drawingPoints[-1], [event.x, event.y]) / 10)
+                            self.pointerLine = self.canvas.create_line(drawingPoints[-1][0], drawingPoints[-1][1],
+                                                                       event.x, event.y, dash=(3, 5), width=1)
+                        distanceLabel.config(text=str(cmDistance))
 
-                mouseDistance = [int(self.multiplierMmPx * event.x / 10), int(self.multiplierMmPx * event.y / 10)]
-                mouseLabel.config(text=str(mouseDistance))
+                    mouseDistance = [int(self.multiplierMmPx * event.x / 10), int(self.multiplierMmPx * event.y / 10)]
+                    mouseLabel.config(text=str(mouseDistance))
+                except:
+                    forceUnlock()
 
             def actionEvent(line):
                 absCoords = []
@@ -764,21 +770,29 @@ class MainWindow:
 
             def endPolyTerminate(event):
                 if len(drawingPoints) > 2:
-                    self.canvas.unbind("<Motion>", bindIDmove)
-                    self.canvas.unbind("<Button-2>", bindIDclick)
-                    self.master.unbind("<c>", bindClosure)
-                    self.master.unbind("<space>", bindClosureOpen)
-                    actionEvent(drawingPoints)
-                    if self.pointerLine:
-                        self.canvas.delete(self.pointerLine)
-                    self.activeAction.release()
+                    forceUnlock()
+                elif not self.activeAction.locked():
+                    forceUnlock()
 
             def endPolyClose(event):
-                drawingPoints.append(drawingPoints[0])
-                self.canvasItems.append(self.canvas.create_line(drawingPoints[-2][0], drawingPoints[-2][1],
-                                                                drawingPoints[-1][0], drawingPoints[-1][1], dash=(3, 5),
-                                                                width=1))
-                endPolyTerminate(event)
+                try:
+                    drawingPoints.append(drawingPoints[0])
+                    self.canvasItems.append(self.canvas.create_line(drawingPoints[-2][0], drawingPoints[-2][1],
+                                                                    drawingPoints[-1][0], drawingPoints[-1][1], dash=(3, 5),
+                                                                    width=1))
+                    endPolyTerminate(event)
+                except:
+                    forceUnlock()
+
+            def forceUnlock():
+                self.canvas.unbind("<Motion>", bindIDmove)
+                self.canvas.unbind("<Button-2>", bindIDclick)
+                self.master.unbind("<c>")
+                self.master.unbind("<space>")
+                if self.pointerLine:
+                    self.canvas.delete(self.pointerLine)
+                if self.activeAction.locked():
+                    self.activeAction.release()
 
             if self.activeAction.acquire(False):
                 if platform.system() == 'Linux' or platform.system() == 'Windows':
@@ -787,8 +801,10 @@ class MainWindow:
                     bindIDclick = self.canvas.bind("<Button-2>", defineAction)
                 bindIDmove = self.canvas.bind("<Motion>", traceAction)
                 if typeAction == 'poly':
-                    bindClosure = self.master.bind('<c>', endPolyClose)
-                    bindClosureOpen = self.master.bind('<space>', endPolyTerminate)
+                    # bindClosure = self.master.bind('<c>', endPolyClose)
+                    # bindClosureOpen = self.master.bind('<space>', endPolyTerminate)
+                    self.master.bind('<c>', endPolyClose)
+                    self.master.bind('<space>', endPolyTerminate)
 
         def deleteAlarm():
 
@@ -838,13 +854,24 @@ class MainWindow:
                     del self.canvasAlarm[self.canvasItems[1]]
                 closeAction()
 
-            def closeAction():
+            def closeAction(event = None):
                 if self.pointerLine:
                     self.canvas.delete(self.pointerLine)
+                if self.canvasItems:
+                    for item in self.canvasItems[0]:
+                        try:
+                            self.canvas.itemconfig(item, outline="black")
+                        except:
+                            self.canvas.itemconfig(item, fill="black")
                 self.canvas.unbind("<Motion>", bindIDmove)
                 self.canvas.unbind("<Button-2>", bindIDclick)
-                actionLabel.config(text='inactive')
-                self.activeAction.release()
+                self.master.unbind("s>")
+                try:
+                    actionLabel.config(text='inactive')
+                except:
+                    pass
+                if self.activeAction.locked():
+                    self.activeAction.release()
 
             if self.activeAction.acquire(False):
                 if platform.system() == 'Linux' or platform.system() == 'Windows':
@@ -852,6 +879,7 @@ class MainWindow:
                 else:
                     bindIDclick = self.canvas.bind("<Button-2>", deleteSpecificAlarm)
                 bindIDmove = self.canvas.bind("<Motion>", alarmFound)
+                self.master.bind("<s>", closeAction)
                 actionLabel.config(text='delete')
 
         # bind escape to terminate
