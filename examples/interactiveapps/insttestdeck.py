@@ -23,7 +23,7 @@ from geometry import *
 __author__ = "Francesco Pessolano"
 __copyright__ = "Copyright 2017, Xetal nv"
 __license__ = "MIT"
-__version__ = "0.8.0"
+__version__ = "0.9.0"
 __maintainer__ = "Francesco Pessolano"
 __email__ = "francesco@xetal.eu"
 __status__ = "alpha release"
@@ -402,7 +402,6 @@ class MainWindow:
                 if self.monitorActive.locked():
                     self.monitorForEvents()
                 else:
-                    # TODO: add full cleanup
                     pass
 
         self.canvas.after(10, self.trackPersons)  # delay must be larger than 0
@@ -971,6 +970,7 @@ class MainWindow:
                 self.monitor['text'] = "MONITOR OFF"
 
     ## execute the monitoring
+    # TODO: does not use the stability framen input yet
     def monitorForEvents(self):
 
         ### Data used in self.canvasAlarm follows this format
