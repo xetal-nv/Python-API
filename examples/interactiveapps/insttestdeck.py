@@ -23,46 +23,21 @@ from geometry import *
 __author__ = "Francesco Pessolano"
 __copyright__ = "Copyright 2017, Xetal nv"
 __license__ = "MIT"
-__version__ = "0.9.0"
+__version__ = "0.9.1"
 __maintainer__ = "Francesco Pessolano"
 __email__ = "francesco@xetal.eu"
 __status__ = "alpha release"
 __requiredfirmware__ = "february2017 or later"
 
-# Application name
-APPNAME = "Installation and Test Deck: "
+# EVENT VARIABLES
 
-# theses color arrays are used to simplify color assignments
-colorsTracking = ["green", "blue", "magenta", "white", "cyan", "black", "yellow", "red"]
-colorsAlarm = ["red", "yellow", "magenta", "cyan", "green"]
-
-# set the viewing window
-SCALEX = 0.7  # scale from maximum X size of screen window
-SCALEY = 0.7  # scale from maximum X size of screen window
-offset = 10  # padding offset in pixels
-
-# set diameter person in pixels
-diameter = 20
-
-# set selection distance in pixels
-nearbyDistance = 5
-
-# programmatic parameters default values
-LINEWIDTH = 1  # set the tracking line width
-MAXMOVE = 400  # set the maximum line variation (pixels)
-FRAMESRATE = 1  # set the periodicity of reading from the device
-STABLITYRATE = 3  # set the number of captures frames needed for a position to be stable
-
-# alarm presets
-PERSISTANCE = 3  # number of frames
-
-# definition of events labels
+## definition of events labels
 crossEvents = ['From Left', 'From Right']
 rectEvents = ['Is Inside', 'Is Outside', 'Disappear Inside', 'Entering', 'Exiting']
 ovalEvents = ['Is Inside', 'Is Outside', 'Disappear Inside', 'Entering', 'Exiting']
 polyEvents = ['Is Inside', 'Is Outside', 'Disappear Inside', 'Entering', 'Exiting', 'Crossing']
 
-# definition of basic event flags
+## definition of basic event flags
 
 fromLeft = 0xb01000000
 fromRight = 0xb00100000
@@ -75,13 +50,48 @@ entering = 0xb00000010 | isInside
 exiting = 0xb00000001 | isOutside
 empty = 0xb00000000
 
-# definition of event flags per type of alarms
+## definition of event flags per type of alarms
 
 crossEventsFlags = [fromLeft, fromRight]
 rectEventsFlags = [isInside, isOutside, isInside & disappearing, entering, exiting]
 ovalEventsFlags = [isInside, isOutside, isInside & disappearing, entering, exiting]
 polyEventsFlags = [isInside, isOutside, isInside & disappearing, entering, exiting, entering & exiting]
 
+# INTERNAL VARIABLES
+
+## Application name
+APPNAME = "Installation and Test Deck: "
+
+# theses color arrays are used to simplify color assignments
+colorsTracking = ["magenta", "black", "red", "green", "blue", "white", "yellow", "red"]
+colorsAlarm = ["red", "yellow", "magenta", "blue", "green"]
+
+## set the viewing window
+SCALEX = 0.7  # scale from maximum X size of screen window
+SCALEY = 0.7  # scale from maximum X size of screen window
+offset = 10  # padding offset in pixels
+
+## set diameter person in pixels
+diameter = 20
+
+## set selection distance in pixels
+nearbyDistance = 5
+
+## programmatic parameters default values
+LINEWIDTH = 1  # set the tracking line width
+MAXMOVE = 400  # set the maximum line variation (pixels)
+FRAMESRATE = 1  # set the periodicity of reading from the device
+STABLITYRATE = 3  # set the number of captures frames needed for a position to be stable
+
+## alarm presets
+PERSISTANCE = 3  # number of frames
+
+## element coloring
+ROOMBACKGROUND = 'PaleTurquoise1'
+ROOMWALLS = 'black'
+WALLTHICKNESS = '4'
+ENVELOPTHICKNESS = '1'
+ALARMBACKGROUND = 'white'
 
 # this is the main windows whosing tracking, zones, alarms, events and control buttons
 class MainWindow:
@@ -358,14 +368,14 @@ class MainWindow:
             self.canvas.delete(self.boundary)
         self.boundary = self.canvas.create_rectangle(self.offset[0], self.offset[1], self.offset[0] + self.screenX,
                                                      self.screenX + self.offset[1],
-                                                     dash=(5, 5), outline="red", width='2')
+                                                     dash=(5, 5), outline="red", width=ENVELOPTHICKNESS)
         if self.geometry:
             self.canvas.delete(self.geometry)
         if self.run['text'] == "RUNNING":
             self.realVertex = list(map(self.adjustedCoordinates, self.demoKit.getRoomCorners()))
         else:
             self.realVertex = list(map(self.adjustedCoordinates, self.deviceVertex))
-        self.geometry = self.canvas.create_polygon(*self.realVertex, fill='', outline='blue', width='2')
+        self.geometry = self.canvas.create_polygon(*self.realVertex, fill=ROOMBACKGROUND, outline=ROOMWALLS, width=WALLTHICKNESS)
 
     # draws labels on canvas
     def drawLabels(self):
@@ -688,11 +698,11 @@ class MainWindow:
                                 self.canvasItems.append(
                                     self.canvas.create_rectangle(drawingPoints[0][0], drawingPoints[0][1],
                                                                  drawingPoints[1][0], drawingPoints[1][1],
-                                                                 dash=(3, 5), width=1))
+                                                                 dash=(3, 5), width=1, fill=ALARMBACKGROUND))
                             elif typeAction == 'oval':
                                 self.canvasItems.append(self.canvas.create_oval(drawingPoints[0][0], drawingPoints[0][1],
                                                                                 drawingPoints[1][0], drawingPoints[1][1],
-                                                                                dash=(3, 5), width=1))
+                                                                                dash=(3, 5), width=1, fill=ALARMBACKGROUND))
                             self.canvas.unbind("<Motion>", bindIDmove)
                             self.canvas.unbind("<Button-2>", bindIDclick)
                             actionEvent(drawingPoints)
@@ -760,6 +770,7 @@ class MainWindow:
                      alarmColor.get()])
                 forceUnlock()
 
+            # TODO: make closed POLY background set by ALARMBACKGROUND
 
             def endPolyTerminate(event):
                 if len(drawingPoints) > 2:
@@ -920,6 +931,8 @@ class MainWindow:
 
     ## scale the alarm and the temporary mouse pointer
 
+    # TODO: POLY BACK GROUND SET BY ALARM BACKGROUND
+    # BUG: POLY DOES NOT SCALE
     def scaleAlarmDrawing(self):
         for i in range(0, len(self.canvasAlarm)):
             scaledCoord = []
@@ -934,12 +947,12 @@ class MainWindow:
                 self.canvas.delete(self.canvasAlarm[i][2])
                 self.canvasAlarm[i][2] = self.canvas.create_rectangle(scaledCoord[0][0], scaledCoord[0][1],
                                                                       scaledCoord[1][0], scaledCoord[1][1],
-                                                                      dash=(3, 5), width=1)
+                                                                      dash=(3, 5), width=1, fill=ALARMBACKGROUND)
             elif self.canvasAlarm[i][0] == 'oval':
                 self.canvas.delete(self.canvasAlarm[i][2])
                 self.canvasAlarm[i][2] = self.canvas.create_oval(scaledCoord[0][0], scaledCoord[0][1],
                                                                  scaledCoord[1][0], scaledCoord[1][1],
-                                                                 dash=(3, 5), width=1)
+                                                                 dash=(3, 5), width=1, fill=ALARMBACKGROUND)
             elif self.canvasAlarm[i][0] == 'poly':
                 for item in self.canvasAlarm[i][2]:
                     self.canvas.delete(item)
@@ -971,6 +984,7 @@ class MainWindow:
 
     ## execute the monitoring
     # TODO: does not use the stability framen input yet
+
     def monitorForEvents(self):
 
         ### Data used in self.canvasAlarm follows this format
@@ -996,7 +1010,7 @@ class MainWindow:
                         self.canvas.itemconfig(event[0][2], fill=event[0][6], stipple='gray50')
                         eventHappened = True
                     elif not eventHappened:
-                        self.canvas.itemconfig(event[0][2], fill='')
+                        self.canvas.itemconfig(event[0][2], fill=ALARMBACKGROUND)
         except:
             # captures possible corrupted data form the device and skips it
             pass

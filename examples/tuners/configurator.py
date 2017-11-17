@@ -9,6 +9,7 @@ from tkinter import filedialog
 from tkinter import messagebox
 import os
 import sys
+import platform
 
 
 absolutePath = os.path.abspath(__file__)
@@ -21,7 +22,7 @@ import gui
 __author__ = "Francesco Pessolano"
 __copyright__ = "Copyright 2017, Xetal nv"
 __license__ = "MIT"
-__version__ = "1.3.6"
+__version__ = "1.3.7"
 __maintainer__ = "Francesco Pessolano"
 __email__ = "francesco@xetal.eu"
 __status__ = "release"
