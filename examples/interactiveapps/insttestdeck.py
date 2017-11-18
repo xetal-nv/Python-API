@@ -932,7 +932,7 @@ class MainWindow:
     ## scale the alarm and the temporary mouse pointer
 
     # TODO: POLY BACK GROUND SET BY ALARM BACKGROUND
-    # BUG: POLY DOES NOT SCALE
+    # FIXME: POLY DOES NOT SCALE
     def scaleAlarmDrawing(self):
         for i in range(0, len(self.canvasAlarm)):
             scaledCoord = []
