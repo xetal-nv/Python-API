@@ -93,6 +93,7 @@ WALLTHICKNESS = '4'
 ENVELOPTHICKNESS = '1'
 ALARMBACKGROUND = 'white'
 
+
 # this is the main windows whosing tracking, zones, alarms, events and control buttons
 class MainWindow:
     def __init__(self, maximumSize):
@@ -375,7 +376,8 @@ class MainWindow:
             self.realVertex = list(map(self.adjustedCoordinates, self.demoKit.getRoomCorners()))
         else:
             self.realVertex = list(map(self.adjustedCoordinates, self.deviceVertex))
-        self.geometry = self.canvas.create_polygon(*self.realVertex, fill=ROOMBACKGROUND, outline=ROOMWALLS, width=WALLTHICKNESS)
+        self.geometry = self.canvas.create_polygon(*self.realVertex, fill=ROOMBACKGROUND, outline=ROOMWALLS,
+                                                   width=WALLTHICKNESS)
 
     # draws labels on canvas
     def drawLabels(self):
@@ -434,7 +436,6 @@ class MainWindow:
             self.master.filename += ".alm"
         with (open(self.master.filename, 'w')) as saveFile:
             for event in self.canvasAlarm:
-                print(event)
                 saveFile.write(event[0] + ";")
                 for coords in event[1]:
                     saveFile.write(" ")
@@ -614,8 +615,6 @@ class MainWindow:
 
     # ALARMS menu
 
-    # operation being completed
-
     ## alarm window menu launcher
     def alarmWindowLancher(self):
         if "alarms" not in self.extraWindows:
@@ -691,18 +690,20 @@ class MainWindow:
                             drawingPoints.append([event.x, event.y])
                         if len(drawingPoints) == 2 and typeAction != 'poly':
                             if typeAction == 'cross':
-                                self.canvasItems.append(self.canvas.create_line(drawingPoints[0][0], drawingPoints[0][1],
-                                                                                drawingPoints[1][0], drawingPoints[1][1],
-                                                                                dash=(3, 5), width=1))
+                                self.canvasItems.append(
+                                    self.canvas.create_line(drawingPoints[0][0], drawingPoints[0][1],
+                                                            drawingPoints[1][0], drawingPoints[1][1],
+                                                            dash=(3, 5), width=1))
                             elif typeAction == 'rect':
                                 self.canvasItems.append(
                                     self.canvas.create_rectangle(drawingPoints[0][0], drawingPoints[0][1],
                                                                  drawingPoints[1][0], drawingPoints[1][1],
                                                                  dash=(3, 5), width=1, fill=ALARMBACKGROUND))
                             elif typeAction == 'oval':
-                                self.canvasItems.append(self.canvas.create_oval(drawingPoints[0][0], drawingPoints[0][1],
-                                                                                drawingPoints[1][0], drawingPoints[1][1],
-                                                                                dash=(3, 5), width=1, fill=ALARMBACKGROUND))
+                                self.canvasItems.append(
+                                    self.canvas.create_oval(drawingPoints[0][0], drawingPoints[0][1],
+                                                            drawingPoints[1][0], drawingPoints[1][1],
+                                                            dash=(3, 5), width=1, fill=ALARMBACKGROUND))
                             self.canvas.unbind("<Motion>", bindIDmove)
                             self.canvas.unbind("<Button-2>", bindIDclick)
                             actionEvent(drawingPoints)
@@ -753,6 +754,7 @@ class MainWindow:
             def actionEvent(line):
                 absCoords = []
                 actionFlag = empty
+                backgroundShape = None
                 for coordinates in line:
                     absCoords.append(self.extractCoordinates(coordinates))
 
@@ -764,16 +766,21 @@ class MainWindow:
                     actionFlag = ovalEventsFlags[ovalEvents.index(alarmType.get())]
                 elif typeAction == 'poly':
                     actionFlag = polyEventsFlags[polyEvents.index(alarmType.get())]
+                    if line[-1] == line[0]:
+                        corners = line[0:-1]
+                    else:
+                        corners = line
+                    backgroundShape = self.canvas.create_polygon([item for sublist in corners for item in sublist],
+                                                                 outline="", fill=ALARMBACKGROUND)
 
                 self.canvasAlarm.append(
                     [typeAction, line, self.canvasItems, absCoords, stabilityTimeVar.get(), actionFlag,
-                     alarmColor.get()])
+                     alarmColor.get(), backgroundShape])
                 forceUnlock()
-
-            # TODO: make closed POLY background set by ALARMBACKGROUND
 
             def endPolyTerminate(event):
                 if len(drawingPoints) > 2:
+                    actionEvent(drawingPoints)
                     forceUnlock()
                 elif not self.activeAction.locked():
                     forceUnlock()
@@ -782,7 +789,8 @@ class MainWindow:
                 try:
                     drawingPoints.append(drawingPoints[0])
                     self.canvasItems.append(self.canvas.create_line(drawingPoints[-2][0], drawingPoints[-2][1],
-                                                                    drawingPoints[-1][0], drawingPoints[-1][1], dash=(3, 5),
+                                                                    drawingPoints[-1][0], drawingPoints[-1][1],
+                                                                    dash=(3, 5),
                                                                     width=1))
                     endPolyTerminate(event)
                 except:
@@ -809,7 +817,7 @@ class MainWindow:
                 self.master.unbind("<space>")
                 if self.pointerLine:
                     self.canvas.delete(self.pointerLine)
-                if self.canvasItems: # should delete partial poly but it does not work
+                if self.canvasItems:  # should delete partial poly but it does not work
                     for item in self.canvasItems:
                         self.canvas.delete(item)
                 if self.activeAction.locked():
@@ -875,7 +883,7 @@ class MainWindow:
                     del self.canvasAlarm[self.canvasItems[1]]
                 closeAction()
 
-            def closeAction(event = None):
+            def closeAction(event=None):
                 if self.pointerLine:
                     self.canvas.delete(self.pointerLine)
                 if self.canvasItems:
@@ -931,8 +939,6 @@ class MainWindow:
 
     ## scale the alarm and the temporary mouse pointer
 
-    # TODO: POLY BACK GROUND SET BY ALARM BACKGROUND
-    # FIXME: POLY DOES NOT SCALE
     def scaleAlarmDrawing(self):
         for i in range(0, len(self.canvasAlarm)):
             scaledCoord = []
@@ -956,11 +962,18 @@ class MainWindow:
             elif self.canvasAlarm[i][0] == 'poly':
                 for item in self.canvasAlarm[i][2]:
                     self.canvas.delete(item)
+                self.canvas.delete(self.canvasAlarm[i][7])
                 self.canvasAlarm[i][2] = []
                 for j in range(1, len(scaledCoord)):
                     self.canvasAlarm[i][2].append(self.canvas.create_line(scaledCoord[j - 1][0], scaledCoord[j - 1][1],
                                                                           scaledCoord[j][0], scaledCoord[j][1],
                                                                           dash=(3, 5), width=1))
+                if self.canvasAlarm[i][1][-1] == self.canvasAlarm[i][1][0]:
+                    corners = scaledCoord[0:-1]
+                else:
+                    corners = scaledCoord[1]
+                self.canvasAlarm[i][7] = self.canvas.create_polygon([item for sublist in corners for item in sublist],
+                                                                    outline="", fill=ALARMBACKGROUND)
 
     # MONITOR menu
 
@@ -984,11 +997,12 @@ class MainWindow:
 
     ## execute the monitoring
     # TODO: does not use the stability framen input yet
+    # FIXME: POLY BACK DOES NOT CHANGE
 
     def monitorForEvents(self):
 
         ### Data used in self.canvasAlarm follows this format
-        ### [type, canvas coords, ID canvas items, absolute coordinates, number frame stability, event flags, color]
+        ### [type, canvas coords, ID canvas items, abs coordinates, stability, event flags, color, background]
         ### it tracks each person differently, so the results depends also on the tracking consistency
         try:
             if len(self.canvasAlarm) != len(self.eventStatus):
@@ -1002,15 +1016,19 @@ class MainWindow:
 
             for event in self.eventStatus:
                 eventHappened = False
+                if event[0][7]:
+                    background = event[0][7]
+                else:
+                    background = event[0][2]
                 for i in range(0, len(self.positionData)):
                     # check for new flag, then all flags, then show alarm by changing fill of the item
                     event[i + 1] = self.pointPositionVSshape(self.positionData[i], event[0][3], event[0][0],
                                                              event[i + 1])
                     if event[i + 1] == event[0][5]:
-                        self.canvas.itemconfig(event[0][2], fill=event[0][6], stipple='gray50')
+                        self.canvas.itemconfig(background, fill=event[0][6], stipple='gray50')
                         eventHappened = True
                     elif not eventHappened:
-                        self.canvas.itemconfig(event[0][2], fill=ALARMBACKGROUND)
+                        self.canvas.itemconfig(background, fill=ALARMBACKGROUND)
         except:
             # captures possible corrupted data form the device and skips it
             pass
