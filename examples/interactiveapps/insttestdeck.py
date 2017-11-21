@@ -23,7 +23,7 @@ from geometry import *
 __author__ = "Francesco Pessolano"
 __copyright__ = "Copyright 2017, Xetal nv"
 __license__ = "MIT"
-__version__ = "0.9.1"
+__version__ = "0.9.2"
 __maintainer__ = "Francesco Pessolano"
 __email__ = "francesco@xetal.eu"
 __status__ = "alpha release"
@@ -997,7 +997,6 @@ class MainWindow:
 
     ## execute the monitoring
     # TODO: does not use the stability framen input yet
-    # FIXME: POLY BACK DOES NOT CHANGE
 
     def monitorForEvents(self):
 
@@ -1054,7 +1053,7 @@ class MainWindow:
                     polygon = [shape[0], [shape[1][0], shape[0][1]], shape[1],
                                [shape[0][0], shape[1][1]], shape[0]]
                 else:
-                    polygon = shape[0]
+                    polygon = shape
                 pointInside = isPointInPoly(point, polygon)
 
             if (cumulativeFlags == empty) and not isPresent: return empty
