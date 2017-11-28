@@ -23,7 +23,7 @@ from geometry import *
 __author__ = "Francesco Pessolano"
 __copyright__ = "Copyright 2017, Xetal nv"
 __license__ = "MIT"
-__version__ = "0.9.2"
+__version__ = "0.9.3"
 __maintainer__ = "Francesco Pessolano"
 __email__ = "francesco@xetal.eu"
 __status__ = "alpha release"
@@ -65,6 +65,12 @@ APPNAME = "Installation and Test Deck: "
 # theses color arrays are used to simplify color assignments
 colorsTracking = ["magenta", "black", "red", "green", "blue", "white", "yellow", "red"]
 colorsAlarm = ["red", "yellow", "magenta", "blue", "green"]
+
+# when personMarkerFileVector is set, these images are used in the tracking instead of the fat dots
+markerFolder = "./images/"
+personMarkerFileVector = ["mario.gif", "donkey_kong.gif", "princess.gif", "bowser_jr.gif", "luigi.gif", "barrel.gif",
+                          "mushroom.gif", "turtle.gif"]
+# personMarkerFileVector = [] # uncomment to remove image markers and use fat dots
 
 ## set the viewing window
 SCALEX = 0.7  # scale from maximum X size of screen window
@@ -111,6 +117,7 @@ class MainWindow:
         self.deviceVertex = None
         self.persons = []
         self.positionData = None
+        self.personMarkers = []
         self.screenX = maximumSize[0]
         self.screenY = maximumSize[1]
         self.counterLabel = None
@@ -314,21 +321,43 @@ class MainWindow:
     def drawPersons(self):
         if self.positionData:
             newPersons = []
-            for i in range(0, len(self.positionData)):
-                if self.persons:
-                    self.canvas.delete(self.persons[i])
-                currentPositionData = self.adjustedCoordinates(self.positionData[i])
-                if self.positionData[i][0] <= 20 and self.positionData[i][1] <= 20:
-                    state = HIDDEN
-                else:
-                    state = NORMAL
-                person = self.canvas.create_oval(currentPositionData[0],
-                                                 currentPositionData[1],
-                                                 currentPositionData[0] + diameter,
-                                                 currentPositionData[1] + diameter,
-                                                 fill=colorsTracking[i % len(colorsTracking)],
-                                                 state=state)
-                newPersons.append(person)
+            if personMarkerFileVector:
+                if not self.personMarkers:
+                    # initialise the marker image vector
+                    for i in range(0, len(self.positionData)):
+                        imageIndex = i % len(personMarkerFileVector)
+                        fileImage = markerFolder + personMarkerFileVector[imageIndex]
+                        self.personMarkers.append(PhotoImage(file=fileImage))
+                    pass
+                # use markers
+                for i in range(0, len(self.positionData)):
+                    if self.persons:
+                        if self.persons[i]:
+                            self.canvas.delete(self.persons[i])
+                    currentPositionData = self.adjustedCoordinates(self.positionData[i])
+                    if self.positionData[i][0] <= 20 and self.positionData[i][1] <= 20:
+                        person = None
+                    else:
+                        person = self.canvas.create_image(currentPositionData[0], currentPositionData[1],
+                                                          image=self.personMarkers[i])
+                    # person = self.canvas.create_image(currentPositionData[0],currentPositionData[1],image=self.personMarkers[i])
+                    newPersons.append(person)
+            else:
+                for i in range(0, len(self.positionData)):
+                    if self.persons:
+                        self.canvas.delete(self.persons[i])
+                    currentPositionData = self.adjustedCoordinates(self.positionData[i])
+                    if self.positionData[i][0] <= 20 and self.positionData[i][1] <= 20:
+                        state = HIDDEN
+                    else:
+                        state = NORMAL
+                    person = self.canvas.create_oval(currentPositionData[0],
+                                                     currentPositionData[1],
+                                                     currentPositionData[0] + diameter,
+                                                     currentPositionData[1] + diameter,
+                                                     fill=colorsTracking[i % len(colorsTracking)],
+                                                     state=state)
+                    newPersons.append(person)
             self.persons = newPersons
 
     # draws tracing lines
