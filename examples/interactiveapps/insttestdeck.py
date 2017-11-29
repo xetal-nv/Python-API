@@ -23,10 +23,10 @@ from geometry import *
 __author__ = "Francesco Pessolano"
 __copyright__ = "Copyright 2017, Xetal nv"
 __license__ = "MIT"
-__version__ = "0.9.4"
+__version__ = "ref 0.9.4"
 __maintainer__ = "Francesco Pessolano"
 __email__ = "francesco@xetal.eu"
-__status__ = "alpha release"
+__status__ = "beta development"
 __requiredfirmware__ = "february2017 or later"
 
 # EVENT VARIABLES
@@ -68,8 +68,8 @@ colorsAlarm = ["red", "yellow", "magenta", "blue", "green"]
 
 # when personMarkerFileVector is set, these images are used in the tracking instead of the fat dots
 markerFolder = "./images/"
-personMarkerFileVector = ["mario.gif", "donkey_kong.gif", "princess.gif", "bowser_jr.gif", "luigi.gif", "barrel.gif",
-                          "mushroom.gif", "turtle.gif"]
+personMarkerFileVector = ["mario.gif", "turtle.gif", "princess.gif", "bowser_jr.gif", "luigi.gif", "barrel.gif",
+                          "mushroom.gif", "donkey_kong.gif"]
 # personMarkerFileVector = [] # uncomment to remove image markers and use fat dots
 
 ## set the viewing window
@@ -533,6 +533,8 @@ class MainWindow:
     def create_buttons(self):
         frame = Frame(self.master, bg='grey', width=400, height=40)
         frame.pack(fill='x')
+        self.monitor = Button(frame, text="ROOM")
+        self.monitor.pack(side='left')
         self.run = Button(frame, text="RUNNING", command=self.togglePause)
         self.run.pack(side='left')
         self.tracing = Button(frame, text="TRACING", command=self.traceTrackingLauncher)

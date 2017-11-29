@@ -8,7 +8,7 @@ NOTE => PLEASE INSTALL ALL DEPENDENCIES WITH PIP INSTALL -R REQUIREMENTS.TXT AND
 
 NOTE => PLEASE NOTE THAT TRUNK DEVELOPMENT MIGHT CONTAIN ADDITIONAL BUGS OR UNFINISHED CODE
 
-NOTE => TRUNK DEVELOPMENT IS ON APPLICATION INSTTESTDECK.PY (ALPHA RELEASE)
+NOTE => TRUNK DEVELOPMENT IS ON APPLICATION INSTTESTDECK.PY (BETA DEVELOPMENT)
 
 
 ## Introduction
@@ -80,7 +80,7 @@ entry and exit zones by moving around as well as it has a fun factor to it. Some
 in order to alter the behavior: line thickness, maximum line length, sensor frame rate and number of frames for a 
 position to be considered stable if it moved in a given radius
 
-virtualfencing.py: (in development) it allows to define and monitor events using a combination of back and front end elements. It also incliudes the tracking and draw by movement examples, and it supports resizing of the application window.
+virtualfencing.py: (in development) it allows to define and monitor events using a combination of back and front end elements. It also includes the tracking and draw by movement examples, and it supports resizing of the application window.
 
 ## Known issues
 All scripts have a GUI which is not optimal for 4K laptops due to their high DPI count.
