@@ -23,7 +23,7 @@ from geometry import *
 __author__ = "Francesco Pessolano"
 __copyright__ = "Copyright 2017, Xetal nv"
 __license__ = "MIT"
-__version__ = "0.9.3"
+__version__ = "0.9.4"
 __maintainer__ = "Francesco Pessolano"
 __email__ = "francesco@xetal.eu"
 __status__ = "alpha release"
@@ -689,7 +689,8 @@ class MainWindow:
             eventRadio = []
             colorRadio = []
             actionLabel.config(text=typeAction)
-            stabilityTimeVar = StringVar(master, value=LINEWIDTH)
+            # stabilityTimeVar = StringVar(master, value=FRAMESRATE)
+            stabilityTimeVar = StringVar(master, value=" ! not used yet !")
             stabilityTimeLabel = Label(frameEntry, text="Stability time ms")
             stabilityTimeLabel.grid(row=0, sticky=E)
             stabilityTime = Entry(frameEntry, textvariable=stabilityTimeVar)
@@ -1025,7 +1026,7 @@ class MainWindow:
                 self.monitor['text'] = "MONITOR OFF"
 
     ## execute the monitoring
-    # TODO: does not use the stability framen input yet
+    # TODO: does not use the stability frame input yet
 
     def monitorForEvents(self):
 
@@ -1061,7 +1062,7 @@ class MainWindow:
             # captures possible corrupted data form the device and skips it
             pass
 
-    ## check what is the positional relationshio between the point and the shape
+    ## check what is the positional relationship between the point and the shape
     @staticmethod
     def pointPositionVSshape(point, shape, shapeType, cumulativeFlags):
 
