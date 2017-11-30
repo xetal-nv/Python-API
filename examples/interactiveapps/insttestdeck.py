@@ -68,11 +68,11 @@ colorsAlarm = ["red", "yellow", "magenta", "blue", "green"]
 
 ## when personMarkerFileVector is set, these images are used in the tracking instead of the fat dots
 ### where the images to be used are stored
-markerFolder = "./images_xl/"
+markerFolder = "./images_4k/"
 ### file name of the images, supported format is ONLY gif
 personMarkerFileVector = ["mario.gif", "turtle.gif", "princess.gif", "bowser_jr.gif", "luigi.gif", "barrel.gif",
                           "mushroom.gif", "donkey_kong.gif"]
-## uncomment the line below to remove image markers and use fat dots
+## uncomment the line below to remove image mrkers and use fat dots
 # personMarkerFileVector = []
 
 ## set the viewing window
