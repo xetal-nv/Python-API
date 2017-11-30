@@ -62,19 +62,22 @@ polyEventsFlags = [isInside, isOutside, isInside & disappearing, entering, exiti
 ## Application name
 APPNAME = "Installation and Test Deck: "
 
-# theses color arrays are used to simplify color assignments
+## theses color arrays are used to simplify color assignments
 colorsTracking = ["magenta", "black", "red", "green", "blue", "white", "yellow", "red"]
 colorsAlarm = ["red", "yellow", "magenta", "blue", "green"]
 
-# when personMarkerFileVector is set, these images are used in the tracking instead of the fat dots
+## when personMarkerFileVector is set, these images are used in the tracking instead of the fat dots
+### where the images to be used are stored
 markerFolder = "./images/"
+### file name of the images, supported format is ONLY gif
 personMarkerFileVector = ["mario.gif", "turtle.gif", "princess.gif", "bowser_jr.gif", "luigi.gif", "barrel.gif",
                           "mushroom.gif", "donkey_kong.gif"]
-# personMarkerFileVector = [] # uncomment to remove image markers and use fat dots
+## uncomment the line below to remove image markers and use fat dots
+# personMarkerFileVector = []
 
 ## set the viewing window
 SCALEX = 0.7  # scale from maximum X size of screen window
-SCALEY = 0.7  # scale from maximum X size of screen window
+SCALEY = 0.7  # scale from maximum X size of screen windowk/
 offset = 10  # padding offset in pixels
 
 ## set diameter person in pixels
@@ -533,8 +536,8 @@ class MainWindow:
     def create_buttons(self):
         frame = Frame(self.master, bg='grey', width=400, height=40)
         frame.pack(fill='x')
-        self.monitor = Button(frame, text="ROOM")
-        self.monitor.pack(side='left')
+        # self.monitor = Button(frame, text="ROOM")
+        # self.monitor.pack(side='left')
         self.run = Button(frame, text="RUNNING", command=self.togglePause)
         self.run.pack(side='left')
         self.tracing = Button(frame, text="TRACING", command=self.traceTrackingLauncher)
