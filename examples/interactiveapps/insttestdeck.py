@@ -536,8 +536,8 @@ class MainWindow:
     def create_buttons(self):
         frame = Frame(self.master, bg='grey', width=400, height=40)
         frame.pack(fill='x')
-        # self.monitor = Button(frame, text="ROOM")
-        # self.monitor.pack(side='left')
+        self.monitor = Button(frame, text="ROOM", command=self.roomWindowLauncher)
+        self.monitor.pack(side='left')
         self.run = Button(frame, text="RUNNING", command=self.togglePause)
         self.run.pack(side='left')
         self.tracing = Button(frame, text="TRACING", command=self.traceTrackingLauncher)
@@ -1031,7 +1031,7 @@ class MainWindow:
                 self.monitor['text'] = "MONITOR OFF"
 
     ## execute the monitoring
-    # TODO: does not use the stability frame input yet
+    #TODO does not use the stability frame input yet
 
     def monitorForEvents(self):
 
@@ -1101,6 +1101,18 @@ class MainWindow:
             if sideLine > 0: return isLeft
             if sideLine < 0: return isRight
             return isOutside
+
+    # ROOM  menu
+
+    ## room window menu launcher
+
+    #TODO development is here
+    def roomWindowLauncher(self):
+        # stop streaming data
+        # open new window after asking canvas size
+        # port the JS code here
+        print("In development")
+        pass
 
 
 def start():
