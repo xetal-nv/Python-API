@@ -60,7 +60,7 @@ polyEventsFlags = [isInside, isOutside, isInside & disappearing, entering, exiti
 # INTERNAL VARIABLES
 
 ## Application name
-APPNAME = "Installation and Test Deck: "
+APPNAME = "Event Monitor: "
 
 ## theses color arrays are used to simplify color assignments
 colorsTracking = ["magenta", "black", "red", "green", "blue", "white", "yellow", "red"]
