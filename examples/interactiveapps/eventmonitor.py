@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 
-"""virtualfencing.py: allows to track people, define interest zones, events and monitor them """
+"""eventmonitor.py: allows to track people, events and monitor them """
 
 from tkinter import *
 from math import *
@@ -23,10 +23,10 @@ from geometry import *
 __author__ = "Francesco Pessolano"
 __copyright__ = "Copyright 2017, Xetal nv"
 __license__ = "MIT"
-__version__ = "ref 0.9.4"
+__version__ = "0.9.5"
 __maintainer__ = "Francesco Pessolano"
 __email__ = "francesco@xetal.eu"
-__status__ = "beta development"
+__status__ = "alfa"
 __requiredfirmware__ = "february2017 or later"
 
 # EVENT VARIABLES
@@ -68,11 +68,11 @@ colorsAlarm = ["red", "yellow", "magenta", "blue", "green"]
 
 ## when personMarkerFileVector is set, these images are used in the tracking instead of the fat dots
 ### where the images to be used are stored
-markerFolder = "./images_4k/"
+markerFolder = "./images/"
 ### file name of the images, supported format is ONLY gif
 personMarkerFileVector = ["mario.gif", "turtle.gif", "princess.gif", "bowser_jr.gif", "luigi.gif", "barrel.gif",
                           "mushroom.gif", "donkey_kong.gif"]
-## uncomment the line below to remove image mrkers and use fat dots
+## uncomment the line below to permanently disable image markers and use fat dots
 # personMarkerFileVector = []
 
 ## set the viewing window
@@ -90,7 +90,7 @@ nearbyDistance = 5
 LINEWIDTH = 1  # set the tracking line width
 MAXMOVE = 400  # set the maximum line variation (pixels)
 FRAMESRATE = 1  # set the periodicity of reading from the device
-STABLITYRATE = 3  # set the number of captures frames needed for a position to be stable
+STABLITYRATE = 1  # set the number of captures frames needed for a position to be stable
 
 ## alarm presets
 PERSISTANCE = 3  # number of frames
@@ -140,7 +140,7 @@ class MainWindow:
 
         # TRACING
         self.tracing = None
-        self.traceWin = None
+        self.auxWin = None
         self.LINEWIDTH = None  # set the tracking line width
         self.MAXMOVE = None  # set the maximum line lenght (pixels)
         self.FRAMESRATE = None  # set the periodicity of reading from the device
@@ -324,7 +324,7 @@ class MainWindow:
     def drawPersons(self):
         if self.positionData:
             newPersons = []
-            if personMarkerFileVector:
+            if self.run['text'] == "RUNNING GIFS":
                 if not self.personMarkers:
                     # initialise the marker image vector
                     for i in range(0, len(self.positionData)):
@@ -404,7 +404,7 @@ class MainWindow:
                                                      dash=(5, 5), outline="red", width=ENVELOPTHICKNESS)
         if self.geometry:
             self.canvas.delete(self.geometry)
-        if self.run['text'] == "RUNNING":
+        if self.run['text'] != "PAUSED":
             self.realVertex = list(map(self.adjustedCoordinates, self.demoKit.getRoomCorners()))
         else:
             self.realVertex = list(map(self.adjustedCoordinates, self.deviceVertex))
@@ -434,7 +434,7 @@ class MainWindow:
     # track persons and draw on canvas
     def trackPersons(self):
         if not self.lock.locked():
-            if self.run['text'] == "RUNNING":
+            if self.run['text'] != "PAUSED":
                 self.positionData = self.demoKit.getPersonsPositions()
                 personFloat = self.demoKit.getNumberPersonsFloat(False)
                 personFix = self.demoKit.getNumberPersonsFixed(False)
@@ -536,14 +536,10 @@ class MainWindow:
     def create_buttons(self):
         frame = Frame(self.master, bg='grey', width=400, height=40)
         frame.pack(fill='x')
-        self.monitor = Button(frame, text="ROOM", command=self.roomWindowLauncher)
-        self.monitor.pack(side='left')
-        self.run = Button(frame, text="RUNNING", command=self.togglePause)
+        self.run = Button(frame, text="RUNNING DOTS", command=self.togglePause)
         self.run.pack(side='left')
         self.tracing = Button(frame, text="TRACING", command=self.traceTrackingLauncher)
         self.tracing.pack(side='left')
-        # self.monitor = Button(frame, text="ZONES")
-        # self.monitor.pack(side='left')
         self.alarms = Button(frame, text="ALARMS", command=self.alarmWindowLancher)
         self.alarms.pack(side='left')
         self.monitor = Button(frame, text="MONITOR OFF", command=self.monitorWindowToggle)
@@ -553,13 +549,19 @@ class MainWindow:
 
     ## execute the start and pause fanction
     def togglePause(self):
-        if self.run['text'] == "RUNNING":
+        if self.run['text'] == "RUNNING DOTS":
+            if personMarkerFileVector:
+                self.run['text'] = "RUNNING GIFS"
+            elif not self.demoKit.disconnect():
+                self.run['text'] = "PAUSED"
+                self.run.config(relief=SUNKEN)
+        elif self.run['text'] == "RUNNING GIFS":
             if not self.demoKit.disconnect():
                 self.run['text'] = "PAUSED"
                 self.run.config(relief=SUNKEN)
         else:
             if self.demoKit.reconnect():
-                self.run['text'] = "RUNNING"
+                self.run['text'] = "RUNNING DOTS"
                 self.run.config(relief=RAISED)
 
     # TRACING menu
@@ -567,7 +569,7 @@ class MainWindow:
 
         ## set up the tracing window
         def tracingwindow():
-            master = self.traceWin
+            master = self.auxWin
             master.title("Tracing menu")
 
             # bind escape to terminate
@@ -623,13 +625,13 @@ class MainWindow:
 
         if "traceTracking" not in self.extraWindows:
             self.extraWindows.append("traceTracking")
-            self.traceWin = Toplevel()
+            self.auxWin = Toplevel()
             tracingwindow()
         else:
             try:
-                self.traceWin.state()
+                self.auxWin.state()
             except:
-                self.traceWin = Toplevel()
+                self.auxWin = Toplevel()
                 tracingwindow()
 
     ## removes all lines from the canvas
@@ -653,20 +655,20 @@ class MainWindow:
     def alarmWindowLancher(self):
         if "alarms" not in self.extraWindows:
             self.extraWindows.append("alarms")
-            self.traceWin = Toplevel()
+            self.auxWin = Toplevel()
             self.alarmWindow()
         else:
             try:
-                self.traceWin.state()
+                self.auxWin.state()
             except:
-                self.traceWin = Toplevel()
+                self.auxWin = Toplevel()
                 self.alarmWindow()
 
     ## set up the alarm menu and actions
     def alarmWindow(self):
 
         # gui canvas
-        master = self.traceWin
+        master = self.auxWin
         master.title("Alarm menu")
         canvas = Canvas(master)
         canvas.pack(fill=BOTH, expand=1)
@@ -693,12 +695,11 @@ class MainWindow:
             drawingPoints = []
             eventRadio = []
             colorRadio = []
-            actionLabel.config(text=typeAction)
-            # stabilityTimeVar = StringVar(master, value=FRAMESRATE)
-            stabilityTimeVar = StringVar(master, value=" ! not used yet !")
+            actionLabel.config(text=typeAction + ": select point with right click")
+            stabilityTimeVar = StringVar(master, value=STABLITYRATE)
             stabilityTimeLabel = Label(frameEntry, text="Stability time ms")
             stabilityTimeLabel.grid(row=0, sticky=E)
-            stabilityTime = Entry(frameEntry, textvariable=stabilityTimeVar)
+            stabilityTime = Entry(frameEntry, textvariable=stabilityTimeVar, state='disabled')
             stabilityTime.grid(row=0, column=1)
             alarmType = StringVar()
             alarmColor = StringVar()
@@ -843,8 +844,8 @@ class MainWindow:
                     for i in range(0, len(colorRadio)):
                         colorRadio[i].destroy()
                 actionLabel.config(text='inactive')
-                mouseLabel.config(text='inactive')
-                distanceLabel.config(text='inactive')
+                mouseLabel.config(text='mouse position')
+                distanceLabel.config(text='distance')
                 self.canvas.unbind("<Motion>")
                 self.canvas.unbind("<Button-2>")
                 self.master.unbind("<s>")
@@ -967,9 +968,9 @@ class MainWindow:
         # set data on pointer
         actionLabel = Label(frameData, text="inactive")
         actionLabel.grid(row=0, column=0)
-        mouseLabel = Label(frameData, text="inactive")
+        mouseLabel = Label(frameData, text="mouse position")
         mouseLabel.grid(row=0, column=1)
-        distanceLabel = Label(frameData, text="inactive")
+        distanceLabel = Label(frameData, text="distance")
         distanceLabel.grid(row=0, column=2)
 
     ## scale the alarm and the temporary mouse pointer
@@ -1031,7 +1032,7 @@ class MainWindow:
                 self.monitor['text'] = "MONITOR OFF"
 
     ## execute the monitoring
-    #TODO does not use the stability frame input yet
+    #TODO stability frame currently disabled
 
     def monitorForEvents(self):
 
@@ -1102,17 +1103,6 @@ class MainWindow:
             if sideLine < 0: return isRight
             return isOutside
 
-    # ROOM  menu
-
-    ## room window menu launcher
-
-    #TODO development is here
-    def roomWindowLauncher(self):
-        # open new window after asking canvas size
-        # port the JS code here
-        print("In development")
-        self.togglePause()
-        pass
 
 
 def start():

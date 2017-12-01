@@ -1,5 +1,5 @@
 # Python Kinsei Client, Examples and Applications 
-### Version: 4.2.0 (trunk - in development)
+### Version: 4.2.0 (trunk - alfa)
 ### Advised Kinsei firmware: July2017
 ### Supported python version: 3.x
 ### In case of further help please contact us at contact@xetal.eu
@@ -7,8 +7,6 @@
 NOTE => PLEASE INSTALL ALL DEPENDENCIES WITH PIP INSTALL -R REQUIREMENTS.TXT AND ADD TK (TKINTER) MANUALLY FOLLOWING THE INSTRUCTIONS FOR YOUR OS
 
 NOTE => PLEASE NOTE THAT TRUNK DEVELOPMENT MIGHT CONTAIN ADDITIONAL BUGS OR UNFINISHED CODE
-
-NOTE => TRUNK DEVELOPMENT IS ON APPLICATION INSTTESTDECK.PY (BETA DEVELOPMENT)
 
 
 ## Introduction
@@ -80,7 +78,10 @@ entry and exit zones by moving around as well as it has a fun factor to it. Some
 in order to alter the behavior: line thickness, maximum line length, sensor frame rate and number of frames for a 
 position to be considered stable if it moved in a given radius
 
-virtualfencing.py: (in development) it allows to define and monitor events using a combination of back and front end elements. It also includes the tracking and draw by movement examples, and it supports resizing of the application window.
+eventmonitor.py: it allows to define and monitor events using a combination of back and front end elements. 
+It also includes the tracking and draw by movement examples, and it supports resizing of the application window.
+Please note that the application allows usage of GIF images in the tracking, to change the standard GIFS refer to the
+code itself. To select dots or gif in the tracking simply click on the running/paused button
 
 ## Known issues
 All scripts have a GUI which is not optimal for 4K laptops due to their high DPI count.
