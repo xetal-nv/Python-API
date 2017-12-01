@@ -44,8 +44,8 @@ availableDemos = {
     "Draw by moving": lambda: subprocess.Popen(
         ["python3", os.path.join(absolutePath, interactiveappsFolder, 'drawByMoving.py')]),
     # installaton and text application
-    "Install&Test Application": lambda: subprocess.Popen(
-        ["python3", os.path.join(absolutePath, interactiveappsFolder, 'insttestdeck.py')]),
+    "Event Monitor": lambda: subprocess.Popen(
+        ["python3", os.path.join(absolutePath, interactiveappsFolder, 'eventmonitor.py')]),
 }
 
 
