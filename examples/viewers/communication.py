@@ -23,7 +23,7 @@ __requiredfirmware__ = "february2017 or later"
 
 # it accespt also DNS addresses
 
-IP_DEVICE = "192.168.76.1" # remove comment to set as default the standard AP address
+IP_DEVICE = "192.168.0.135" # remove comment to set as default the standard AP address
 # IP_DEVICE = "192.168.1.80"  # remove comment to set as default the standard AP address
 # IP_DEVICE = "81.82.231.115" # occasionally remotely available Kinsei kit
 

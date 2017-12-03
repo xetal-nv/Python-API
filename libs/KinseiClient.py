@@ -16,7 +16,7 @@ __status__ = "release"
 __requiredfirmware__ = "february2017 or later"
 
 
-# the class implmeneting the kinsei client
+# the class implementing the kinsei client
 class KinseiSocket(object):
     kinseiCommand = {
         "roomSize": b'\x73',
