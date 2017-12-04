@@ -12,3 +12,4 @@ lib/
 /usr/*
 .idea/
 *.ip
+/venv/*
