@@ -20,7 +20,7 @@ LINUX: n/a
 
 MacOS: n/a
 
-OVERALL: You might suffer a "division by zero" or "index out of bounds" error when running the hotspotmap.py and thermalmap.py examples for a very long ti,r
+OVERALL: You might suffer a "division by zero" or "index out of bounds" error when running the hotspotmap.py and thermalmap.py examples for a very long time
 
 ## Introduction
 This module provides the Python3 libraries/API for the standard use of a Kinsei system, examples illustrating their usage and applications that can be used either to optimize the device or as examples for more complex application requiring open/closed loop control.
