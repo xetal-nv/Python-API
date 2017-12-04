@@ -12,6 +12,15 @@ IF YOU ARE ON MAC OS, PLEASE REFER TO https://matplotlib.org/faq/osx_framework.h
 
 PLEASE NOTE THAT TRUNK DEVELOPMENT MIGHT CONTAIN ADDITIONAL BUGS OR UNFINISHED CODE
 
+### KNOWN BUGS
+
+WINDOWS: The scripts examples.py and deviceconfig.py have a path problem. The individual scripts (examples and apps) work fine is called individually
+
+LINUX: n/a
+
+MacOS: n/a
+
+OVERALL: You might suffer a "division by zero" or "index out of bounds" error when running the hotspotmap.py and thermalmap.py examples for a very long ti,r
 
 ## Introduction
 This module provides the Python3 libraries/API for the standard use of a Kinsei system, examples illustrating their usage and applications that can be used either to optimize the device or as examples for more complex application requiring open/closed loop control.
@@ -54,7 +63,7 @@ communication.py: basic script connecting to a kinsei device, checking its tunin
 
 hotspot_viewer.py: client that retrieves the data from the aggregator.py server and displaying a hotspot map
 
-hotspotmap.py*: collects and cumulates position data form the device and generate a hotspot map in real time
+hotspotmap.py*: collects and accumulates position data form the device and generate a hotspot map in real time
 
 thermalmap.py*: displays a thermal map in real time (color coded or actual values)
 
