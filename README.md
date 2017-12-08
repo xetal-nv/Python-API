@@ -2,6 +2,7 @@
 ### Version: 4.2.0 (trunk - alfa)
 ### Advised Kinsei firmware: July2017
 ### Supported python version: 3.x
+### Refer also to the Quick Start guide at http://www.xetal.net/?page_id=1569
 ### In case of further help please contact us at contact@xetal.eu
 
 ## NOTES
