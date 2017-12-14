@@ -14,7 +14,7 @@ import os
 __author__ = "Francesco Pessolano"
 __copyright__ = "Copyright 2017, Xetal nv"
 __license__ = "MIT"
-__version__ = "2.2.0"
+__version__ = "2.3.0"
 __maintainer__ = "Francesco Pessolano"
 __email__ = "francesco@xetal.eu"
 __status__ = "release"
@@ -31,9 +31,6 @@ availableDemos = {
     # shows an example of graphical viewer for tracking and raw data (fusion)
     "Tracking & fusion viewer": lambda: subprocess.Popen(
         ["python3", os.path.join(absolutePath, viewersFolder, 'trackingFusionViewer.py')]),
-    # shows an example of http server reporting number of people
-    "Presence http server ": lambda: subprocess.Popen(
-        ["python3", os.path.join(absolutePath, serverFolder, 'presencehttp.py')]),
     # shows a thermal map based on the settings in the source files
     "Thermal map": lambda: subprocess.Popen(
         ["python3", os.path.join(absolutePath, viewersFolder, 'thermalmap.py')]),

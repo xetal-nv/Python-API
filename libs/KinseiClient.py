@@ -420,7 +420,7 @@ class KinseiSocket(object):
     !! useable only from firmware july2017 !!
     Returns the number of pixel per x and y axis and the pixel size in mm.
     
-    False in case of comunication error
+    False in case of communication error
     """
 
     def getThermalMapResolution(self, wait=True):
@@ -433,7 +433,7 @@ class KinseiSocket(object):
     !! available only from firmware july2017 !!
     Returns the pisel temperatures in row order
     
-    False in case of comunication error
+    False in case of communication error
     """
 
     def getThermalMapPixels(self, wait=True):
