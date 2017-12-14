@@ -11,6 +11,5 @@ lib/
 *.Python
 /usr/*
 .idea/
-*.ip
 /venv/*
 
