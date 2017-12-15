@@ -1,6 +1,6 @@
 # Python Kinsei Client, Examples and Applications 
 ### Version: 4.2.0 (trunk - alfa)
-### Advised Kinsei firmware: July2017
+### Advised Kinsei trackingserver: July2017
 ### Supported python version: 3.x
 ### Refer also to the Quick Start guide at http://www.xetal.net/?page_id=1569
 ### In case of further help please contact us at contact@xetal.eu
@@ -81,7 +81,7 @@ Currently the following applications are provided and can be accessed by running
 
 tuner.py: this script can be used to retrieve and set parameters that affect the behavior of the device in real time (e.g. maximum person speed, temperature thresholds and so on).
 
-configurator.py: this script can be used to perform full device configuration including kinsei firmware upload, changing room topology, sensor topology, storing of measurement of data locally, etc. When run, load the configuration file for an example of all available parameters and an explanation of their use. Please note, that altering the configuration takes effect only after stopping/starting or restarting the device (via the application itself). 
+configurator.py: this script can be used to perform full device configuration including kinsei trackingserver upload, changing room topology, sensor topology, storing of measurement of data locally, etc. When run, load the configuration file for an example of all available parameters and an explanation of their use. Please note, that altering the configuration takes effect only after stopping/starting or restarting the device (via the application itself). 
 
 ## Interactive Applications
 Interactive Applications are examples that are meant to show interactively the functionality of the kit. 

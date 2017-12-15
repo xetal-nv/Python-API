@@ -20,10 +20,10 @@ __version__ = "2.0.2"
 __maintainer__ = "Francesco Pessolano"
 __email__ = "francesco@xetal.eu"
 __status__ = "release"
-__requiredfirmware__ = "february2017 or later"
+__requiredtrackingserver__ = "february2017 or later"
 
 
-# Set to false with firmwares older than july2017
+# Set to false with trackingservers older than july2017
 FWB4july2017 = True
 
 def is_valid_ip(ip):

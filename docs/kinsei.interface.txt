@@ -34,7 +34,7 @@ Number Of Persons (Fixed number used by the system)
     0x6D
     MOCA -> Client
     0x6D #persons(1) 
-	!! ERROR !! The current firmware has a bug and returns 0x6E #persons(1) 
+	!! ERROR !! The current trackingserver has a bug and returns 0x6E #persons(1)
     
 Persons Position (it is independent from the number of persons but if different (fixed one) it will fallback after a while)
     Client -> MOCA

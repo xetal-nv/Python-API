@@ -22,7 +22,7 @@ __version__ = "1.2.6"
 __maintainer__ = "Francesco Pessolano"
 __email__ = "francesco@xetal.eu"
 __status__ = "release"
-__requiredfirmware__ = "july2017 or later"
+__requiredtrackingserver__ = "july2017 or later"
 
 
 # set the viewing window

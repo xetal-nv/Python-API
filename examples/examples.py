@@ -18,6 +18,8 @@ __version__ = "2.3.0"
 __maintainer__ = "Francesco Pessolano"
 __email__ = "francesco@xetal.eu"
 __status__ = "release"
+__requiredtrackingserver__ = "see individual scripts"
+
 
 absolutePath = os.path.dirname(__file__)
 viewersFolder = 'viewers'

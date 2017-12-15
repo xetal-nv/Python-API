@@ -26,7 +26,7 @@ __version__ = "1.2.0"
 __maintainer__ = "Francesco Pessolano"
 __email__ = "francesco@xetal.eu"
 __status__ = "release"
-__requiredfirmware__ = "february2017 or later"
+__requiredtrackingserver__ = "february2017 or later"
 
 # the color array is used to simplify color assignment to the tracking balls
 # change for changing colors

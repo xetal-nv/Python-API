@@ -27,7 +27,7 @@ __version__ = "0.9.5"
 __maintainer__ = "Francesco Pessolano"
 __email__ = "francesco@xetal.eu"
 __status__ = "alfa"
-__requiredfirmware__ = "february2017 or later"
+__requiredtrackingserver__ = "february2017 or later"
 
 # EVENT VARIABLES
 

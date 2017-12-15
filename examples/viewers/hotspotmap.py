@@ -27,7 +27,7 @@ __version__ = "1.1.2"
 __maintainer__ = "Francesco Pessolano"
 __email__ = "francesco@xetal.eu"
 __status__ = "release"
-__requiredfirmware__ = "february2017 or later"
+__requiredtrackingserver__ = "february2017 or later"
 
 # TODO add outliers removal
 # please use SKIMSAMPLES > 5 and set a RAWTHRESHOLD to ignore false data points

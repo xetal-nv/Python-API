@@ -26,7 +26,7 @@ __version__ = "1.3.7"
 __maintainer__ = "Francesco Pessolano"
 __email__ = "francesco@xetal.eu"
 __status__ = "release"
-__requiredfirmware__ = "july2017 or later"
+__requiredtrackingserver__ = "july2017 or later"
 
 # This DICT holds the available configuration commands with type and range
 # 'name parameter' : [range type, min, max]
@@ -155,7 +155,7 @@ class Configurator:
             self.toolmenu.add_command(label="Stop service", state=DISABLED, command=self.stopService)
             self.toolmenu.add_command(label="Start service", state=DISABLED, command=self.startService)
             self.toolmenu.add_separator()
-            self.toolmenu.add_command(label="Upload new firmware", state=DISABLED)
+            self.toolmenu.add_command(label="Upload new trackingserver", state=DISABLED)
             self.toolmenu.add_command(label="Reboot device", state=DISABLED)
 
         helpmenu = Menu(menu)
@@ -255,7 +255,7 @@ class Configurator:
             self.toolmenu.entryconfig("Start service", state=enabled)
 
             # following items have not been implemented yet
-            # self.toolmenu.add_command(label="Upload new firmware", state=enabled)
+            # self.toolmenu.add_command(label="Upload new trackingserver", state=enabled)
             # self.toolmenu.add_command(label="Reboot device", state=enabled)
 
     # generic methods for the file and help menus

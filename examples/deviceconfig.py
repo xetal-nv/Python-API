@@ -19,6 +19,8 @@ __version__ = "1.0.0"
 __maintainer__ = "Francesco Pessolano"
 __email__ = "francesco@xetal.eu"
 __status__ = "release"
+__requiredtrackingserver__ = "see individual scripts"
+
 
 absolutePath = os.path.dirname(__file__)
 tuneFolder = 'tuners'

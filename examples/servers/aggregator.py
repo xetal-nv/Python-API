@@ -28,7 +28,7 @@ __version__ = "1.0.2"
 __maintainer__ = "Francesco Pessolano"
 __email__ = "francesco@xetal.eu"
 __status__ = "release"
-__requiredfirmware__ = "february2017 or later"
+__requiredtrackingserver__ = "february2017 or later"
 
 # The kit IP can be specified as a parameter to the command line or here
 IP_DEVICE = "81.82.231.115"  # occasionally remotely available Xetal kit

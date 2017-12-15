@@ -11,7 +11,7 @@ __version__ = "0.1.0"
 __maintainer__ = "Francesco Pessolano"
 __email__ = "francesco@xetal.eu"
 __status__ = "in development"
-__requiredfirmware__ = ""
+__requiredtrackingserver__ = ""
 
 
 def isPointInPoly(point, polygon):
