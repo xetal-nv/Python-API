@@ -1,4 +1,3 @@
-#!/usr/bin/python3
 
 """guy.py: methods for gui interfaces"""
 
