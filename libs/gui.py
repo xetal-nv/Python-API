@@ -9,7 +9,7 @@ from tkinter import messagebox
 __author__ = "Francesco Pessolano"
 __copyright__ = "Copyright 2017, Xetal nv"
 __license__ = "MIT"
-__version__ = "2.1.2"
+__version__ = "2.1.3"
 __maintainer__ = "Francesco Pessolano"
 __email__ = "francesco@xetal.eu"
 __status__ = "internal usage, not documented"
@@ -124,29 +124,30 @@ class LoginGUI:
     def connectDevice(self):
         username = self.username.get()
         password = self.password.get()
-        if password == "":
-            password = None
-        hostname = self.hostip.get()
-
-        if self.platformCheck:
-            self.device.setPlatform(self.version.get())
-
-        # need to ask which device platform is it
-
-        self.device.connect(username, password, hostname)
-
-        if self.device.isConnected():
-            self.master.destroy()
-            with (open(SAVEDIP, 'w')) as saved:
-                saved.write(hostname)
-            with (open(SAVEDUSER, 'w')) as saved:
-                saved.write(username)
-            self.device.start()
+        if not password:
+            messagebox.showinfo("Null password", "Null password is not supported, please set one before using this tool")
         else:
-            if messagebox.askokcancel("Connection failed", "Failed to connect or login to the device\n"
-                                                           "Proceed anyhow?"):
+            hostname = self.hostip.get()
+
+            if self.platformCheck:
+                self.device.setPlatform(self.version.get())
+
+            # need to ask which device platform is it
+
+            self.device.connect(username, password, hostname)
+
+            if self.device.isConnected():
                 self.master.destroy()
-                self.device.start(False)
+                with (open(SAVEDIP, 'w')) as saved:
+                    saved.write(hostname)
+                with (open(SAVEDUSER, 'w')) as saved:
+                    saved.write(username)
+                self.device.start()
+            else:
+                if messagebox.askokcancel("Connection failed", "Failed to connect or login to the device\n"
+                                                               "Proceed anyhow?"):
+                    self.master.destroy()
+                    self.device.start(False)
 
     def openEditor(self):
         self.master.destroy()
