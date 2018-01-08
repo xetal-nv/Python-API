@@ -12,72 +12,77 @@ Command:
     message (in bytes)
    
 Room Size
-    Client -> MOCA
-    0x73 
-    MOCA -> Client
+    Client -> KINSEI
+    0x73
+    KINSEI -> Client
     0x73 Xsize(2) Ysize(2) #corners(1) {corner_X(2) corner_Y(2)}*#corners
-    
+
 Entry/Exit Zones
-    Client -> MOCA
-    0x78 
-    MOCA -> Client
+    Client -> KINSEI
+    0x78
+    KINSEI -> Client
     0x78 #zones(1) {zonetype(1)(Circle = 0, Polygon =1) if circle -> center_X(2) center_Y(2) radius(2) elseif polygon -> #corners [corner_X(2) corner_Y(2)]*#corners}*#zones
 
 Number Of Persons (float number)
-    Client -> MOCA
+    Client -> KINSEI
     0x6E
-    MOCA -> Client
-    0x6E npersons(1) (this value is an unsigned int divide by 10 to get the float number) 
- 
+    KINSEI -> Client
+    0x6E npersons(1) (this value is an unsigned int divide by 10 to get the float number)
+
 Number Of Persons (Fixed number used by the system)
-    Client -> MOCA
+    Client -> KINSEI
     0x6D
-    MOCA -> Client
-    0x6D #persons(1) 
-	!! ERROR !! The current trackingserver has a bug and returns 0x6E #persons(1)
-    
+    KINSEI -> Client
+    0x6D #persons(1)
+
 Persons Position (it is independent from the number of persons but if different (fixed one) it will fallback after a while)
-    Client -> MOCA
-    0x64 
-    MOCA -> Client
-    0x64 #positions(1) {index(2) X(2) Y(2)}*#positions (when a position is not valid the index will be 0xffff) 
-  
+    Client -> KINSEI
+    0x64
+    KINSEI -> Client
+    0x64 #positions(1) {index(2) X(2) Y(2)}*#positions (when a position is not valid the index will be 0xffff)
+
 Online Check
-    Client -> MOCA
+    Client -> KINSEI
     0x74
-    MOCA -> Client
+    KINSEI -> Client
     0x74 online(1) (1 if online)
-    
+
 Online Sensors Check
-    Client -> MOCA
+    Client -> KINSEI
     0x7A
-    MOCA -> Client
+    KINSEI -> Client
     0x7A #sensors(1) {online(1) X(2) Y(2)}*#sensors
-                  
+
 Sensors Battery Level
-    Client -> MOCA
+    Client -> KINSEI
     0x76
-    MOCA -> Client
+    KINSEI -> Client
     0x76 #sensors(1) {Voltage(2)}*#sensors //the voltage must be divided by 100
-    
+
 Fusion Values
-    Client -> MOCA
+    Client -> KINSEI
     0x66
-    MOCA -> Client
+    KINSEI -> Client
     0x66 #cells(1) {index(2) center_x(2) center_y(2) value(1)}*#cells //the value must be divided by 10
 
 Pixel Resolution and pixel size for the thermal map
-    Client -> MOCA
+    Client -> KINSEI
     0x1A
-    MOCA -> Client
+    KINSEI -> Client
     0x1A PixelNumber_X PixelNumber_Y PixelSizeInCm
 
-Thermal map, pixel temperature (multiplied by 10 and trunced)
-    Client -> MOCA
+Thermal map, pixel temperature (multiplied by 10 and truncated)
+    Client -> KINSEI
     0x1B
-    MOCA -> Client
+    KINSEI -> Client
     0x1B #PixelNumber(2) {pixeltemp(2)}*#PixelNumber
-                                    
+
+Thermistors temperature (multiplied by 10 and truncated)
+    Client -> KINSEI
+    0x1C
+    KINSEI -> Client
+    0x1C #Thermistors(1) {temperature(2)}*#Thermistors
+
 Error generic
-    MOCA -> Client     
+    KINSEI -> Client
     0x65

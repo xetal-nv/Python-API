@@ -9,7 +9,7 @@ import math
 __author__ = "Francesco Pessolano"
 __copyright__ = "Copyright 2017, Xetal nv"
 __license__ = "MIT"
-__version__ = "2.3.7"
+__version__ = "2.4.7"
 __maintainer__ = "Francesco Pessolano"
 __email__ = "francesco@xetal.eu"
 __status__ = "release"
@@ -30,7 +30,8 @@ class KinseiSocket(object):
         "fusionValues": b'\x66',
         "thermres": b'\x1A',
         "thermmap": b'\x1B',
-        "error": b'\x65'
+        "thermtemp": b'\x1c',
+        "error": b'\x65',
     }
 
     """ __init__:
@@ -444,6 +445,24 @@ class KinseiSocket(object):
         for i in range(numberPixels):
             pixelTemps.append(self.bytes_to_int([data[2 * i], data[2 * i + 1]]))
         return pixelTemps
+
+    """ getSensorTemperatures:
+    !! available only from trackingserver january2018 !!
+    Returns the pisel temperatures in row order
+
+    False in case of communication error
+    """
+
+    def getSensorTemperatures(self, wait=True):
+        data = self.executeCommand(self.kinseiCommand["thermtemp"], wait)
+        if data == self.kinseiCommand["error"]:
+            return False
+        numberSensors = data[1]
+        sensorTemperatures = []
+        for x in range(numberSensors):
+            singleSensor = [data[2 + 2 * x], data[3 + 2 * x]]
+            sensorTemperatures.append(self.bytes_to_int(singleSensor) / 10)
+        return sensorTemperatures
 
     """
     Internal methods

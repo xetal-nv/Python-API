@@ -68,6 +68,13 @@ def start():
                     positionData = demoKit.getNumberPersonsFloat()
                     if positionData:
                         print("Number of detected people is " + str(positionData) + "\n")
+
+                    # Please comment the code below with __requiredtrackingserver__ older then January 2018
+                    # START
+                    sensorTemoeratures = demoKit.getSensorTemperatures(False)
+                    if sensorTemoeratures:
+                        print("Sensor report temperatures ", ' '.join([str(item) for item in sensorTemoeratures]))
+                    # END
             else:
                 print("There has been an error in communicating with the Kinsei system")
         else:

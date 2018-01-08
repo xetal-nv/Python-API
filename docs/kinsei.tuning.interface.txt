@@ -17,97 +17,97 @@ Command:
     message (in bytes)
 
 Reset Background
-   Client -> MOCA
+   Client -> KINSEI
    0x00
-   MOCA -> Client
+   KINSEI -> Client
    0x00
 
 Get Background Alfa
-   Client -> MOCA
+   Client -> KINSEI
    0x01
-   MOCA -> Client
+   KINSEI -> Client
    0x01 0xYY 0xYY
 
 Set Background Alfa
-   Client -> MOCA
+   Client -> KINSEI
    0x02 0xYY 0xYY
-   MOCA -> Client
+   KINSEI -> Client
    0x02 0xYY 0xYY
 
 Get Background Threshold
-   Client -> MOCA
+   Client -> KINSEI
    0x03
-   MOCA -> Client
+   KINSEI -> Client
    0x03 0xYY 0xYY
 
 Set Background Threshold
-   Client -> MOCA
+   Client -> KINSEI
    0x04 0xYY 0xYY
-   MOCA -> Client
+   KINSEI -> Client
    0x04 0xYY 0xYY
 
 Get Background Temperature Threshold
-   Client -> MOCA
+   Client -> KINSEI
    0x05
-   MOCA -> Client
+   KINSEI -> Client
    0x05 0xYY 0xYY
 
 Set Background Temperature Threshold
-   Client -> MOCA
+   Client -> KINSEI
    0x06 0xYY 0xYY
-   MOCA -> Client
+   KINSEI -> Client
    0x06 0xYY 0xYY
 
 Get Fusion Background Threshold
-   Client -> MOCA
+   Client -> KINSEI
    0x07
-   MOCA -> Client
+   KINSEI -> Client
    0x07 0xYY 0xYY
 
 Set Fusion Background Threshold
-   Client -> MOCA
+   Client -> KINSEI
    0x08 0xYY 0xYY
-   MOCA -> Client
+   KINSEI -> Client
    0x08 0xYY 0xYY
 
 Get Fusion Consensum Factor
-   Client -> MOCA
+   Client -> KINSEI
    0x09
-   MOCA -> Client
+   KINSEI -> Client
    0x09 0xYY 0xYY
 
 Set Fusion Consensum Factor
-   Client -> MOCA
+   Client -> KINSEI
    0x10 0xYY 0xYY
-   MOCA -> Client
+   KINSEI -> Client
    0x10 0xYY 0xYY
 
 Get Fusion Threshold
-   Client -> MOCA
+   Client -> KINSEI
    0x11
-   MOCA -> Client
+   KINSEI -> Client
    0x11 0xYY 0xYY
 
 Set Fusion Threshold
-   Client -> MOCA
+   Client -> KINSEI
    0x12 0xYY 0xYY
-   MOCA -> Client
+   KINSEI -> Client
    0x12 0xYY 0xYY
 
 Save override
-   Client -> MOCA
+   Client -> KINSEI
    0xfe
-   MOCA -> Client
+   KINSEI -> Client
    0xfe
 
 Delete override
-   Client -> MOCA
+   Client -> KINSEI
    0xff
-   MOCA -> Client
+   KINSEI -> Client
    0xff
 
 Reset Offset
-   Client -> MOCA
+   Client -> KINSEI
    0xfd
-   MOCA -> Client
+   KINSEI -> Client
    0xfd
