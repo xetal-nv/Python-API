@@ -16,7 +16,7 @@ from KinseiTuner import *
 __author__ = "Francesco Pessolano"
 __copyright__ = "Copyright 2017, Xetal nv"
 __license__ = "MIT"
-__version__ = "2.0.2"
+__version__ = "2.1.2"
 __maintainer__ = "Francesco Pessolano"
 __email__ = "francesco@xetal.eu"
 __status__ = "release"
@@ -36,18 +36,29 @@ def start():
 
     ipDevice = input("Please enter the device IP: ")
 
-    if is_valid_ip(ipDevice):
+    connectDevice = True
+
+    if not is_valid_ip(ipDevice):
+        ddnsDevice = input("The IP is not valid, is this its DDNS (yes/no)?")
+        if ddnsDevice != "yes":
+            connectDevice = False
+
+    if connectDevice:
         demoKit = KinseiClient.KinseiSocket(ipDevice)
 
         if FWB4july2017 and demoKit.checkIfOnline():
             demoKitTuning = KinseiTuner(ipDevice)
             print("\nCurrent settings of the Kinsei system are:\n")
-            print("Background Alfa:", demoKitTuning.execGet(getCommand["backgroundAlfa"]))
-            print("Background Threshold:", demoKitTuning.execGet(getCommand["backgroundThreshold"]))
-            print("Temperature Threshold:", demoKitTuning.execGet(getCommand["temperatureThreshold"]))
-            print("Fusion Background Threshold:", demoKitTuning.execGet(getCommand["fusionBackgroundThreshold"]))
-            print("Fusion Consensum Factor:", demoKitTuning.execGet(getCommand["fusionConsensumFactor"]))
-            print("Fusion Threshold:", demoKitTuning.execGet(getCommand["fusionThreshold"]))
+            backgroundAlfa = demoKitTuning.execGet(getCommand["backgroundAlfa"])
+            if backgroundAlfa:
+                print("Background Alfa:", backgroundAlfa)
+                print("Background Threshold:", demoKitTuning.execGet(getCommand["backgroundThreshold"]))
+                print("Temperature Threshold:", demoKitTuning.execGet(getCommand["temperatureThreshold"]))
+                print("Fusion Background Threshold:", demoKitTuning.execGet(getCommand["fusionBackgroundThreshold"]))
+                print("Fusion Consensum Factor:", demoKitTuning.execGet(getCommand["fusionConsensumFactor"]))
+                print("Fusion Threshold:", demoKitTuning.execGet(getCommand["fusionThreshold"]))
+            else:
+                print("Either the tunig server is not active or the port has been blocked")
             input("\nPress Enter to continue...")
 
         # check if the system is online before asking data
