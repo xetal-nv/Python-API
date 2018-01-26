@@ -5,6 +5,8 @@
 import sys
 import os
 import re
+import time
+import datetime
 
 absolutePath = os.path.abspath(__file__)
 processRoot = os.path.dirname(absolutePath)
@@ -35,6 +37,17 @@ def start():
     # create a socket connection to the device
 
     ipDevice = input("Please enter the device IP: ")
+    logMode = input("Log mode (y/n)? ")
+
+    if logMode.upper() == 'Y':
+        logMode = True
+        timeLog = input("Logging activity for how many minutes: ")
+        timeLog = round(int(timeLog)*60)
+        fileName = input("Log file name? ")
+        file = open(fileName, 'w')
+    else:
+        logMode = False
+
 
     connectDevice = True
 
@@ -46,20 +59,21 @@ def start():
     if connectDevice:
         demoKit = KinseiClient.KinseiSocket(ipDevice)
 
-        if FWB4july2017 and demoKit.checkIfOnline():
-            demoKitTuning = KinseiTuner(ipDevice)
-            print("\nCurrent settings of the Kinsei system are:\n")
-            backgroundAlfa = demoKitTuning.execGet(getCommand["backgroundAlfa"])
-            if backgroundAlfa:
-                print("Background Alfa:", backgroundAlfa)
-                print("Background Threshold:", demoKitTuning.execGet(getCommand["backgroundThreshold"]))
-                print("Temperature Threshold:", demoKitTuning.execGet(getCommand["temperatureThreshold"]))
-                print("Fusion Background Threshold:", demoKitTuning.execGet(getCommand["fusionBackgroundThreshold"]))
-                print("Fusion Consensum Factor:", demoKitTuning.execGet(getCommand["fusionConsensumFactor"]))
-                print("Fusion Threshold:", demoKitTuning.execGet(getCommand["fusionThreshold"]))
-            else:
-                print("Either the tunig server is not active or the port has been blocked")
-            input("\nPress Enter to continue...")
+        if not logMode:
+            if FWB4july2017 and demoKit.checkIfOnline():
+                demoKitTuning = KinseiTuner(ipDevice)
+                print("\nCurrent settings of the Kinsei system are:\n")
+                backgroundAlfa = demoKitTuning.execGet(getCommand["backgroundAlfa"])
+                if backgroundAlfa:
+                    print("Background Alfa:", backgroundAlfa)
+                    print("Background Threshold:", demoKitTuning.execGet(getCommand["backgroundThreshold"]))
+                    print("Temperature Threshold:", demoKitTuning.execGet(getCommand["temperatureThreshold"]))
+                    print("Fusion Background Threshold:", demoKitTuning.execGet(getCommand["fusionBackgroundThreshold"]))
+                    print("Fusion Consensum Factor:", demoKitTuning.execGet(getCommand["fusionConsensumFactor"]))
+                    print("Fusion Threshold:", demoKitTuning.execGet(getCommand["fusionThreshold"]))
+                else:
+                    print("Either the tuning server is not active or the port has been blocked")
+                if not logMode: input("\nPress Enter to continue...")
 
         # check if the system is online before asking data
         if demoKit.checkIfOnline():
@@ -68,24 +82,48 @@ def start():
             if dimensions:
                 print("\nThe Kinsei system is online. \nRoom size is " + str(dimensions[0]) + "mm by " + str(
                     dimensions[1]) + "mm.\n")
-                print("Starting persons tracking")
-                while True:
+                print("Starting persons tracking\n")
+                if logMode:
+                    file.write("# Data spatial range limited to room dimensions " + str(dimensions[0]) + "mm by " + str(
+                        dimensions[1]) + "mm.\n")
+                    file.write("# Data logged with format timestamp - [position] - number_of_people - [sensor "
+                               "temperatures]\n\n")
+                start_time = time.time()
+                while (not logMode) or (timeLog > time.time() - start_time):
                     # get position data
-                    positionData = demoKit.getPersonsPositions(False)
-                    if positionData:
-                        print("Coordinates of present persons ")
-                        print("\t\t", positionData)
-                    # get the number of people in float mode
-                    positionData = demoKit.getNumberPersonsFloat()
-                    if positionData:
-                        print("Number of detected people is " + str(positionData) + "\n")
+                    positionDataFix = demoKit.getPersonsPositions(False)
+                    positionDataFloat = demoKit.getNumberPersonsFloat(False)
+                    sensorTemperatures = demoKit.getSensorTemperatures(False)
+                    if not logMode:
+                        if positionDataFix:
+                            print("Coordinates of present persons ")
+                            print("\t\t", positionDataFix)
+                        # get the number of people in float mode
+                        if positionDataFloat or positionDataFloat == 0.0:
+                            print("Number of detected people is " + str(positionDataFloat) + "\n")
 
-                    # Please comment the code below with __requiredtrackingserver__ older then January 2018
-                    # START
-                    sensorTemoeratures = demoKit.getSensorTemperatures(False)
-                    if sensorTemoeratures:
-                        print("Sensor report temperatures ", ' '.join([str(item) for item in sensorTemoeratures]))
-                    # END
+                        # Please comment the code below with trackingserver older then January 2018
+                        # START
+                        if sensorTemperatures:
+                            print("Sensor report temperatures ", ' '.join([str(item) for item in sensorTemperatures]))
+                        # END
+                    else:
+                        file.write(str(datetime.datetime.time(datetime.datetime.now())) + ' - ')
+                        if positionDataFix:
+                            file.write('[ ')
+                            for pos in positionDataFix:
+                                file.write('[' + str(pos[0]) + ', ' + str(pos[1]) + '] ')
+                            file.write('] - ')
+                        # get the number of people in float mode
+                        if positionDataFloat or positionDataFloat == 0.0:
+                            file.write(str(positionDataFloat) + " - ")
+                        # Please comment the code below with tracking server older then January 2018
+                        # START
+                        if sensorTemperatures:
+                            file.write('[ ' + ', '.join([str(item) for item in sensorTemperatures]) + ']\n')
+                        # END
+                if logMode: file.close()
+
             else:
                 print("There has been an error in communicating with the Kinsei system")
         else:
