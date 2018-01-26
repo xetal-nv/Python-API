@@ -86,8 +86,8 @@ def start():
                 if logMode:
                     file.write("# Data spatial range limited to room dimensions " + str(dimensions[0]) + "mm by " + str(
                         dimensions[1]) + "mm.\n")
-                    file.write("# Data logged with format timestamp - [position] - number_of_people - [sensor "
-                               "temperatures]\n\n")
+                    file.write("# Data logged with format timestamp - [position in mm] - number_of_people - [sensor "
+                               "temperatures in C]\n\n")
                 start_time = time.time()
                 while (not logMode) or (timeLog > time.time() - start_time):
                     # get position data
