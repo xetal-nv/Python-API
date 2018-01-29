@@ -8,7 +8,7 @@ import time
 __author__ = "Francesco Pessolano"
 __copyright__ = "Copyright 2017, Xetal nv"
 __license__ = "MIT"
-__version__ = "1.0.1"
+__version__ = "1.1.1"
 __maintainer__ = "Francesco Pessolano"
 __email__ = "francesco@xetal.eu"
 __status__ = "release"
@@ -157,8 +157,8 @@ class KinseiSSHclient(object):
     """ readConfiguration:
     Read the kinsei server configuration file"""
 
-    def readConfiguration(self):
-        return self.readFile('TrackingServer.conf')
+    def readConfiguration(self, filename="TrackingServer.conf"):
+        return self.readFile(filename)
 
     """ writeConfiguration:
     Writes a new kinsei server configuration file.
