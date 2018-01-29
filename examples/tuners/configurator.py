@@ -31,6 +31,7 @@ __requiredtrackingserver__ = "july2017 or later"
 # This DICT holds the available configuration commands with type and range
 # 'name parameter' : [range type, min, max]
 parameters = {
+    'CHANNEL': ['num', 0, None],
     'MONITORED_AREA': [None, None, None],
     'SAMPLES_AVERAGE': ['num', 1, None],
     'NOTMONITORED_CZONE': ['', None, None],
