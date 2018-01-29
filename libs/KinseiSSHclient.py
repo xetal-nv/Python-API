@@ -164,17 +164,17 @@ class KinseiSSHclient(object):
     Writes a new kinsei server configuration file.
     The previous file is archived"""
 
-    def writeConfiguration(self, configuration):
+    def writeConfiguration(self, configuration, filename = 'TrackingServer/TrackingServer.conf'):
         if self.connected:
             try:
                 # self.archiveFile('/root/TrackingServer/TrackingServer.conf')
-                self.archiveFile('TrackingServer/TrackingServer.conf')
+                self.archiveFile(filename)
                 conf = configuration.split("\n")
                 # self.sendCommand('rm /root/TrackingServer/TrackingServer.conf')
-                self.sendCommand('rm TrackingServer/TrackingServer.conf')
+                self.sendCommand('rm ' + filename)
                 for line in conf:
                     # self.sendCommand('printf \'' + line + '\n\' >> ' + '/root/TrackingServer/TrackingServer.conf')
-                    self.sendCommand('printf \'' + line + '\n\' >> ' + 'TrackingServer/TrackingServer.conf')
+                    self.sendCommand('printf \'' + line + '\n\' >> ' + filename)
                 return True
             except:
                 pass
